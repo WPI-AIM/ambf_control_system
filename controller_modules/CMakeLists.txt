@@ -8,7 +8,6 @@ project(controller_modules)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  ambf_msgs
   geometry_msgs
   trajectory_msgs
   message_generation
@@ -16,14 +15,11 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
 
-
-
+set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 find_package(GTest REQUIRED)
 
-include_directories( include ${catkin_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS} ${RBDL_MODEL_INCLUDE_DIRS})
-include_directories("../rbdl_model/include/")
-include_directories("../rbdl_server/include/")
+include_directories( include ${catkin_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
 
 ###########
 ## Build ##
@@ -55,7 +51,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES controller_modules
-  CATKIN_DEPENDS ambf_msgs geometry_msgs trajectory_msgs  tf
+  CATKIN_DEPENDS geometry_msgs trajectory_msgs  tf
   #DEPENDS system_lib
 )
 

@@ -5,7 +5,6 @@ endif (POLICY CMP0048)
 project(rbdl_model_test)
 
 find_package(catkin REQUIRED COMPONENTS
-  ambf_msgs
   geometry_msgs
   message_generation
   tf
@@ -15,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package( INCLUDE_DIRS include
   LIBRARIES rbdl_model_test rbdl_model
-  CATKIN_DEPENDS ambf_msgs geometry_msgs
+  CATKIN_DEPENDS  geometry_msgs
   DEPENDS rbdl_model
 )
 

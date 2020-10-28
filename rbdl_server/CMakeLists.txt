@@ -92,7 +92,7 @@ add_dependencies(${PROJECT_NAME}  ${catkin_EXPORTED_TARGETS})
 
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME} ${YAML_CPP_LIBRARIES}  ${AMBF_LIBRARIES} ${Eigen_LIBRARIES} ${RBDL_LIBRARY} ${Boost_LIBRARIES} ${catkin_LIBRARIES} ambf_client)
+target_link_libraries(${PROJECT_NAME} ${YAML_CPP_LIBRARIES} ${Eigen_LIBRARIES} ${RBDL_LIBRARY} ${Boost_LIBRARIES} ${catkin_LIBRARIES} )
 
 set (RBDL_SERVER_INCLUDE_DIRS include)
 set (RBDL_SERVER_LIBRARIES rbdl_server)

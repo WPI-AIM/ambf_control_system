@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   controller_modules
 )
+LIST( APPEND CMAKE_MODULE_PATH ../cmake/)
 
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 find_package(GTest REQUIRED)
