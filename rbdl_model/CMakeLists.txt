@@ -19,8 +19,8 @@ catkin_package( INCLUDE_DIRS include
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/home/shreyas/rbdl/CMake/")
 
 #SET (RBDL_DIR "/home/shreyas/rbdl/examples/simple/")
-LIST( APPEND CMAKE_MODULE_PATH "../cmake/" )
-
+get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
+set (CMAKE_MODULE_PATH ${PARENT_CMAKE} )
 find_package(RBDL REQUIRED)
 include_directories(${RBDL_INCLUDE_DIRS})
 
@@ -28,7 +28,7 @@ FIND_PACKAGE (yaml-cpp REQUIRED)
 FIND_PACKAGE (RBDL REQUIRED)
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 #find_package(RBDL REQUIRED PATHS "/home/shreyas/rbdl/examples/simple/")
-include_directories(include ${YAML_CPP_INCLUDE_DIR} ${Eigen_INCLUDE_DIRS} ${RBDL_INCLUDE_DIR})
+include_directories(include ${YAML_CPP_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Eigen_INCLUDE_DIRS} ${RBDL_INCLUDE_DIR})
 
 
 #set(EXECUTABLE_NAME ${PROJECT_NAME})
@@ -63,7 +63,7 @@ add_dependencies(rbdl_model ${catkin_EXPORTED_TARGETS})
 
 #add_executable (${PROJECT_NAME} ${HDR_FILES} ${SOURCE_FILES})
 ## Specify libraries to link a library or executable target against
-target_link_libraries(rbdl_model ${catkin_LIBRARIES} ${GLFW_LIBRARIES} ${Boost_LIBRARIES} ${Eigen_LIBRARIES} ${RBDL_LIBRARY} ${YAML_CPP_LIBRARIES} pthread)
+target_link_libraries(rbdl_model ${catkin_LIBRARIES} ${GLFW_LIBRARIES} ${Boost_LIBRARIES}  ${Eigen_LIBRARIES} ${RBDL_LIBRARY} ${YAML_CPP_LIBRARIES} pthread)
 
 set (RBDL_MODEL_INCLUDE_DIRS include)
 set (RBDL_MODEL_LIBRARIES rbdl_model)
