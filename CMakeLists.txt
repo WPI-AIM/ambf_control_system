@@ -16,8 +16,8 @@ include_directories(
 )
 
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_model)
-# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_server)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_server)
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_model_test)
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/trajectory_generator)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/controller_modules)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/controller_modules_test)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/controller_modules_test)

@@ -8,7 +8,10 @@ project(rbdl_server)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
-LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR} )
+
+get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
+set (CMAKE_MODULE_PATH ${PARENT_CMAKE} )
+# message(STATUS "foo include dir: " ${PARENT_CMAKE} )
 FIND_PACKAGE (RBDL REQUIRED)
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 FIND_PACKAGE (yaml-cpp REQUIRED)

@@ -15,11 +15,13 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
 
-set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+#set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
+set (CMAKE_MODULE_PATH ${PARENT_CMAKE} )
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 find_package(GTest REQUIRED)
 
-include_directories( include ${catkin_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
+include_directories( include ${catkin_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
 
 ###########
 ## Build ##
@@ -71,7 +73,7 @@ set (HDR_FILES
 ## Declare a C++ library
 add_library(${PROJECT_NAME} ${SRC_FILES} ${HRD_FILES} )
 add_dependencies(${PROJECT_NAME}  ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${Eigen_LIBRARIES} ${catkin_LIBRARIES})
 
 
 find_package (GLFW REQUIRED)
