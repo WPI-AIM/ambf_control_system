@@ -24,7 +24,7 @@ catkin_package( #INCLUDE_DIRS include
 )
 
 include_directories(${controller_modules_INCLUDE_DIRS})
-include_directories( include ${GTEST_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${controller_modules_INCLUDE_DIRS} )
+include_directories( include ${EIGEN3_INCLUDE_DIR} ${Eigen_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${controller_modules_INCLUDE_DIRS} )
 
 include_directories(
   #include
@@ -37,7 +37,7 @@ find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 include_directories (${GLFW_INCLUDE_DIRS})
 
 add_executable (${PROJECT_NAME} src/controller_manager_test.cpp)
-target_link_libraries (${PROJECT_NAME} ${GLFW_LIBRARIES} ${CONTROLLER_MODULES_LIBRARIES} controller_modules)
+target_link_libraries (${PROJECT_NAME} ${GLFW_LIBRARIES}  ${Eigen_LIBRARIES} ${CONTROLLER_MODULES_LIBRARIES} controller_modules)
 
 add_executable (manager_test src/manager_test.cpp)
-target_link_libraries (manager_test ${GLFW_LIBRARIES} ${CONTROLLER_MODULES_LIBRARIES} controller_modules)
+target_link_libraries (manager_test ${GLFW_LIBRARIES}  ${Eigen_LIBRARIES} ${CONTROLLER_MODULES_LIBRARIES} controller_modules)
