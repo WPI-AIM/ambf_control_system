@@ -35,8 +35,8 @@ include_directories(include ${YAML_CPP_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Eige
 #set(EXECUTABLE_NAME rbdl_model)
 
 
-set (RBDL_MODEL_INCLUDE_DIRS include)
-set (RBDL_MODEL_LIBRARIES rbdl_model)
+# set (RBDL_MODEL_INCLUDE_DIRS include)
+# set (RBDL_MODEL_LIBRARIES rbdl_model)
 
 
 #add_executable(${EXECUTABLE_NAME})
@@ -63,11 +63,21 @@ add_dependencies(rbdl_model ${catkin_EXPORTED_TARGETS})
 
 #add_executable (${PROJECT_NAME} ${HDR_FILES} ${SOURCE_FILES})
 ## Specify libraries to link a library or executable target against
-target_link_libraries(rbdl_model ${catkin_LIBRARIES} ${GLFW_LIBRARIES} ${Boost_LIBRARIES}  ${Eigen_LIBRARIES} ${RBDL_LIBRARY} ${YAML_CPP_LIBRARIES} pthread)
+target_link_libraries(rbdl_model ${catkin_LIBRARIES} ${GLFW_LIBRARIES} ${Boost_LIBRARIES} ${Eigen_LIBRARIES} ${RBDL_LIBRARY} ${YAML_CPP_LIBRARIES} pthread)
 
 set (RBDL_MODEL_INCLUDE_DIRS include)
 set (RBDL_MODEL_LIBRARIES rbdl_model)
 
+# install(
+#   TARGETS ${PROJECT_NAME}
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
+# )
+# install(
+#   DIRECTORY include/${PROJECT_NAME}/
+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+# )
 
 #find_package (GLFW REQUIRED)
 #find_package (Boost COMPONENTS program_options filesystem REQUIRED)

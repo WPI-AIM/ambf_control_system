@@ -14,6 +14,7 @@ RBDLServer::RBDLServer(ros::NodeHandle* nodehandle):nh_(*nodehandle)
      Jac_srv = nh_.advertiseService("Jacobian", &RBDLServer::Jacobian_srv, this);
      Kin_srv = nh_.advertiseService("ForwardKinimatics", &RBDLServer::ForwardKinimatics_srv, this);
      ROS_INFO("RBDL server running");
+     ros::spinOnce;
 }
 
 RBDLServer::~RBDLServer()
@@ -35,11 +36,14 @@ RigidBodyDynamics::Model* RBDLServer::getModel()
 bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server::RBDLModelResponse& res) //parses the AMBF model into  rbdl model
 {
 
-    // std::string actuator_config_file;
-    // BuildRBDLModel  buildRBDLModel(actuator_config_file);
-    // body_ids = buildRBDLModel.getRBDLBodyToIDMap();
-    // *model = buildRBDLModel.getRBDLModel();
-    // buildRBDLModel.cleanUp();
+    ROS_INFO("Parsing");
+    std::string actuator_config_file = req.model;
+;
+    BuildRBDLModel  buildRBDLModel(actuator_config_file);
+    body_ids = buildRBDLModel.getRBDLBodyToIDMap();
+    *model = buildRBDLModel.getRBDLModel();
+    buildRBDLModel.cleanUp();
+    ROS_INFO("Parsed");
 
     return true;
 }
