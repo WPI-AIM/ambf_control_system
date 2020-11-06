@@ -14,13 +14,25 @@ include_directories(
 # include
 # ${catkin_INCLUDE_DIRS}
 )
+include_directories (${PROJECT_SOURCE_DIR}/external/Eigen)
 
+# static library external dependencies source files
+file (GLOB_RECURSE source_eigen     RELATIVE ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/external/Eigen/Eigen/*)
+
+# group source files (MSVC likes this)
+foreach (FILE ${source} ${source_eigen})
+  get_filename_component (PARENT_DIR "${FILE}" PATH)
+  string (REGEX REPLACE "(\\./)?(src|include)/?" "" GROUP "${PARENT_DIR}")
+  string (REPLACE "/" "\\" GROUP "${GROUP}")
+  source_group ("${GROUP}" FILES "${FILE}")
+endforeach ()
 
 # output location
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_model)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_model_test)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_server)
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_model_test)
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/trajectory_generator)
