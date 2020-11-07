@@ -5,14 +5,15 @@
 BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) {
     actuator_config_file_ = actuator_config_file;
 
-    try{
+    try {
         baseNode_ = YAML::LoadFile(actuator_config_file_);
 
-    }catch (std::exception &e){
+    } catch (std::exception &e){
         std::cerr << "[Exception]: " << e.what() << std::endl;
         std::cerr << "ERROR! FAILED TO ACTUATOR CONFIG: " << actuator_config_file_ << std::endl;
         return;
     }
+
     if (baseNode_.IsNull()) return;
 
     this->getNamespace();
@@ -191,23 +192,12 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
     double mass = (bodyParamObjectMap_[child_name])->Mass();
     Vector3d com = (bodyParamObjectMap_[child_name])->InertialOffsetOrientation();
     Vector3d inertia = (bodyParamObjectMap_[child_name])->Inertia();
-//    std::cout << "child_name: " << child_name << ": inertia: " << inertia[0] << ", " << inertia[1] << ", " << inertia[2] << std::endl;
 
     Body child_body = Body(mass, com, inertia);
 
     // Create RBDL Joint between parent and child
     std::string joint_type_str = (jointParamObjectMap_[parent_name][joint_name])->Type();
     RigidBodyDynamics::JointType joint_type = getRBDLJointType(joint_type_str);
-    std::cout << "joint_type_str: " << joint_type_str << ", joint_type: " << joint_type << std::endl;
-
-//    Vector3d parent_axis = (jointParamObjectMap_[parent_name][joint_name])->ParentAxis();
-//    std::cout << "parent_axis : " << parent_axis [0] << ", " << parent_axis[1] << ", " << parent_axis[2] << std::endl;
-//    Joint rbdl_joint = Joint(joint_type, parent_axis);
-
-
-
-//    joint_type = JointType6DoF;
-//    std::cout << "joint_type: " << joint_type << std::endl;
 
     // Get Child transformation and rotation w.r.t parent
     Vector3d child_translation = (jointParamObjectMap_[parent_name][joint_name])->ParentPivot();
@@ -294,26 +284,10 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
                  << std::endl;
         throw Errors::RBDLError(errormsg.str());
     }
-//    std::cout << "joint_type: " << joint_type << ", rbdl_joint.mJointType: " << rbdl_joint.mJointType << std::endl;
     // Create RBDL ID for parent to child
-
     SpatialTransform child_tf(body_rotation, child_translation);
 
-//    std::cout << "parent_id: " << parent_id << std::endl;
-//    std::cout << "child_body: " << std::endl;
-//    std::cout << child_translation(2) << std::endl;
-
     unsigned int child_id = RBDLmodel_->AddBody(parent_id, child_tf, rbdl_joint, child_body);
-
-//    Matrix3_t body_rotation_trial;
-//    body_rotation_trial <<  0., 0., 1.,
-//                            0., -1., 0.,
-//                            1., 0., 0.;
-
-//    Vector3d child_translation_trial(0.,0.,0.);
-//    SpatialTransform child_tf_trial(body_rotation_trial, child_translation_trial);
-
-//    RBDLmodel_->AddBody(parent_id, child_tf_trial, rbdl_joint, child_body, "abc");
 
     return child_id;
 }
