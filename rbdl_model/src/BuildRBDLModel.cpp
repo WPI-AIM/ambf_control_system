@@ -145,38 +145,38 @@ bool BuildRBDLModel::buildModel() {
 
     unsigned int root_id = addBodyToRBDL(root_parent_name_, 0, root_joint_name_, rootRigidBody_);
 
-//    rbdlObjectMap_.insert(std::make_pair(rootRigidBody_, root_id));
+    rbdlObjectMap_.insert(std::make_pair(rootRigidBody_, root_id));
 
-//    ancestry_set.emplace(rootRigidBody_);
-//    while(!ancestry_set.empty()) {
-//        ancestry_set_itr = ancestry_set.begin();
-//        std::string parent_name = *ancestry_set_itr;
-//        ancestry_set.erase(*ancestry_set_itr);
+    ancestry_set.emplace(rootRigidBody_);
+    while(!ancestry_set.empty()) {
+        ancestry_set_itr = ancestry_set.begin();
+        std::string parent_name = *ancestry_set_itr;
+        ancestry_set.erase(*ancestry_set_itr);
 
-//        outter_map_itr = jointParamObjectMap_.find(parent_name);
-//        if(outter_map_itr != jointParamObjectMap_.end()) {
-//            unsigned int parent_id = rbdlObjectMap_[parent_name];
-//            std::cout << "parent_name: " << parent_name << ", parent_id: " << parent_id << ", its children: ";
-//            for (inner_map_itr = outter_map_itr->second.begin(); inner_map_itr != outter_map_itr->second.end(); inner_map_itr++) {
+        outter_map_itr = jointParamObjectMap_.find(parent_name);
+        if(outter_map_itr != jointParamObjectMap_.end()) {
+            unsigned int parent_id = rbdlObjectMap_[parent_name];
+            std::cout << "parent_name: " << parent_name << ", parent_id: " << parent_id << ", its children: ";
+            for (inner_map_itr = outter_map_itr->second.begin(); inner_map_itr != outter_map_itr->second.end(); inner_map_itr++) {
 
-//                std::string child_name = inner_map_itr->second->Child();
-//                std::cout << child_name << ", ";
+                std::string child_name = inner_map_itr->second->Child();
+                std::cout << child_name << ", ";
 
-//                // Create RBDL Joint between parent and child
-//                std::string joint_name = inner_map_itr->first;
-//                unsigned int child_id = addBodyToRBDL(parent_name, parent_id, joint_name, child_name);
+                // Create RBDL Joint between parent and child
+                std::string joint_name = inner_map_itr->first;
+                unsigned int child_id = addBodyToRBDL(parent_name, parent_id, joint_name, child_name);
 
 
-//                rbdl_object_map_itr_ = rbdlObjectMap_.find((child_name));
-//                if(rbdl_object_map_itr_ == rbdlObjectMap_.end()) {
-//                    ancestry_set.emplace(child_name);
-//                    rbdlObjectMap_.insert(std::make_pair(child_name, child_id));
-//                }
-//            }
-//            std::cout << std::endl;
-//        }
+                rbdl_object_map_itr_ = rbdlObjectMap_.find((child_name));
+                if(rbdl_object_map_itr_ == rbdlObjectMap_.end()) {
+                    ancestry_set.emplace(child_name);
+                    rbdlObjectMap_.insert(std::make_pair(child_name, child_id));
+                }
+            }
+            std::cout << std::endl;
+        }
 
-//    }
+    }
 
     std::cout << "rbdlObjectMap: " << std::endl;
     for(rbdl_object_map_itr_ = rbdlObjectMap_.begin(); rbdl_object_map_itr_ != rbdlObjectMap_.end(); rbdl_object_map_itr_++) {
@@ -197,8 +197,8 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 
     // Create RBDL Joint between parent and child
     std::string joint_type_str = (jointParamObjectMap_[parent_name][joint_name])->Type();
-    RigidBodyDynamics::JointType joint_type; /*= getRBDLJointType(joint_type_str);*/
-//    std::cout << "joint_type: " << joint_type << std::endl;
+    RigidBodyDynamics::JointType joint_type = getRBDLJointType(joint_type_str);
+    std::cout << "joint_type_str: " << joint_type_str << ", joint_type: " << joint_type << std::endl;
 
 //    Vector3d parent_axis = (jointParamObjectMap_[parent_name][joint_name])->ParentAxis();
 //    std::cout << "parent_axis : " << parent_axis [0] << ", " << parent_axis[1] << ", " << parent_axis[2] << std::endl;
@@ -206,8 +206,12 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 
 
 
-    joint_type = JointType6DoF;
-    std::cout << "joint_type: " << joint_type << std::endl;
+//    joint_type = JointType6DoF;
+//    std::cout << "joint_type: " << joint_type << std::endl;
+
+    // Get Child transformation and rotation w.r.t parent
+    Vector3d child_translation = (jointParamObjectMap_[parent_name][joint_name])->ParentPivot();
+    Matrix3_t body_rotation = (jointParamObjectMap_[parent_name][joint_name])->BodyRotation();
 
     Joint rbdl_joint;
     if(joint_type == JointTypeUndefined) {
@@ -218,14 +222,11 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
               joint_type == JointTypeTranslationXYZ) {
         rbdl_joint = Joint (joint_type);
     } else if(joint_type == JointTypeCustom ) {
-        // This needs to be parsed in YAML file
         int degreesOfFreedom = 0;
         rbdl_joint = Joint (joint_type, degreesOfFreedom);
     } else if(joint_type == JointTypeRevolute || joint_type == JointTypePrismatic) {
         Vector3d parent_axis = (jointParamObjectMap_[parent_name][joint_name])->ParentAxis();
-        std::cout << "parent_axis : " << parent_axis [0] << ", " << parent_axis[1] << ", " << parent_axis[2] << std::endl;
         rbdl_joint = Joint(joint_type, parent_axis);
-        std::cout << "after joint creation" << std::endl;
     } else if(joint_type == JointTypeRevoluteX || joint_type == JointTypeRevoluteY || joint_type == JointTypeRevoluteZ || joint_type == JointTypeHelical) {
         //Get this value from yaml. hardcoding it for testing
 //        1 DoF joint with the given motion subspaces.
@@ -244,9 +245,10 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
         //Get this value from yaml. hardcoding it for testing
 //        3 DoF joint with the given motion subspaces.
 //        \f[ (r_x, r_y, r_z, t_x, t_y, t_z) \f]
-        const Math::SpatialVector axis_0 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_1 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_2 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
+        //Body rotaion used to create create Joint as well as child_tf - check this to be right implementation
+        const Math::SpatialVector axis_0 = Math::SpatialVector(body_rotation(0, 0), body_rotation(0, 1), body_rotation(0, 2), 0., 0., 0.);
+        const Math::SpatialVector axis_1 = Math::SpatialVector(body_rotation(1, 0), body_rotation(1, 1), body_rotation(2, 2), 0., 0., 0.);
+        const Math::SpatialVector axis_2 = Math::SpatialVector(body_rotation(2, 0), body_rotation(2, 1), body_rotation(2, 2), 0., 0., 0.);
 
         rbdl_joint = Joint(axis_0, axis_1, axis_2);
     } else if(joint_type == JointType4DoF) {
@@ -285,16 +287,20 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
     } else if(joint_type == JointTypeFloatingBase || joint_type == JointTypeFixed) {
 //        std::cout << "inside else - joint_type: " << joint_type << std::endl;
         rbdl_joint = Joint(joint_type);
+    } else {
+        std::ostringstream errormsg;
+        errormsg <<
+                 "Error: Unsupported Joint type defined"
+                 << std::endl;
+        throw Errors::RBDLError(errormsg.str());
     }
-    std::cout << "joint_type: " << joint_type << ", rbdl_joint.mJointType: " << rbdl_joint.mJointType << std::endl;
+//    std::cout << "joint_type: " << joint_type << ", rbdl_joint.mJointType: " << rbdl_joint.mJointType << std::endl;
     // Create RBDL ID for parent to child
-    Vector3d child_translation = (jointParamObjectMap_[parent_name][joint_name])->ParentPivot();
-    Matrix3_t body_rotation = (jointParamObjectMap_[parent_name][joint_name])->BodyRotation();
 
     SpatialTransform child_tf(body_rotation, child_translation);
 
-    std::cout << "parent_id: " << parent_id << std::endl;
-    std::cout << "child_body: " << std::endl;
+//    std::cout << "parent_id: " << parent_id << std::endl;
+//    std::cout << "child_body: " << std::endl;
 //    std::cout << child_translation(2) << std::endl;
 
     unsigned int child_id = RBDLmodel_->AddBody(parent_id, child_tf, rbdl_joint, child_body);
@@ -309,14 +315,13 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 
 //    RBDLmodel_->AddBody(parent_id, child_tf_trial, rbdl_joint, child_body, "abc");
 
-//    return child_id;
-    return 0;
+    return child_id;
 }
 
 const RigidBodyDynamics::JointType BuildRBDLModel::getRBDLJointType(std::string joint_type) {
     if (joint_type == "undefined") return JointTypeUndefined; //Not supported
-    else if (joint_type == "revolute") return JointTypeRevolute; //Tested with hard coded values
-    else if (joint_type == "prismatic") return JointTypePrismatic; //Tested with hard coded values
+    else if (joint_type == "revolute") return JointTypeRevolute; //Tested with YAML file and works
+    else if (joint_type == "prismatic") return JointTypePrismatic; //Tested with YAML file and works
     else if (joint_type == "revoluteX") return JointTypeRevoluteX; //Tested with hard coded values
     else if (joint_type == "revolutey") return JointTypeRevoluteY; //Tested with hard coded values
     else if (joint_type == "revoluteZ") return JointTypeRevoluteZ; //Tested with hard coded values
@@ -330,7 +335,7 @@ const RigidBodyDynamics::JointType BuildRBDLModel::getRBDLJointType(std::string 
     else if (joint_type == "helical") return JointTypeHelical; //Tested with hard coded values
     else if (joint_type == "1dof") return JointType1DoF; //Not supported
     else if (joint_type == "2dof") return JointType2DoF; //Tested with hard coded values
-    else if (joint_type == "3dof") return JointType3DoF; //Tested with hard coded values
+    else if (joint_type == "p2p") return JointType3DoF; //Tested with YAML file and works
     else if (joint_type == "4dof") return JointType4DoF; //Tested with hard coded values
     else if (joint_type == "5dof") return JointType5DoF; //Tested with hard coded values
     else if (joint_type == "6dof") return JointType6DoF; //Tested with hard coded values
