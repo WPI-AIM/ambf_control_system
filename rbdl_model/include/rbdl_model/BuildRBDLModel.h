@@ -11,6 +11,7 @@
 #include <rbdl/rbdl_math.h>
 #include <sstream>
 #include <unordered_set>
+#include <vector>
 
 using namespace RigidBodyDynamics;
 using namespace Math;
@@ -38,12 +39,16 @@ public:
 
     std::unordered_map<std::string, unsigned int> inline getRBDLBodyToIDMap() { return rbdlObjectMap_; }
     Model inline getRBDLModel() { return *RBDLmodel_; }
+    std::string inline getBaseRigidBody() { return baseRigidBody_; }
+
+    std::vector<std::string> getAllBodyNames();
+
 private:
     void getNamespace();
     bool getBodies();
     bool getJoints();
-    bool findRootNode();
-    void addDummyRootJoint();
+    bool findBaseNode();
+    void addDummyBaseJoint();
 
     bool buildBodyTree();
     bool buildModel();
@@ -51,10 +56,10 @@ private:
     std::string blender_namespace_;
     YAML::Node baseNode_;
     std::string actuator_config_file_;
-    std::string rootRigidBody_;
+    std::string baseRigidBody_;
 
-    const std::string root_parent_name_ = "world";
-    std::string root_joint_name_;
+    const std::string base_parent_name_ = "world";
+    std::string base_joint_name_;
     Model *RBDLmodel_ = NULL;
 
     std::unordered_map<std::string, bodyParamPtr> bodyParamObjectMap_;

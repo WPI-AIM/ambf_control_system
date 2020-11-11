@@ -4,31 +4,37 @@ if (POLICY CMP0048)
 endif (POLICY CMP0048)
 project(rbdl_model_test)
 
+
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
   #ambf_msgs
-  #geometry_msgs
-  #message_generation
-  #tf
+  geometry_msgs
+  message_generation
+  tf
   rbdl_model
+  std_msgs
+)
+
+generate_messages(
+ DEPENDENCIES
+ geometry_msgs
+ std_msgs
+ #ambf_msgs
 )
 
 
 catkin_package( INCLUDE_DIRS include
   LIBRARIES rbdl_model_test rbdl_model
-  CATKIN_DEPENDS #ambf_msgs geometry_msgs
+  CATKIN_DEPENDS
+  #ambf_msgs
+  geometry_msgs message_runtime std_msgs
   DEPENDS rbdl_model
 )
-
-include_directories(${rbdl_model_INCLUDE_DIRS})
-include_directories( include ${catkin_INCLUDE_DIRS} ${RBDL_MODEL_INCLUDE_DIRS})
 
 FIND_PACKAGE (yaml-cpp REQUIRED)
 #FIND_PACKAGE (RBDL REQUIRED)
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 include_directories(include ${YAML_CPP_INCLUDE_DIR} ${Eigen_INCLUDE_DIRS} ${RBDL_INCLUDE_DIR})
-
-
-
 
 include_directories( include ${catkin_INCLUDE_DIRS})
 include_directories(RBDL_MODEL_INCLUDE_DIRS)
@@ -40,23 +46,37 @@ LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../cmake )
 FIND_PACKAGE (UnitTest++ REQUIRED)
 INCLUDE_DIRECTORIES (${UNITTEST++_INCLUDE_DIR})
 
+FIND_PACKAGE (ambf_client REQUIRED)
+include_directories(${AMBF_CLIENT_INCLUDE_DIR})
+MESSAGE(STATUS "Found AMBF: ${AMBF_CLIENT_INCLUDE_DIR}")
+
+FIND_PACKAGE (ambf_msgs REQUIRED)
+include_directories(${ambf_msgs_INCLUDE_DIR})
+MESSAGE(STATUS "Found AMBF MSGS: ${ambf_msgs_INCLUDE_DIR}")
+
+
+find_package (Boost COMPONENTS program_options filesystem REQUIRED)
+
+include_directories(${rbdl_model_INCLUDE_DIRS}  ${AMBF_CLIENT_INCLUDE_DIRS})
+include_directories( include ${catkin_INCLUDE_DIRS} ${RBDL_MODEL_INCLUDE_DIRS})
+
+
 set (HDR_FILES
     include/${PROJECT_NAME}/rbdl_model_test.h)
 
 set(SOURCE_FILES
     src/rbdl_model_test.cpp
-    src/main.cpp
+#     src/main.cpp
     )
 
 
 set (PSM_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/PsmBodyTests.h)
+    include/${PROJECT_NAME}/RBDLBodyTests.h )
 
 set(PSM_TESTS_SOURCE_FILES
-    src/PsmBodyTests.cpp
-    src/main.cpp
+    src/RBDLBodyTests.cpp
+#    src/main.cpp
     )
-
 
 find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
@@ -71,14 +91,14 @@ include_directories (${GLFW_INCLUDE_DIRS})
 
 SET_TARGET_PROPERTIES ( ${PROJECT_EXECUTABLES} PROPERTIES
   LINKER_LANGUAGE CXX
-  OUTPUT_NAME runtests
+  OUTPUT_NAME rbdl_psm_tests
   )
 
-ADD_EXECUTABLE ( rbdl_tests ${PSM_TESTS_HDR_FILES} ${PSM_TESTS_SOURCE_FILES} )
+ADD_EXECUTABLE ( rbdl_psm_tests ${PSM_TESTS_HDR_FILES} ${PSM_TESTS_SOURCE_FILES} )
 
-SET_TARGET_PROPERTIES ( rbdl_tests PROPERTIES
+SET_TARGET_PROPERTIES ( rbdl_psm_tests PROPERTIES
   LINKER_LANGUAGE CXX
-  OUTPUT_NAME runtests
+  OUTPUT_NAME rbdl_psm_tests
   )
 
 SET (RBDL_LIBRARY rbdl)
@@ -86,7 +106,8 @@ IF (RBDL_BUILD_STATIC)
   SET (RBDL_LIBRARY rbdl-static)
 ENDIF (RBDL_BUILD_STATIC)
 
-TARGET_LINK_LIBRARIES ( rbdl_tests
+TARGET_LINK_LIBRARIES ( rbdl_psm_tests
+  ${AMBF_CLIENT_LIBRARY}
   ${GLFW_LIBRARIES}
   ${Boost_LIBRARIES}
   ${Eigen_LIBRARIES}
