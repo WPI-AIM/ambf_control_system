@@ -42,6 +42,9 @@ public:
     std::string inline getBaseRigidBody() { return baseRigidBody_; }
 
     std::vector<std::string> getAllBodyNames();
+    unsigned int getBodyId(std::string bodyName);
+//    bodyParamPtr getBodyParamPtr(std::string bodyName);
+//    std::unordered_map<std::string, jointParamPtr> getJointChildren(std::string parent);
 
 private:
     void getNamespace();

@@ -328,6 +328,35 @@ std::vector<std::string> BuildRBDLModel::getAllBodyNames() {
     return bodyNames;
 }
 
+unsigned int BuildRBDLModel::getBodyId(std::string bodyName) {
+    if (rbdlObjectMap_.find(bodyName) != rbdlObjectMap_.end()){
+        return rbdlObjectMap_[bodyName];
+    }
+    std::cout << "Body: " << bodyName << " not found in the model" << std::endl;
+
+    return -1;
+}
+
+//bodyParamPtr BuildRBDLModel::getBodyParamPtr(std::string bodyName) {
+//    if(bodyParamObjectMap_.find(bodyName) != bodyParamObjectMap_.end()) {
+//        return bodyParamObjectMap_[bodyName];
+//    }
+//    std::cout << "Body: " << bodyName << " not found in the model" << std::endl;
+//    return nullptr;
+//}
+
+
+//std::unordered_map<std::string, jointParamPtr> BuildRBDLModel::getJointChildren(std::string parent) {
+//    if(jointParamObjectMap_.find(parent) != jointParamObjectMap_.end()) {
+//        return jointParamObjectMap_[parent];
+//    }
+
+//    std::cout << "Parent: " << parent << " does not have any children in the model" << std::endl;
+
+////    return std::unordered_map<std::string, jointParamPtr>();
+//    return {};
+//}
+
 void BuildRBDLModel::printBody() {
     std::unordered_map<std::string, bodyParamPtr>::iterator body_map_itr;
     for (body_map_itr = bodyParamObjectMap_.begin(); body_map_itr != bodyParamObjectMap_.end(); body_map_itr++) {
