@@ -12,15 +12,18 @@
 #include <sstream>
 #include <unordered_set>
 #include <vector>
+#include <boost/optional.hpp>
+#include <rbdl_model/RBDLModelErrors.h>
 
 using namespace RigidBodyDynamics;
 using namespace Math;
 using namespace RigidBodyDynamics::Math;
-
 //------------------------------------------------------------------------------
 typedef BodyParam* bodyParamPtr;
 typedef JointParam* jointParamPtr;
-typedef RigidBodyDynamics::Body* rbdlBodyptr;
+typedef RigidBodyDynamics::Body rbdlBody;
+typedef RigidBodyDynamics::Joint rbdlJoint;
+typedef RigidBodyDynamics::JointType rbdlJointType;
 //------------------------------------------------------------------------------
 
 class BuildRBDLModel
@@ -42,8 +45,9 @@ public:
     std::string inline getBaseRigidBody() { return baseRigidBody_; }
 
     std::vector<std::string> getAllBodyNames();
-    unsigned int getBodyId(std::string bodyName);
-//    bodyParamPtr getBodyParamPtr(std::string bodyName);
+    unsigned int getBodyId(const std::string bodyName);
+
+    boost::optional<rbdlBody> getRBDLBody(const std::string bodyName);
 //    std::unordered_map<std::string, jointParamPtr> getJointChildren(std::string parent);
 
 private:
@@ -74,8 +78,13 @@ private:
     std::unordered_map<std::string, unsigned int> ::iterator rbdl_object_map_itr_;
 
 
-    const RigidBodyDynamics::JointType getRBDLJointType(std::string joint_type);
+    const rbdlJointType getRBDLJointType(std::string joint_type);
     unsigned int addBodyToRBDL(std::string parent_name, unsigned int parent_id, std::string joint_name, std::string child_name);
+
+    // Below Maps are used for Getters only. They dont play a role in model creation.
+//    std::unordered_map<std::string, rbdlBody> rbdlBodyMap_;
+    std::unordered_map<std::string, boost::optional<rbdlBody>> rbdlBodyMap_;
+
 };
 
 #endif // PARSE_YAML_H

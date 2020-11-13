@@ -48,6 +48,7 @@ set (HDR_FILES
     include/${PROJECT_NAME}/BodyParam.h
     include/${PROJECT_NAME}/JointParam.h
     include/${PROJECT_NAME}/BuildRBDLModel.h
+    include/${PROJECT_NAME}/RBDLModelErrors.h
 )
 
 set(SOURCE_FILES
@@ -55,6 +56,7 @@ set(SOURCE_FILES
     src/BodyParam.cpp
     src/JointParam.cpp
     src/BuildRBDLModel.cpp
+    src/RBDLModelErrors.cpp
 #    src/main.cpp
     )
 

@@ -44,7 +44,8 @@ void testPrep() {
 
 TEST ( TestComputeSpatialInertiaFromAbsoluteRadiiGyration ) {
     //    testPrep();
-    const std::string actuator_config_file = "/localcodebase/ambfnags92/ambf/ambf_models/descriptions/multi-bodies/robots/blender-kuka.yaml";
+//    const std::string actuator_config_file = "/localcodebase/ambfnags92/ambf/ambf_models/descriptions/multi-bodies/robots/blender-kuka.yaml";
+    const std::string actuator_config_file = "/localcodebase/ambf_addon_updated/KUKA/blender-kuka.yaml";
     BuildRBDLModelPtr buildRBDLModelPtr = new BuildRBDLModel (actuator_config_file);
 
     std::string baseRigidBody = buildRBDLModelPtr->getBaseRigidBody();
@@ -55,9 +56,19 @@ TEST ( TestComputeSpatialInertiaFromAbsoluteRadiiGyration ) {
         std::cout << bodyName << std::endl;
     }
 
-    std::string bodyName = bodyNames[4];
+    const std::string bodyName = "link1";
     std::cout << "ID for body: " << bodyName << ", is " << buildRBDLModelPtr->getBodyId(bodyName) << std::endl;
+    boost::optional<rbdlBody> bodyBoostRbdlBody = buildRBDLModelPtr->getRBDLBody(bodyName);
+    rbdlBody bodyRbdlBody =bodyBoostRbdlBody.get();
+    Matrix3_t body_inertia = bodyRbdlBody.mInertia;
 
+    std::cout << body_inertia(0,0) << ", " << body_inertia(0,1) << ", " << body_inertia(0,2) << ", "
+              << body_inertia(0,1) << ", " << body_inertia(1,1) << ", " << body_inertia(1,2) << ", "
+              << body_inertia(0,2) << ", " << body_inertia(1,2) << ", " << body_inertia(2,2) << ", "
+              << std::endl;
+
+
+    CHECK_CLOSE(1.0, bodyRbdlBody.mMass, TEST_PREC);
 //    bodyParamPtr rootBodyParamPtr = buildRBDLModelPtr->getBodyParamPtr(bodyName);
 //    double mass = rootBodyParamPtr->Mass();
 
@@ -83,28 +94,28 @@ TEST ( TestComputeSpatialInertiaFromAbsoluteRadiiGyration ) {
 
     //    tf::Quaternion rot = baselink_handler->get_rot();
     //    std::cout << rot[0] << ", " << rot[1] << ", " << rot[2] << ", " << rot[3] << std::endl;
-    Body body(1.1, Vector3d (1.5, 1.2, 1.3), Vector3d (1.4, 2., 3.));
+//    Body body(1.1, Vector3d (1.5, 1.2, 1.3), Vector3d (1.4, 2., 3.));
 
-    Matrix3d inertia_C (
-      1.4, 0., 0.,
-      0., 2., 0.,
-      0., 0., 3.);
+//    Matrix3d inertia_C (
+//      1.4, 0., 0.,
+//      0., 2., 0.,
+//      0., 0., 3.);
 
-    SpatialMatrix reference_inertia (
-      4.843, -1.98, -2.145, 0, -1.43, 1.32,
-      -1.98, 6.334, -1.716, 1.43, 0, -1.65,
-      -2.145, -1.716, 7.059, -1.32, 1.65, 0,
-      0, 1.43, -1.32, 1.1, 0, 0,
-      -1.43, 0, 1.65, 0, 1.1, 0,
-      1.32, -1.65, 0, 0, 0, 1.1
-      );
+//    SpatialMatrix reference_inertia (
+//      4.843, -1.98, -2.145, 0, -1.43, 1.32,
+//      -1.98, 6.334, -1.716, 1.43, 0, -1.65,
+//      -2.145, -1.716, 7.059, -1.32, 1.65, 0,
+//      0, 1.43, -1.32, 1.1, 0, 0,
+//      -1.43, 0, 1.65, 0, 1.1, 0,
+//      1.32, -1.65, 0, 0, 0, 1.1
+//      );
 
     //	cout << LogOutput.str() << endl;
 
-    SpatialRigidBodyInertia body_rbi = SpatialRigidBodyInertia::createFromMassComInertiaC (body.mMass, body.mCenterOfMass, body.mInertia);
+//    SpatialRigidBodyInertia body_rbi = SpatialRigidBodyInertia::createFromMassComInertiaC (body.mMass, body.mCenterOfMass, body.mInertia);
 
-    CHECK_ARRAY_CLOSE (reference_inertia.data(), body_rbi.toMatrix().data(), 36, TEST_PREC);
-    CHECK_ARRAY_CLOSE (inertia_C.data(), body.mInertia.data(), 9, TEST_PREC);
+//    CHECK_ARRAY_CLOSE (reference_inertia.data(), body_rbi.toMatrix().data(), 36, TEST_PREC);
+//    CHECK_ARRAY_CLOSE (inertia_C.data(), body.mInertia.data(), 9, TEST_PREC);
 
     //  buildRBDLModelPtr_->cleanUp();
     //  rbdlTestsPrep->~RbdlTestsPrep();

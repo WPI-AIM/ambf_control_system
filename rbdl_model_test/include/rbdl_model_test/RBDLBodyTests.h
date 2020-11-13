@@ -20,7 +20,7 @@ typedef Client* ClientPtr;
 
 
 
-const double TEST_PREC = 1.0e-14;
+const double TEST_PREC = 1.0e-7;
 
 //class PSMBodyTests
 //{

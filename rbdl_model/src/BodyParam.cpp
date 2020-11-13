@@ -6,7 +6,18 @@ BodyParam::BodyParam(YAML::Node bodyNode)
     Utilities utilities;
 
     YAML::Node name = bodyNode["name"];
-    if(name.IsDefined()) name_ = utilities.trimTrailingSpaces(name);
+//    if(name.IsDefined()) name_ = utilities.trimTrailingSpaces(name);
+    if(name.IsDefined()) {
+        name_ = utilities.trimTrailingSpaces(name);
+    } else {
+      throw RBDLModel::ModelErrors::RBDLModelMissingParameterError("Error: Missing Body Name which is a mandate field to build RBDL Model. Terminating model creation!\n");
+//        std::ostringstream errormsg;
+//        errormsg <<
+//                 "Error: FAILED TO ACTUATOR CONFIG: " + actuator_config_file_
+//                 << std::endl;
+//        throw RBDLModel::ModelErrors::RBDLModelInvalidFilePathError(errormsg.str());
+    }
+
 
     YAML::Node mass = bodyNode["mass"];
     if(mass.IsDefined()) mass_ = mass.as<double>();
