@@ -20,6 +20,7 @@ public:
     Vector3d toXYZ(YAML::Node* node);
     Vector3d toRPY(YAML::Node* node);
     Vector3d toXYZInertia(YAML::Node* node);
+    Math::Matrix3d vectorToMatrix3d(YAML::Node* node);
     Matrix3_t toRotation(YAML::Node* node);
 
     std::string trimTrailingSpaces(YAML::Node bodyNode);

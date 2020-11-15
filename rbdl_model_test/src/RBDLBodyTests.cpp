@@ -60,7 +60,7 @@ TEST ( TestComputeSpatialInertiaFromAbsoluteRadiiGyration ) {
     std::cout << "ID for body: " << bodyName << ", is " << buildRBDLModelPtr->getBodyId(bodyName) << std::endl;
     boost::optional<rbdlBody> bodyBoostRbdlBody = buildRBDLModelPtr->getRBDLBody(bodyName);
     rbdlBody bodyRbdlBody =bodyBoostRbdlBody.get();
-    Matrix3_t body_inertia = bodyRbdlBody.mInertia;
+    Math::Matrix3d body_inertia = bodyRbdlBody.mInertia;
 
     std::cout << body_inertia(0,0) << ", " << body_inertia(0,1) << ", " << body_inertia(0,2) << ", "
               << body_inertia(0,1) << ", " << body_inertia(1,1) << ", " << body_inertia(1,2) << ", "

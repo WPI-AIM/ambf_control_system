@@ -35,6 +35,25 @@ Vector3d Utilities::toXYZ(YAML::Node* node){
     return v;
 }
 
+Math::Matrix3d Utilities::vectorToMatrix3d(YAML::Node* node) {
+//    Matrix3_t m;
+    Math::Matrix3d m;
+//    mInertia(0, 0) = 0.0;
+
+    m(0, 0) = (*node)["ix"].as<double>();
+    m(0, 1) = 0.0;
+    m(0, 2) = 0.0;
+
+    m(1, 0) = 0.0;
+    m(1, 1) = (*node)["iy"].as<double>();
+    m(1, 2) = 0.0;
+
+    m(2, 0) = 0.0;
+    m(2, 1) = 0.0;
+    m(2, 2) = (*node)["iz"].as<double>();
+
+    return m;
+}
 
 ///
 /// \brief toVector3d
