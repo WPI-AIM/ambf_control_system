@@ -14,7 +14,7 @@ BodyParam::BodyParam(YAML::Node bodyNode)
     mass_ = mass.as<double>();
     if(mass_ == 0.0) mass_ = 0.0000001;
 
-    YAML::Node inertia = bodyNode["inertia"];
+    YAML::Node inertia = bodyNode["body_inertia"];
     if(!inertia.IsDefined()) throwExceptionMessage("inertia in Body Params");
 //    inertia_ = utilities.toXYZInertia(&inertia);
     inertia_ = utilities.vectorToMatrix3d(&inertia);
