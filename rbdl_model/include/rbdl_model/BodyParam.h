@@ -12,7 +12,9 @@ public:
     BodyParam(YAML::Node bodyNode);
     ~BodyParam(void);
     inline double Mass() { return mass_; }
+    inline Vector3d InertialOffsetPosition() { return inertial_offset_position_; }
     inline Vector3d InertialOffsetOrientation() { return inertial_offset_orientation_; }
+
     inline Math::Matrix3d Inertia() { return inertia_; }
 
 private:

@@ -196,7 +196,7 @@ bool BuildRBDLModel::buildModel() {
 unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned int parent_id, std::string joint_name, std::string child_name) {
     // Create RBDL body for child joint
     double mass = (bodyParamObjectMap_[child_name])->Mass();
-    Vector3d com = (bodyParamObjectMap_[child_name])->InertialOffsetOrientation();
+    Vector3d com = (bodyParamObjectMap_[child_name])->InertialOffsetPosition();
     Math::Matrix3d inertia = (bodyParamObjectMap_[child_name])->Inertia();
 
     boost::optional<rbdlBody> child_body = Body(mass, com, inertia);

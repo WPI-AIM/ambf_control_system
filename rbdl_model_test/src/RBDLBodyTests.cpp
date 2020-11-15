@@ -60,15 +60,19 @@ TEST ( TestComputeSpatialInertiaFromAbsoluteRadiiGyration ) {
     std::cout << "ID for body: " << bodyName << ", is " << buildRBDLModelPtr->getBodyId(bodyName) << std::endl;
     boost::optional<rbdlBody> bodyBoostRbdlBody = buildRBDLModelPtr->getRBDLBody(bodyName);
     rbdlBody bodyRbdlBody =bodyBoostRbdlBody.get();
-    Math::Matrix3d body_inertia = bodyRbdlBody.mInertia;
 
-    std::cout << body_inertia(0,0) << ", " << body_inertia(0,1) << ", " << body_inertia(0,2) << ", "
-              << body_inertia(0,1) << ", " << body_inertia(1,1) << ", " << body_inertia(1,2) << ", "
-              << body_inertia(0,2) << ", " << body_inertia(1,2) << ", " << body_inertia(2,2) << ", "
-              << std::endl;
+    const Math::Vector3d com_yaml(0.0, -0.0169, 0.1342);
 
+    const Math::Matrix3d inertia_yaml (
+    0.0453,     0.0,    0.0,
+    0.0,        0.0446, 0.0,
+    0.0,        0.0,    0.0041
+    );
 
     CHECK_CLOSE(1.0, bodyRbdlBody.mMass, TEST_PREC);
+    CHECK_ARRAY_CLOSE(inertia_yaml.data(), bodyRbdlBody.mInertia.data(), 9, TEST_PREC);
+    CHECK_ARRAY_CLOSE(com_yaml.data(), bodyRbdlBody.mCenterOfMass.data(), 3, TEST_PREC);
+    CHECK_ARRAY_CLOSE(inertia_yaml.data(), bodyRbdlBody.mInertia.data(), 9, TEST_PREC);
 //    bodyParamPtr rootBodyParamPtr = buildRBDLModelPtr->getBodyParamPtr(bodyName);
 //    double mass = rootBodyParamPtr->Mass();
 
