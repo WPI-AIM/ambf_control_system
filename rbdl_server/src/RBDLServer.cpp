@@ -42,7 +42,8 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
     BuildRBDLModel  buildRBDLModel(actuator_config_file);
     body_ids = buildRBDLModel.getRBDLBodyToIDMap();
     *model = buildRBDLModel.getRBDLModel();
-    buildRBDLModel.cleanUp();
+    //buildRBDLModel.cleanUp();
+    have_model = true;
     ROS_INFO("Parsed");
 
     return true;
@@ -162,7 +163,7 @@ bool RBDLServer::ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest& req, 
     {
         key = body.first;
         id = body.second;
-        fk = CalcBodyToBaseCoordinates(*model, Q, id, point, false);
+        fk = CalcBodyToBaseCoordinates(*model, Q, id, point, true);
         current_point.x = fk(0);
         current_point.y = fk(1);
         current_point.z = fk(2);
