@@ -42,7 +42,8 @@ void testPrep() {
     std::cout << "Inside test Prep" << std::endl;
 }
 
-TEST ( TestComputeSpatialInertiaFromAbsoluteRadiiGyration ) {
+/*
+TEST ( TestRBBLBodyToYAML ) {
     //    testPrep();
 //    const std::string actuator_config_file = "/localcodebase/ambfnags92/ambf/ambf_models/descriptions/multi-bodies/robots/blender-kuka.yaml";
     const std::string actuator_config_file = "/localcodebase/ambf_addon_updated/KUKA/blender-kuka.yaml";
@@ -127,9 +128,51 @@ TEST ( TestComputeSpatialInertiaFromAbsoluteRadiiGyration ) {
     buildRBDLModelPtr->~BuildRBDLModel();
     //  clientPtr->cleanUp();
 }
+*/
 
+TEST ( TestRBBLBodyToAMBF ) {
+    ClientPtr clientPtr = new Client();
+    clientPtr->connect();
+    usleep(20000);
+
+    string base = "base";
+    // cout << "psm_baselink: " << psm_baselink << "\n";
+//    rigidBodyPtr base_handler = clientPtr->getARigidBody(base, true);
+//    usleep(250000);
+//    base_handler->set_joint_pos(0, 0.0);
+//    std::cout << "get_num_joints(): " << base_handler->get_num_joints() << std::endl;
+
+//    usleep(100000);
+//    tf::Vector3 base_inertia(0.0, 0.0, 0.0);
+//    base_inertia = base_handler->get_inertia();
+
+//    std::cout << "base_inertia: " << base_inertia[0] << ", " << base_inertia[1] << ", " << base_inertia[2] << std::endl;
+
+    string link1 = "link1";
+    rigidBodyPtr link1_handler = clientPtr->getARigidBody(link1, true);
+    usleep(250000);
+//    base_handler->set_joint_pos(0, 0.0);
+//    std::cout << "get_num_joints(): " << base_handler->get_num_joints() << std::endl;
+
+//    usleep(100000);
+    std::cout << "link1_mass: " << link1_handler->get_mass() << std::endl;
+    tf::Vector3 link1_inertia(0.0, 0.0, 0.0);
+    link1_inertia = link1_handler->get_inertia();
+    std::cout << "link1_inertia: " << link1_inertia[0] << ", " << link1_inertia[1] << ", " << link1_inertia[2] << std::endl;
+
+
+}
 
 int main(int argc, char **argv) {
+
+//     usleep(1000000);
+
+
+
+//    clientPtr->cleanUp();
+//    Client client;
+//    client.connect();
+//    client.cleanUp();
     rbdl_check_api_version (RBDL_API_VERSION);
 
     if (argc > 1) {
@@ -139,5 +182,12 @@ int main(int argc, char **argv) {
         rbdl_print_version();
     }
 
-    return UnitTest::RunAllTests ();
+//    return UnitTest::RunAllTests ();
+//    UnitTest::Test* UnitTestTestPtr;
+//    UnitTest::Test TestRBBLBodyToYAML_test("TestRBBLBodyToYAML");
+//    UnitTest::TestList testList;
+//    testList.Add(new UnitTest::Test("TestRBBLBodyToYAML"));
+
+    return UnitTest::RunAllTests();
+
 }
