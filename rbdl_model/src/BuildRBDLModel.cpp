@@ -35,8 +35,6 @@ void BuildRBDLModel::getNamespace() {
 
     YAML::Node blender_namespace = baseNode_["namespace"];
     if(blender_namespace.IsDefined())  blender_namespace_ = utilities.trimTrailingSpaces(blender_namespace);
-
-//    std::cout << blender_namespace_ << std::endl;
 }
 
 

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 if (POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif (POLICY CMP0048)
-project(rbdl_model_test)
+project(rbdl_model_tests)
 
 
 find_package(catkin REQUIRED COMPONENTS
@@ -24,7 +24,7 @@ generate_messages(
 
 
 catkin_package( INCLUDE_DIRS include
-  LIBRARIES rbdl_model_test rbdl_model
+  LIBRARIES rbdl_model_tests rbdl_model
   CATKIN_DEPENDS
   #ambf_msgs
   geometry_msgs message_runtime std_msgs
@@ -66,16 +66,19 @@ set (HDR_FILES
 
 set(SOURCE_FILES
     src/rbdl_model_test.cpp
-#     src/main.cpp
+    #src/main.cpp
     )
 
 
 set (RBDL_MODEL_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/RBDLBodyTests.h )
+#    include/${PROJECT_NAME}/RBDLBodyTests.h
+    include/${PROJECT_NAME}/RBDLTestPrep.h
+    )
 
 set(RBDL_MODEL_TESTS_SOURCE_FILES
     src/RBDLBodyTests.cpp
-#    src/main.cpp
+    src/RBDLTestPrep.cpp
+    src/main.cpp
     )
 
 find_package (GLFW REQUIRED)

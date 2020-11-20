@@ -1,4 +1,4 @@
-#include "rbdl_model_test/RBDLBodyTests.h"
+#include "rbdl_model_tests/RBDLTestPrep.h"
 
 //PSMBodyTests::PSMBodyTests()
 //{
@@ -37,10 +37,6 @@
  */
 
 
-
-void testPrep() {
-    std::cout << "Inside test Prep" << std::endl;
-}
 
 /*
 TEST ( TestRBBLBodyToYAML ) {
@@ -131,63 +127,45 @@ TEST ( TestRBBLBodyToYAML ) {
 */
 
 TEST ( TestRBBLBodyToAMBF ) {
-    ClientPtr clientPtr = new Client();
+    const string bodyName = "link1";
+
+    BuildRBDLModelPtr buildRBDLModelPtr = RBDLTestPrep::getInstance()->getRBDLModelInstance();
+    boost::optional<rbdlBody> bodyBoostRbdlBody = buildRBDLModelPtr->getRBDLBody(bodyName);
+    rbdlBody bodyRbdlBody = bodyBoostRbdlBody.get();
+
+
+    ClientPtr clientPtr = RBDLTestPrep::getInstance()->getAMBFClientInstance();
     clientPtr->connect();
-    usleep(20000);
+//    usleep(20000);
 
-    string base = "base";
-    // cout << "psm_baselink: " << psm_baselink << "\n";
-//    rigidBodyPtr base_handler = clientPtr->getARigidBody(base, true);
-//    usleep(250000);
-//    base_handler->set_joint_pos(0, 0.0);
-//    std::cout << "get_num_joints(): " << base_handler->get_num_joints() << std::endl;
 
-//    usleep(100000);
-//    tf::Vector3 base_inertia(0.0, 0.0, 0.0);
-//    base_inertia = base_handler->get_inertia();
-
-//    std::cout << "base_inertia: " << base_inertia[0] << ", " << base_inertia[1] << ", " << base_inertia[2] << std::endl;
-
-    string link1 = "link1";
-    rigidBodyPtr link1_handler = clientPtr->getARigidBody(link1, true);
+    rigidBodyPtr body_handler = clientPtr->getARigidBody(bodyName, true);
     usleep(250000);
+
+//    std::cout << "get_num_joints(): " << body_handler->get_num_joints() << std::endl;
+
+    float body_mass = body_handler->get_mass();
+
+    tf::Vector3 body_inertia(0.0, 0.0, 0.0);
+    body_inertia = body_handler->get_inertia();
+
+    CHECK_CLOSE(body_mass, bodyRbdlBody.mMass, TEST_PREC);
+
+}
+
+
+
+//TEST ( TestRBBLJointToAMBF ) {
+////    Singleton::instance().Test();
+//    RBDLTestPrep::getInstance()->getTime();
+//    ClientPtr clientPtr = RBDLTestPrep::getInstance()->getAMBFClientInstance();
+//    clientPtr->connect();
+
+//    string base = "base";
+//    rigidBodyPtr base_handler = clientPtr->getARigidBody(base, true);
+//    usleep(350000);
+
 //    base_handler->set_joint_pos(0, 0.0);
 //    std::cout << "get_num_joints(): " << base_handler->get_num_joints() << std::endl;
 
-//    usleep(100000);
-    std::cout << "link1_mass: " << link1_handler->get_mass() << std::endl;
-    tf::Vector3 link1_inertia(0.0, 0.0, 0.0);
-    link1_inertia = link1_handler->get_inertia();
-    std::cout << "link1_inertia: " << link1_inertia[0] << ", " << link1_inertia[1] << ", " << link1_inertia[2] << std::endl;
-
-
-}
-
-int main(int argc, char **argv) {
-
-//     usleep(1000000);
-
-
-
-//    clientPtr->cleanUp();
-//    Client client;
-//    client.connect();
-//    client.cleanUp();
-    rbdl_check_api_version (RBDL_API_VERSION);
-
-    if (argc > 1) {
-      std::string arg (argv[1]);
-
-      if (arg == "-v" || arg == "--version")
-        rbdl_print_version();
-    }
-
-//    return UnitTest::RunAllTests ();
-//    UnitTest::Test* UnitTestTestPtr;
-//    UnitTest::Test TestRBBLBodyToYAML_test("TestRBBLBodyToYAML");
-//    UnitTest::TestList testList;
-//    testList.Add(new UnitTest::Test("TestRBBLBodyToYAML"));
-
-    return UnitTest::RunAllTests();
-
-}
+//}

@@ -1,26 +1,7 @@
 #ifndef PSMBODYTESTS_H
 #define PSMBODYTESTS_H
 
-#include <UnitTest++.h>
-#include <UnitTest++/UnitTest++.h>
-#include "rbdl/rbdl_mathutils.h"
-#include "rbdl/Body.h"
-#include "rbdl_model/BuildRBDLModel.h"
-#include "ambf_client/ambf_client.h"
 
-using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
-
-
-//------------------------------------------------------------------------------
-typedef BuildRBDLModel* BuildRBDLModelPtr;
-typedef Client* ClientPtr;
-//------------------------------------------------------------------------------
-
-
-
-const double TEST_PREC = 1.0e-7;
 
 //class PSMBodyTests
 //{
