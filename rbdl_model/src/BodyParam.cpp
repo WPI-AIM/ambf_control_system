@@ -6,16 +6,16 @@ BodyParam::BodyParam(YAML::Node bodyNode)
     Utilities utilities;
 
     YAML::Node name = bodyNode["name"];
-    if(!name.IsDefined()) throwExceptionMessage("name in Body Params");
+    if(!name.IsDefined()) utilities.throwExceptionMessage("name in Body Params");
     name_ = utilities.trimTrailingSpaces(name);
 
     YAML::Node mass = bodyNode["mass"];
-    if(!mass.IsDefined())  throwExceptionMessage("mass in Body Params");
+    if(!mass.IsDefined()) utilities.throwExceptionMessage("mass in Body Params");
     mass_ = mass.as<double>();
     if(mass_ == 0.0) mass_ = 0.0000001;
 
     YAML::Node inertia = bodyNode["inertia"];
-    if(!inertia.IsDefined()) throwExceptionMessage("inertia in Body Params");
+    if(!inertia.IsDefined()) utilities.throwExceptionMessage("inertia in Body Params");
 //    inertia_ = utilities.toXYZInertia(&inertia);
     inertia_ = utilities.vectorToMatrix3d(&inertia);
 
@@ -36,14 +36,14 @@ BodyParam::BodyParam(YAML::Node bodyNode)
 
 
     YAML::Node inertial_offset = bodyNode["inertial offset"];
-    if(!inertial_offset.IsDefined()) throwExceptionMessage("inertia offset in Body Params");
+    if(!inertial_offset.IsDefined()) utilities.throwExceptionMessage("inertia offset in Body Params");
 
     YAML::Node inertial_offset_position = inertial_offset["position"];
-    if(!inertial_offset_position.IsDefined()) throwExceptionMessage("inertia offset position in Body Params");
+    if(!inertial_offset_position.IsDefined()) utilities.throwExceptionMessage("inertia offset position in Body Params");
     inertial_offset_position_ = utilities.toXYZ(&inertial_offset_position);
 
     YAML::Node inertial_offset_orientation = inertial_offset["orientation"];
-    if(!inertial_offset_orientation.IsDefined()) throwExceptionMessage("inertia offset orientation in Body Params");
+    if(!inertial_offset_orientation.IsDefined()) utilities.throwExceptionMessage("inertia offset orientation in Body Params");
     inertial_offset_orientation_ = utilities.toRPY(&inertial_offset_orientation);
 
 
@@ -72,9 +72,9 @@ BodyParam::BodyParam(YAML::Node bodyNode)
     utilities.~Utilities();
 }
 
-void BodyParam::throwExceptionMessage(const std::string message) {
-    throw RBDLModel::ModelErrors::RBDLModelMissingParameterError("Error: Missing " + message + " which is mandate field to build RBDL Model. Terminating model creation!\n");
-}
+//void BodyParam::throwExceptionMessage(const std::string message) {
+//    throw RBDLModel::ModelErrors::RBDLModelMissingParameterError("Error: Missing " + message + " which is mandate field to build RBDL Model. Terminating model creation!\n");
+//}
 
 BodyParam::~BodyParam() {
 

@@ -2,7 +2,7 @@
 #define BODYPARAM_H
 #include <iostream>
 #include <rbdl_model/Utilities.h>
-#include<rbdl_model/RBDLModelErrors.h>
+
 
 using namespace RBDLModel;
 
@@ -39,7 +39,7 @@ private:
 //    double damping_linear_{0.0};
 
     std::string trimTrailingSpaces(YAML::Node bodyNode);
-    void throwExceptionMessage(const std::string message);
+//    void throwExceptionMessage(const std::string message);
 
 };
 

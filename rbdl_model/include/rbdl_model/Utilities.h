@@ -6,6 +6,7 @@
 #include <iostream>
 #include "rbdl/rbdl_math.h"
 #include <algorithm>
+#include<rbdl_model/RBDLModelErrors.h>
 
 using namespace RigidBodyDynamics;
 using namespace Math;
@@ -25,7 +26,7 @@ public:
     std::string trimTrailingSpaces(YAML::Node bodyNode);
     void eraseSubStr(std::string & mainStr, const std::string & toErase);
     void eraseAllSubStr(std::string & mainStr, const std::string & toErase);
-
+    void throwExceptionMessage(const std::string message);
     ~Utilities(void);
 };
 

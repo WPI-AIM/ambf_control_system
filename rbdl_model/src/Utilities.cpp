@@ -130,6 +130,11 @@ void Utilities::eraseAllSubStr(std::string & mainStr, const std::string & toEras
     }
 }
 
+
+void Utilities::throwExceptionMessage(const std::string message) {
+    throw RBDLModel::ModelErrors::RBDLModelMissingParameterError("Error: Missing " + message + " which is mandate field to build RBDL Model. Terminating model creation!\n");
+}
+
 Utilities::~Utilities(void) {
 
 }

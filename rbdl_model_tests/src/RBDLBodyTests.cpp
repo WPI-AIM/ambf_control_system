@@ -1,40 +1,5 @@
 #include "rbdl_model_tests/RBDLTestPrep.h"
 
-//PSMBodyTests::PSMBodyTests()
-//{
-
-
-
-////    buildRBDLModel_(actuator_config_file);
-//    //    buildRBDLModel.printBody();
-
-//    //    buildRBDLModel.printJoint();
-////        buildRBDLModel.cleanUp();
-//    buildRBDLModelPtr_ = new BuildRBDLModel(actuator_config_file_);
-
-////    client_.connect();
-
-////    client_.printSummary();
-////    string psm_baselink = "psm/baselink";
-////    cout << "psm_baselink: " << psm_baselink << "\n";
-////    psm_baselink_handler_ = client_.getARigidBody(psm_baselink, true);
-////    usleep(1000000);
-
-//}
-
-
-//PSMBodyTests::~PSMBodyTests(void){
-//    buildRBDLModelPtr_->cleanUp();
-//}
-
-
-//void PSMBodyTests::cleanUp(){
-//    buildRBDLModelPtr_->cleanUp();
-//}
-
-/* Tests whether the spatial inertia matches the one specified by its
- * parameters
- */
 
 
 
@@ -126,46 +91,29 @@ TEST ( TestRBBLBodyToYAML ) {
 }
 */
 
-TEST ( TestRBBLBodyToAMBF ) {
-    const string bodyName = "link1";
+//TEST ( TestRBBLBodyToAMBF ) {
+//    const string bodyName = "link1";
 
-    BuildRBDLModelPtr buildRBDLModelPtr = RBDLTestPrep::getInstance()->getRBDLModelInstance();
-    boost::optional<rbdlBody> bodyBoostRbdlBody = buildRBDLModelPtr->getRBDLBody(bodyName);
-    rbdlBody bodyRbdlBody = bodyBoostRbdlBody.get();
-
-
-    ClientPtr clientPtr = RBDLTestPrep::getInstance()->getAMBFClientInstance();
-    clientPtr->connect();
-//    usleep(20000);
+//    BuildRBDLModelPtr buildRBDLModelPtr = RBDLTestPrep::getInstance()->getRBDLModelInstance();
+//    boost::optional<rbdlBody> bodyBoostRbdlBody = buildRBDLModelPtr->getRBDLBody(bodyName);
+//    rbdlBody bodyRbdlBody = bodyBoostRbdlBody.get();
 
 
-    rigidBodyPtr body_handler = clientPtr->getARigidBody(bodyName, true);
-    usleep(250000);
-
-//    std::cout << "get_num_joints(): " << body_handler->get_num_joints() << std::endl;
-
-    float body_mass = body_handler->get_mass();
-
-    tf::Vector3 body_inertia(0.0, 0.0, 0.0);
-    body_inertia = body_handler->get_inertia();
-
-    CHECK_CLOSE(body_mass, bodyRbdlBody.mMass, TEST_PREC);
-
-}
-
-
-
-//TEST ( TestRBBLJointToAMBF ) {
-////    Singleton::instance().Test();
-//    RBDLTestPrep::getInstance()->getTime();
 //    ClientPtr clientPtr = RBDLTestPrep::getInstance()->getAMBFClientInstance();
 //    clientPtr->connect();
+////    usleep(20000);
 
-//    string base = "base";
-//    rigidBodyPtr base_handler = clientPtr->getARigidBody(base, true);
-//    usleep(350000);
 
-//    base_handler->set_joint_pos(0, 0.0);
-//    std::cout << "get_num_joints(): " << base_handler->get_num_joints() << std::endl;
+//    rigidBodyPtr body_handler = clientPtr->getARigidBody(bodyName, true);
+//    usleep(250000);
+
+////    std::cout << "get_num_joints(): " << body_handler->get_num_joints() << std::endl;
+
+//    float body_mass = body_handler->get_mass();
+
+//    tf::Vector3 body_inertia(0.0, 0.0, 0.0);
+//    body_inertia = body_handler->get_inertia();
+
+//    CHECK_CLOSE(body_mass, bodyRbdlBody.mMass, TEST_PREC);
 
 //}

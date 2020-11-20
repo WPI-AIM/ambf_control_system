@@ -77,6 +77,7 @@ set (RBDL_MODEL_TESTS_HDR_FILES
 
 set(RBDL_MODEL_TESTS_SOURCE_FILES
     src/RBDLBodyTests.cpp
+    src/RBDLJointTests.cpp
     src/RBDLTestPrep.cpp
     src/main.cpp
     )
