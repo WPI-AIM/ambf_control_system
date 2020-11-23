@@ -6,7 +6,7 @@ class JointParam
 {
 public:
     JointParam(YAML::Node jointNode);
-    JointParam(std::string name, std::string parent_name, std::string child, Vector3d parent_axis, Vector3d parent_pivot, std::string type);
+    JointParam(std::string name, std::string parent_name, std::string child, Vector3d parent_axis, Vector3d parent_pivot, std::string type, Matrix3_t body_rotation);
 
     ~JointParam(void);
 

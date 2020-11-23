@@ -15,6 +15,19 @@
 #include <thread>
 #include <chrono>
 
+
+#include <UnitTest++.h>
+
+#include "rbdl/rbdl_mathutils.h"
+#include "rbdl/Logging.h"
+
+#include "rbdl/Model.h"
+#include "rbdl/Kinematics.h"
+#include "rbdl/Dynamics.h"
+#include "rbdl/Constraints.h"
+#include <vector>
+
+
 using namespace std;
 using namespace RigidBodyDynamics;
 using namespace RigidBodyDynamics::Math;

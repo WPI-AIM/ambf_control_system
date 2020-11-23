@@ -5,11 +5,6 @@
 
 /*
 TEST ( TestRBBLBodyToYAML ) {
-    //    testPrep();
-//    const std::string actuator_config_file = "/localcodebase/ambfnags92/ambf/ambf_models/descriptions/multi-bodies/robots/blender-kuka.yaml";
-    const std::string actuator_config_file = "/localcodebase/ambf_addon_updated/KUKA/blender-kuka.yaml";
-    BuildRBDLModelPtr buildRBDLModelPtr = new BuildRBDLModel (actuator_config_file);
-
     std::string baseRigidBody = buildRBDLModelPtr->getBaseRigidBody();
 
     std::vector<std::string> bodyNames = buildRBDLModelPtr->getAllBodyNames();

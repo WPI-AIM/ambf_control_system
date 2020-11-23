@@ -38,7 +38,6 @@ public:
     ~BuildRBDLModel(void);
 
     std::unordered_map<std::string, bodyParamPtr> inline getRBDLBodyToObjectMap() { return bodyParamObjectMap_; }
-    std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr>> inline getRBDLJointToObjectMap() { return jointParamObjectMap_; }
 
     std::unordered_map<std::string, unsigned int> inline getRBDLBodyToIDMap() { return rbdlObjectMap_; }
     Model inline getRBDLModel() { return *RBDLmodel_; }
@@ -48,7 +47,7 @@ public:
     unsigned int getBodyId(const std::string bodyName);
 
     boost::optional<rbdlBody> getRBDLBody(const std::string bodyName);
-//    std::unordered_map<std::string, jointParamPtr> getJointChildren(std::string parent);
+    std::unordered_map<std::string, jointParamPtr> getJointChildren(std::string parent);
 
 private:
     void getNamespace();
@@ -59,6 +58,8 @@ private:
 
     bool buildBodyTree();
     bool buildModel();
+    bool buildModelTrial();
+    bool buildModelTrialKuka();
 
     std::string blender_namespace_;
     YAML::Node baseNode_;
