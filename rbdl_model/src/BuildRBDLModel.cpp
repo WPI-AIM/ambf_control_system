@@ -140,8 +140,8 @@ void BuildRBDLModel::addDummyBaseJoint() {
     std::string joint_type = "fixed";
 
     // Create RBDL ID for Base
-    Vector3d parent_axis(0., 0., 0.);
-    Vector3d parent_pivot(0., 0., 0.);
+    Vector3d parent_axis(0.0, 0.0, 0.0);
+    Vector3d parent_pivot(0.0, 0.0, 0.0);
     Matrix3_t body_rotation(
                 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0,
@@ -318,17 +318,47 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 
     boost::optional<rbdlBody> child_body = Body(mass, com, inertia);
 
+    Vector3d parent_pivot = (jointParamObjectMap_[parent_name][joint_name])->ParentPivot();
+    Vector3d parent_axis = (jointParamObjectMap_[parent_name][joint_name])->ParentAxis();
+//    std::cout << "parent_pivot: " << parent_pivot[0] << ", " << parent_pivot[1] << ", " << parent_pivot[2] << std::endl;
+
     rbdlBodyMap_.insert(std::make_pair(child_name, child_body));
 
     // Create RBDL Joint between parent and child
     std::string joint_type_str = (jointParamObjectMap_[parent_name][joint_name])->Type();
+    rbdlJointType joint_type = getRBDLJointType(joint_type_str);
+//    std::cout << "child: " << child_name << ", joint_type_str: " << joint_type_str << ", joint_type: " << joint_type << ", parent: " << parent_name << std::endl;
+
+    rbdlJoint joint_rot_z;
+
+    if(joint_type == JointTypeFixed || joint_type == JointTypeFixed) {
+        joint_rot_z = SpatialVector (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+    } else if (joint_type == JointTypeRevolute || joint_type == JointType3DoF) {
+        joint_rot_z = SpatialVector (parent_axis[0], parent_axis[1], parent_axis[2], 0.0, 0.0, 0.0);
+    } else if (joint_type == JointTypePrismatic) {
+        joint_rot_z = SpatialVector (0.0, 0.0, 0.0, parent_axis[0], parent_axis[1], parent_axis[2]);
+    }
+
+    unsigned int child_id;
+    // check if the body is base
+    if(parent_id == 0) {
+        child_id = RBDLmodel_->AddBody(parent_id, Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
+    } else {
+        child_id = RBDLmodel_->AppendBody(Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
+    }
+//     unsigned int child_id = RBDLmodel_->AddBody(parent_id,  child_tf, rbdl_joint, child_body.get());
+//    unsigned int fixed_body_id = model.AppendBody (Xtrans(Vector3d(0., 1., 0.)), Joint(JointTypeFixed), fixed_body);
+//    unsigned int child_id = RBDLmodel_->AddBody(parent_id,  child_tf, rbdl_joint, child_body.get());
+
+    /*
     rbdlJointType joint_type = getRBDLJointType(joint_type_str);
 
     // Get Child transformation and rotation w.r.t parent
     Vector3d child_translation = (jointParamObjectMap_[parent_name][joint_name])->ParentPivot();
     Matrix3_t body_rotation = (jointParamObjectMap_[parent_name][joint_name])->BodyRotation();
 
-    rbdlJoint rbdl_joint;
+
 
 //    std::cout << "joint_type_str: " << joint_type_str << ", joint_type: " << joint_type << std::endl;
 //    std::cout << "child_translation: " << child_translation[0] << ", " << child_translation[1] << ", " << child_translation[2] << std::endl;
@@ -418,13 +448,18 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
                  << std::endl;
         throw Errors::RBDLError(errormsg.str());
     }
-    // Create RBDL ID for parent to child
-    SpatialTransform child_tf(body_rotation, child_translation);
+    */
 
-//    unsigned int child_id = RBDLmodel_->AddBody(parent_id, child_tf, rbdl_joint, child_body);
-    unsigned int child_id = RBDLmodel_->AddBody(parent_id,  child_tf, rbdl_joint, child_body.get());
 
-//    std::cout << "####################################################" << std::endl;
+
+
+//    // Create RBDL ID for parent to child
+//    SpatialTransform child_tf(body_rotation, child_translation);
+
+////    unsigned int child_id = RBDLmodel_->AddBody(parent_id, child_tf, rbdl_joint, child_body);
+//    unsigned int child_id = RBDLmodel_->AddBody(parent_id,  child_tf, rbdl_joint, child_body.get());
+
+////    std::cout << "####################################################" << std::endl;
     return child_id;
 //    return 0;
 }

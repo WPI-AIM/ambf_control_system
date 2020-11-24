@@ -41,6 +41,9 @@
 
 TEST( TestRBDLForwardKinematics ) {
     BuildRBDLModelPtr rbdlModelPtr = RBDLTestPrep::getInstance()->getRBDLModelInstance();
+
+
+
 //    std::vector<std::string> bodyNames = rbdlModelPtr->getAllBodyNames();
 
 //    for(std::string bodyName : bodyNames) {
@@ -86,7 +89,7 @@ TEST( TestRBDLForwardKinematics ) {
 //    unsigned int body_id = model.GetBodyId("link1");
 //    std:cout << "model.GetBodyName(1): " << body_id << std::endl;
 
-    Eigen::PlainObjectBase<Eigen::Matrix<double, 3, 3> >::Scalar* E = model.X_base[2].E.data();
+    Eigen::PlainObjectBase<Eigen::Matrix<double, 3, 3> >::Scalar* E = model.X_base[4].E.data();
     std::cout << "FK value E: "
               << E[0, 0] << ", " << E[0, 1] << ", " << E[0, 2] << ", "
               << E[1, 0] << ", " << E[1, 1] << ", " << E[1, 2] << ", "
@@ -95,4 +98,5 @@ TEST( TestRBDLForwardKinematics ) {
     Eigen::PlainObjectBase<Eigen::Matrix<double, 3, 1> >::Scalar* r = model.X_base[2].r.data();
     std::cout << "FK value r: "
               << r[0, 0] << ", " << r[0, 1] << ", " << r[0, 2] << std::endl;
+
 }
