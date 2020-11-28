@@ -58,8 +58,6 @@ private:
 
     bool buildBodyTree();
     bool buildModel();
-    bool buildModelTrial();
-    bool buildModelTrialKuka();
 
     std::string blender_namespace_;
     YAML::Node baseNode_;

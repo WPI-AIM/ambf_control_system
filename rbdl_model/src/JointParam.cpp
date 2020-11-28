@@ -51,11 +51,6 @@ JointParam::JointParam(YAML::Node jointNode)
 //    YAML::Node passive = jointNode["passive"];
 //    if(passive.IsDefined()) passive_ = passive.as<bool>();
 
-    YAML::Node body_rotation = jointNode["body rotation"];
-//    if(parent_axis.IsDefined()) body_rotation_ = utilities.toRotation(&body_rotation);
-    if(!body_rotation.IsDefined()) utilities.throwExceptionMessage("joint name: " + name_ + ", body rotation in Joint Params");
-    body_rotation_ = utilities.toRotation(&body_rotation);
-
 //    YAML::Node detached = jointNode["detached"];
 //    if(detached.IsDefined()) detached_ = detached.as<bool>();
 
@@ -71,14 +66,13 @@ JointParam::JointParam(YAML::Node jointNode)
 //    if(offset.IsDefined()) offset_ = jointNode["offset"].as<double>();
 }
 
-JointParam::JointParam(std::string name, std::string parent_name, std::string child, Vector3d parent_axis, Vector3d parent_pivot, std::string type, Matrix3_t body_rotation) {
+JointParam::JointParam(std::string name, std::string parent_name, std::string child, Vector3d parent_axis, Vector3d parent_pivot, std::string type) {
     name_ = (std::string(name)).c_str();
     parent_ = (std::string(parent_name)).c_str();
     child_ = (std::string(child)).c_str();
     parent_axis_ = parent_axis;
     parent_pivot_ = parent_pivot;
     type_ = (std::string(type)).c_str();
-    body_rotation_ = body_rotation;
 }
 
 JointParam::~JointParam(void) {

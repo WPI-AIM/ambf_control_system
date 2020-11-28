@@ -69,30 +69,6 @@ Vector3d Utilities::toRPY(YAML::Node* node){
     return v;
 }
 
-
-///
-/// \brief Matrix3_t
-/// \param node
-/// \return
-///
-Matrix3_t Utilities::toRotation(YAML::Node* node) {
-    Matrix3_t m;
-
-    m(0, 0) = (*node)["xx"].as<double>();
-    m(0, 1) = (*node)["xy"].as<double>();
-    m(0, 2) = (*node)["xz"].as<double>();
-
-    m(1, 0) = (*node)["yx"].as<double>();
-    m(1, 1) = (*node)["yy"].as<double>();
-    m(1, 2) = (*node)["yz"].as<double>();
-
-    m(2, 0) = (*node)["zx"].as<double>();
-    m(2, 1) = (*node)["zy"].as<double>();
-    m(2, 2) = (*node)["zz"].as<double>();
-
-    return m;
-}
-
 std::string Utilities::trimTrailingSpaces(YAML::Node bodyNode) {
     std::string m_name;
     if(bodyNode.IsDefined()){

@@ -28,9 +28,6 @@ BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) {
     if(!this->findBaseNode()) return;
     this->addDummyBaseJoint();
     this->buildModel();
-//    this->buildModelTrial();
-//    this->buildModelTrialKuka();
-
 }
 
 void BuildRBDLModel::getNamespace() {
@@ -142,112 +139,10 @@ void BuildRBDLModel::addDummyBaseJoint() {
     // Create RBDL ID for Base
     Vector3d parent_axis(0.0, 0.0, 0.0);
     Vector3d parent_pivot(0.0, 0.0, 0.0);
-    Matrix3_t body_rotation(
-                0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0,
-                0.0, 0.0, 0.0
-                );
 
     base_joint_name_ = base_parent_name_ + "-" + baseRigidBody_;
     jointParamObjectMap_[base_parent_name_].insert(std::make_pair(base_joint_name_,
-                                                                  new JointParam(base_joint_name_, base_parent_name_, baseRigidBody_, parent_axis, parent_pivot, joint_type, body_rotation)));
-}
-
-
-bool BuildRBDLModel::buildModelTrial() {
-    unsigned int body_a_id, body_b_id, body_c_id, body_d_id;
-    Body body_a, body_b, body_c, body_d;
-    Joint joint_a, joint_b, joint_c, joint_d;
-
-
-    rbdl_check_api_version(RBDL_API_VERSION);
-    RBDLmodel_ = new Model();
-
-//    RBDLmodel_->gravity = Vector3d(0., 0., -9.81); // in my case should set in the Z direction
-//    double mass = (bodyParamObjectMap_[child_name])->Mass();
-//    Vector3d com = (bodyParamObjectMap_[child_name])->InertialOffsetPosition();
-//    Math::Matrix3d inertia = (bodyParamObjectMap_[child_name])->Inertia();
-
-//    boost::optional<rbdlBody> child_body = Body(mass, com, inertia);
-
-
-    /** \brief Constructs a joint from the given cartesian parameters.
-     *
-     * This constructor creates all the required spatial values for the given
-     * cartesian parameters.
-     *
-     * \param joint_type whether the joint is revolute or prismatic
-     * \param joint_axis the axis of rotation or translation
-     */
-//    Joint (
-//      const JointType joint_type,
-//      const Math::Vector3d &joint_axis
-//    )
-//    Vector3d parent_axis = (jointParamObjectMap_[parent_name][joint_name])->ParentAxis();
-//    rbdl_joint = rbdlJoint(joint_type, parent_axis);
-
-
-
-    body_a = Body (1., Vector3d (1., 0., 0.), Vector3d (1., 1., 1.));
-    joint_a = Joint( SpatialVector (0., 0., 1., 0., 0., 0.));
-
-    body_a_id = RBDLmodel_->AddBody(0, Xtrans(Vector3d(0., 0., 0.)), joint_a, body_a);
-
-    body_b = Body (1., Vector3d (0., 1., 0.), Vector3d (1., 1., 1.));
-    joint_b = Joint ( SpatialVector (0., 1., 0., 0., 0., 0.));
-
-    body_b_id = RBDLmodel_->AddBody(body_a_id, Xtrans(Vector3d(1., 0., 0.)), joint_b, body_b);
-
-    body_c = Body (1., Vector3d (0., 0., 1.), Vector3d (1., 1., 1.));
-    joint_c = Joint ( SpatialVector (0., 0., 1., 0., 0., 0.));
-
-    body_c_id = RBDLmodel_->AddBody(body_b_id, Xtrans(Vector3d(0., 1., 0.)), joint_c, body_c);
-
-    body_d = Body (1., Vector3d (1., 0., 0.), Vector3d (1., 1., 1.));
-    joint_c = Joint ( SpatialVector (1., 0., 0., 0., 0., 0.));
-
-//    unsigned int child_id = RBDLmodel_->AddBody(parent_id,  child_tf, rbdl_joint, child_body.get());
-    body_d_id = RBDLmodel_->AddBody(body_c_id, Xtrans(Vector3d(0., 0., -1.)), joint_c, body_d);
-
-    std::cout << body_a_id << ", " << body_b_id << ", " << body_c_id << ", " << body_d_id << std::endl;
-
-    return true;
-}
-
-
-bool BuildRBDLModel::buildModelTrialKuka() {
-    unsigned int body_a_id, body_b_id, body_c_id, body_d_id;
-    Body body_a, body_b, body_c, body_d;
-    Joint joint_a, joint_b, joint_c, joint_d;
-
-
-    rbdl_check_api_version(RBDL_API_VERSION);
-    RBDLmodel_ = new Model();
-
-    body_a = Body (1., Vector3d (1., 0., 0.), Vector3d (1., 1., 1.));
-    joint_a = Joint( SpatialVector (0., 0., 1., 0., 0., 0.));
-
-    body_a_id = RBDLmodel_->AddBody(0, Xtrans(Vector3d(0., 0., 0.)), joint_a, body_a);
-
-    body_b = Body (1., Vector3d (0., 1., 0.), Vector3d (1., 1., 1.));
-    joint_b = Joint ( SpatialVector (0., 1., 0., 0., 0., 0.));
-
-    body_b_id = RBDLmodel_->AddBody(body_a_id, Xtrans(Vector3d(1., 0., 0.)), joint_b, body_b);
-
-    body_c = Body (1., Vector3d (0., 0., 1.), Vector3d (1., 1., 1.));
-    joint_c = Joint ( SpatialVector (0., 0., 1., 0., 0., 0.));
-
-    body_c_id = RBDLmodel_->AddBody(body_b_id, Xtrans(Vector3d(0., 1., 0.)), joint_c, body_c);
-
-    body_d = Body (1., Vector3d (1., 0., 0.), Vector3d (1., 1., 1.));
-    joint_c = Joint ( SpatialVector (1., 0., 0., 0., 0., 0.));
-
-//    unsigned int child_id = RBDLmodel_->AddBody(parent_id,  child_tf, rbdl_joint, child_body.get());
-    body_d_id = RBDLmodel_->AddBody(body_c_id, Xtrans(Vector3d(0., 0., -1.)), joint_c, body_d);
-
-    std::cout << body_a_id << ", " << body_b_id << ", " << body_c_id << ", " << body_d_id << std::endl;
-
-    return true;
+                                                                  new JointParam(base_joint_name_, base_parent_name_, baseRigidBody_, parent_axis, parent_pivot, joint_type)));
 }
 
 bool BuildRBDLModel::buildModel() {
@@ -331,7 +226,7 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 
     rbdlJoint joint_rot_z;
 
-    if(joint_type == JointTypeFixed || joint_type == JointTypeFixed) {
+    if(joint_type == JointTypeFixed) {
         joint_rot_z = SpatialVector (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
     } else if (joint_type == JointTypeRevolute || joint_type == JointType3DoF) {
@@ -347,121 +242,7 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
     } else {
         child_id = RBDLmodel_->AppendBody(Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
     }
-//     unsigned int child_id = RBDLmodel_->AddBody(parent_id,  child_tf, rbdl_joint, child_body.get());
-//    unsigned int fixed_body_id = model.AppendBody (Xtrans(Vector3d(0., 1., 0.)), Joint(JointTypeFixed), fixed_body);
-//    unsigned int child_id = RBDLmodel_->AddBody(parent_id,  child_tf, rbdl_joint, child_body.get());
-
-    /*
-    rbdlJointType joint_type = getRBDLJointType(joint_type_str);
-
-    // Get Child transformation and rotation w.r.t parent
-    Vector3d child_translation = (jointParamObjectMap_[parent_name][joint_name])->ParentPivot();
-    Matrix3_t body_rotation = (jointParamObjectMap_[parent_name][joint_name])->BodyRotation();
-
-
-
-//    std::cout << "joint_type_str: " << joint_type_str << ", joint_type: " << joint_type << std::endl;
-//    std::cout << "child_translation: " << child_translation[0] << ", " << child_translation[1] << ", " << child_translation[2] << std::endl;
-//    std::cout << "body_rotation: "
-//              << body_rotation(0, 0) << ", " << body_rotation(0 , 1) << ", " << body_rotation(0, 2) << ", "
-//              << body_rotation(1, 0) << ", " << body_rotation(1 , 1) << ", " << body_rotation(1, 2) << ", "
-//              << body_rotation(2, 0) << ", " << body_rotation(2 , 1) << ", " << body_rotation(2, 2)
-//              << std::endl;
-
-    if(joint_type == JointTypeUndefined) {
-        rbdl_joint = Joint();
-    } else if(joint_type == JointTypeRevoluteX || joint_type == JointTypeRevoluteY || joint_type == JointTypeRevoluteZ ||
-              joint_type == JointTypeSpherical || joint_type == JointTypeEulerZYX  || joint_type == JointTypeEulerXYZ ||
-              joint_type == JointTypeEulerYXZ  || joint_type == JointTypeFixed     || joint_type == JointTypeFloatingBase ||
-              joint_type == JointTypeTranslationXYZ) {
-        rbdl_joint = rbdlJoint (joint_type);
-    } else if(joint_type == JointTypeCustom ) {
-        int degreesOfFreedom = 0;
-        rbdl_joint = rbdlJoint (joint_type, degreesOfFreedom);
-    } else if(joint_type == JointTypeRevolute || joint_type == JointTypePrismatic) {
-        Vector3d parent_axis = (jointParamObjectMap_[parent_name][joint_name])->ParentAxis();
-        rbdl_joint = rbdlJoint(joint_type, parent_axis);
-    } else if(joint_type == JointTypeRevoluteX || joint_type == JointTypeRevoluteY || joint_type == JointTypeRevoluteZ || joint_type == JointTypeHelical) {
-        //Get this value from yaml. hardcoding it for testing
-//        1 DoF joint with the given motion subspaces.
-//        \f[ (r_x, r_y, r_z, t_x, t_y, t_z) \f]
-        const Math::SpatialVector axis_0 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        rbdl_joint = rbdlJoint(axis_0);
-    } else if(joint_type == JointType2DoF) {
-        //Get this value from yaml. hardcoding it for testing
-//        2 DoF joint with the given motion subspaces.
-//        \f[ (r_x, r_y, r_z, t_x, t_y, t_z) \f]
-        const Math::SpatialVector axis_0 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_1 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-
-        rbdl_joint = rbdlJoint(axis_0, axis_1);
-    } else if(joint_type == JointType3DoF) {
-        //Get this value from yaml. hardcoding it for testing
-//        3 DoF joint with the given motion subspaces.
-//        \f[ (r_x, r_y, r_z, t_x, t_y, t_z) \f]
-        //Body rotaion used to create create Joint as well as child_tf - check this to be right implementation
-        const Math::SpatialVector axis_0 = Math::SpatialVector(body_rotation(0, 0), body_rotation(0, 1), body_rotation(0, 2), 0., 0., 0.);
-        const Math::SpatialVector axis_1 = Math::SpatialVector(body_rotation(1, 0), body_rotation(1, 1), body_rotation(2, 2), 0., 0., 0.);
-        const Math::SpatialVector axis_2 = Math::SpatialVector(body_rotation(2, 0), body_rotation(2, 1), body_rotation(2, 2), 0., 0., 0.);
-
-        rbdl_joint = rbdlJoint(axis_0, axis_1, axis_2);
-    } else if(joint_type == JointType4DoF) {
-        //Get this value from yaml. hardcoding it for testing
-//        2 DoF joint with the given motion subspaces.
-//        \f[ (r_x, r_y, r_z, t_x, t_y, t_z) \f]
-        const Math::SpatialVector axis_0 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_1 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_2 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_3 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-
-        rbdl_joint = rbdlJoint(axis_0, axis_1, axis_2, axis_3);
-    } else if(joint_type == JointType5DoF) {
-        //Get this value from yaml. hardcoding it for testing
-//        2 DoF joint with the given motion subspaces.
-//        \f[ (r_x, r_y, r_z, t_x, t_y, t_z) \f]
-        const Math::SpatialVector axis_0 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_1 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_2 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_3 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_4 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-
-        rbdl_joint = rbdlJoint(axis_0, axis_1, axis_2, axis_3, axis_4);
-    } else if(joint_type == JointType6DoF) {
-        //Get this value from yaml. hardcoding it for testing
-//        2 DoF joint with the given motion subspaces.
-//        \f[ (r_x, r_y, r_z, t_x, t_y, t_z) \f]
-        const Math::SpatialVector axis_0 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_1 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_2 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_3 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_4 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-        const Math::SpatialVector axis_5 = Math::SpatialVector(0., 0., 1., 0., 0., 0.);
-
-        rbdl_joint = rbdlJoint(axis_0, axis_1, axis_2, axis_3, axis_4, axis_5);
-    } else if(joint_type == JointTypeFloatingBase || joint_type == JointTypeFixed) {
-//        std::cout << "inside else - joint_type: " << joint_type << std::endl;
-        rbdl_joint = Joint(joint_type);
-    } else {
-        std::ostringstream errormsg;
-        errormsg <<
-                 "Error: Unsupported Joint type defined"
-                 << std::endl;
-        throw Errors::RBDLError(errormsg.str());
-    }
-    */
-
-
-
-
-//    // Create RBDL ID for parent to child
-//    SpatialTransform child_tf(body_rotation, child_translation);
-
-////    unsigned int child_id = RBDLmodel_->AddBody(parent_id, child_tf, rbdl_joint, child_body);
-//    unsigned int child_id = RBDLmodel_->AddBody(parent_id,  child_tf, rbdl_joint, child_body.get());
-
-////    std::cout << "####################################################" << std::endl;
     return child_id;
-//    return 0;
 }
 
 const rbdlJointType BuildRBDLModel::getRBDLJointType(std::string joint_type) {
