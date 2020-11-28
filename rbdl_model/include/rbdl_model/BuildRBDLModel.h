@@ -14,6 +14,7 @@
 #include <vector>
 #include <boost/optional.hpp>
 #include <rbdl_model/RBDLModelErrors.h>
+#include <limits>
 
 using namespace RigidBodyDynamics;
 using namespace Math;

@@ -237,11 +237,15 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 
     unsigned int child_id;
     // check if the body is base
-    if(parent_id == 0) {
-        child_id = RBDLmodel_->AddBody(parent_id, Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
-    } else {
-        child_id = RBDLmodel_->AppendBody(Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
+
+    if(RBDLmodel_->GetBodyId(child_name.c_str()) != UINT_MAX) {
+        if(parent_id == 0) {
+            child_id = RBDLmodel_->AddBody(parent_id, Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
+        } else {
+            child_id = RBDLmodel_->AppendBody(Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
+        }
     }
+
     return child_id;
 }
 
