@@ -14,6 +14,7 @@
 #include <vector>
 #include <boost/optional.hpp>
 #include <rbdl_model/RBDLModelErrors.h>
+#include <limits>
 
 using namespace RigidBodyDynamics;
 using namespace Math;
@@ -58,8 +59,6 @@ private:
 
     bool buildBodyTree();
     bool buildModel();
-    bool buildModelTrial();
-    bool buildModelTrialKuka();
 
     std::string blender_namespace_;
     YAML::Node baseNode_;

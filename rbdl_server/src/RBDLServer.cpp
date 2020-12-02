@@ -214,7 +214,7 @@ bool RBDLServer::Jacobian_srv(rbdl_server::RBDLJacobianRequest& req, rbdl_server
         GetNames(names);
         for(std::string name: names)
         {
-            ROS_INFO("%s", name);
+            ROS_INFO("%s", name.c_str());
         }
 
 		return false;

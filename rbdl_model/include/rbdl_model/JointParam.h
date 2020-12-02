@@ -6,7 +6,7 @@ class JointParam
 {
 public:
     JointParam(YAML::Node jointNode);
-    JointParam(std::string name, std::string parent_name, std::string child, Vector3d parent_axis, Vector3d parent_pivot, std::string type, Matrix3_t body_rotation);
+    JointParam(std::string name, std::string parent_name, std::string child, Vector3d parent_axis, Vector3d parent_pivot, std::string type);
 
     ~JointParam(void);
 
@@ -15,7 +15,6 @@ public:
     inline std::string Child() { return child_; }
     inline Vector3d ParentAxis() { return parent_axis_; }
     inline Vector3d ParentPivot() { return parent_pivot_; }
-    inline Matrix3_t BodyRotation() { return body_rotation_; }
     inline std::string Type() { return type_; }
 
 private:
@@ -30,7 +29,6 @@ private:
 //    double joint_limits_low_{0.0};
 //    bool passive_{false};
 //    bool detached_{false};
-    Matrix3_t body_rotation_;
     std::string type_;
 //    double damping_{0.0};
 //    double offset_{0.0};

@@ -72,7 +72,7 @@ private:
     static std::atomic<RBDLTestPrep*> instance;
     static std::mutex myMutex;
 
-    const std::string actuator_config_file_ = "/localcodebase/ambfnags92/ambf/ambf_models/descriptions/multi-bodies/robots/blender-kuka.yaml";
+    const std::string actuator_config_file_ = "/localcodebase/ambfnags92/ambf/ambf_models/descriptions/multi-bodies/robots/blender-psm.yaml";
 
 };
 
