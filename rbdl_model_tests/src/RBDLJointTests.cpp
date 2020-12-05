@@ -42,28 +42,29 @@
 TEST( TestRBDLForwardKinematics ) {
     BuildRBDLModelPtr rbdlModelPtr = RBDLTestPrep::getInstance()->getRBDLModelInstance();
 
-
+//    std::cout << "Number of bodies: " <<
 
 //    std::vector<std::string> bodyNames = rbdlModelPtr->getAllBodyNames();
 
 //    for(std::string bodyName : bodyNames) {
 ////        std::cout << bodyName << std::endl;
 //        unsigned int body_id = rbdlModelPtr->getBodyId(bodyName.c_str());
-//        std::cout << bodyName << ", " << ", body_id: " << body_id << std::endl;
+//        std::cout << bodyName << ", body_id: " << body_id << std::endl;
 //    }
 //    std::cout << "------------------------------------------" << std::endl;
 
 
-    /*
+
     Model model = rbdlModelPtr->getRBDLModel();
-    std::cout << "name of body id 1: " << model.GetBodyName(1) << std::endl;
-//    std::vector<std::string> bodyNames_from_model = rbdlModelPtr->getAllBodyNames();
-//    for(const std::string bodyName : bodyNames_from_model) {
-//        unsigned int body_id = model.GetBodyId(bodyName.c_str());
-//        std::cout << bodyName << ", " << ", body_id: " << body_id << std::endl;
-//    }
 
+    std::cout << "model.q_size: " << model.q_size << std::endl;
+    std::vector<std::string> bodyNames_from_model = rbdlModelPtr->getAllBodyNames();
+    for(const std::string bodyName : bodyNames_from_model) {
+        unsigned int body_id = model.GetBodyId(bodyName.c_str());
+        std::cout << bodyName << ", " << ", body_id: " << body_id << std::endl;
+    }
 
+/*
     std::cout << "------------------------------------------" << std::endl;
 //    std::cout << "base" << ", " << ", body_id: " << model.GetBodyId("base") << std::endl;
 //    std::cout << "link1" << ", " << ", body_id: " << model.GetBodyId("link1") << std::endl;

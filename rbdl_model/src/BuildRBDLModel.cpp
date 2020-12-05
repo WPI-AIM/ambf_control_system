@@ -235,17 +235,23 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
         joint_rot_z = SpatialVector (0.0, 0.0, 0.0, parent_axis[0], parent_axis[1], parent_axis[2]);
     }
 
+    std::cout << "outside - child_name.c_str(): " << child_name.c_str() << ", RBDLmodel_->GetBodyId(child_name.c_str(): " << RBDLmodel_->GetBodyId(child_name.c_str()) << ", parent_id: " << parent_id << ", UINT_MAX: " << UINT_MAX << std::endl;
+//    std:cout << "(RBDLmodel_->GetBodyId(child_name.c_str()) != UINT_MAX ): " << (RBDLmodel_->GetBodyId(child_name.c_str()) != UINT_MAX ) << std::endl;
     unsigned int child_id;
     // check if the body is base
-
-    if(RBDLmodel_->GetBodyId(child_name.c_str()) != UINT_MAX) {
+//    if(parent_id == 0 || (RBDLmodel_->GetBodyId(child_name.c_str()) != UINT_MAX && parent_id != 0)) {
+    if(parent_name == base_parent_name_ || (RBDLmodel_->GetBodyId(child_name.c_str()) == UINT_MAX && parent_name != base_parent_name_)) {
+//    if(parent_name == base_parent_name_ || (parent_name != base_parent_name_ && RBDLmodel_->GetBodyId(child_name.c_str()) != UINT_MAX)) {
+        std::cout << "inside - child_name.c_str(): " << child_name.c_str() << ", RBDLmodel_->GetBodyId(child_name.c_str(): " << RBDLmodel_->GetBodyId(child_name.c_str()) << ", parent_id: " << parent_id << ", UINT_MAX: " << UINT_MAX << std::endl;
         if(parent_id == 0) {
             child_id = RBDLmodel_->AddBody(parent_id, Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
         } else {
             child_id = RBDLmodel_->AppendBody(Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
         }
     }
+    std::cout << "child_id: " << child_id << std::endl;
 
+    std::cout << "------" << std::endl;
     return child_id;
 }
 

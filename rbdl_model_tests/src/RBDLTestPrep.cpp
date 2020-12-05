@@ -13,10 +13,10 @@ std::chrono::duration<double> RBDLTestPrep::getTime(){
 
 }
 
-ClientPtr RBDLTestPrep::getAMBFClientInstance(){
-  ClientPtr clientPtr = new Client();
-  return clientPtr;
-}
+//ClientPtr RBDLTestPrep::getAMBFClientInstance(){
+//  ClientPtr clientPtr = new Client();
+//  return clientPtr;
+//}
 
 BuildRBDLModelPtr RBDLTestPrep::getRBDLModelInstance() {
     BuildRBDLModelPtr buildRBDLModelPtr = new BuildRBDLModel (actuator_config_file_);

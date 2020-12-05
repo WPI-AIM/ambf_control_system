@@ -5,7 +5,7 @@
 #include "rbdl/rbdl_mathutils.h"
 #include "rbdl/Body.h"
 #include "rbdl_model/BuildRBDLModel.h"
-#include "ambf_client/ambf_client.h"
+//#include "ambf_client/ambf_client.h"
 
 
 #include <atomic>
@@ -35,7 +35,7 @@ using namespace RigidBodyDynamics::Math;
 
 //------------------------------------------------------------------------------
 typedef BuildRBDLModel* BuildRBDLModelPtr;
-typedef Client* ClientPtr;
+//typedef Client* ClientPtr;
 //------------------------------------------------------------------------------
 
 const double TEST_PREC = 1.0e-7;
@@ -61,7 +61,7 @@ public:
     }
 
     std::chrono::duration<double> getTime();
-    ClientPtr getAMBFClientInstance();
+//    ClientPtr getAMBFClientInstance();
     BuildRBDLModelPtr getRBDLModelInstance();
 private:
     RBDLTestPrep()= default;
@@ -72,7 +72,8 @@ private:
     static std::atomic<RBDLTestPrep*> instance;
     static std::mutex myMutex;
 
-    const std::string actuator_config_file_ = "/localcodebase/ambfnags92/ambf/ambf_models/descriptions/multi-bodies/robots/blender-psm.yaml";
+//    const std::string actuator_config_file_ = "/localcodebase/ambf_repos/nag92/ambf/ambf_models/descriptions/multi-bodies/robots/blender-ecm.yaml";
+    const std::string actuator_config_file_ = "/home/shreyas/Downloads/exohuman/exohuman_v4/exohuman_v4.yaml";
 
 };
 
