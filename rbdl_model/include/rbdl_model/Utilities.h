@@ -7,6 +7,7 @@
 #include "rbdl/rbdl_math.h"
 #include <algorithm>
 #include<rbdl_model/RBDLModelErrors.h>
+//#include<cmath>
 
 using namespace RigidBodyDynamics;
 using namespace Math;
@@ -21,6 +22,7 @@ public:
     Vector3d toRPY(YAML::Node* node);
     Vector3d toXYZInertia(YAML::Node* node);
     Math::Matrix3d vectorToMatrix3d(YAML::Node* node);
+    Math::Matrix3d rotationMatrixFromVectors(Vector3d vec1, Vector3d vec2);
 
     std::string trimTrailingSpaces(YAML::Node bodyNode);
     void eraseSubStr(std::string & mainStr, const std::string & toErase);

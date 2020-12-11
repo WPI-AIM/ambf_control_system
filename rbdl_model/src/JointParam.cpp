@@ -33,6 +33,14 @@ JointParam::JointParam(YAML::Node jointNode)
     if(!parent_axis.IsDefined()) utilities.throwExceptionMessage("joint name: " + name_ + ", parent axis in Joint Params");
     parent_axis_ = utilities.toXYZ(&parent_axis);
 
+    YAML::Node child_pivot = jointNode["child pivot"];
+    if(!child_pivot.IsDefined()) utilities.throwExceptionMessage("joint name: " + name_ + ", child pivot in Joint Params");
+    child_pivot_ = utilities.toXYZ(&child_pivot);
+
+    YAML::Node child_axis = jointNode["child axis"];
+    if(!child_axis.IsDefined()) utilities.throwExceptionMessage("joint name: " + name_ + ", child axis in Joint Params");
+    child_axis_ = utilities.toXYZ(&child_axis);
+
 //    YAML::Node child_pivot = jointNode["child pivot"];
 //    if(parent_pivot.IsDefined()) child_pivot_ = utilities.toXYZ(&child_pivot);
 
@@ -66,12 +74,15 @@ JointParam::JointParam(YAML::Node jointNode)
 //    if(offset.IsDefined()) offset_ = jointNode["offset"].as<double>();
 }
 
-JointParam::JointParam(std::string name, std::string parent_name, std::string child, Vector3d parent_axis, Vector3d parent_pivot, std::string type) {
+JointParam::JointParam(std::string name, std::string parent_name, std::string child, Vector3d parent_axis,
+                       Vector3d parent_pivot, Vector3d child_axis, Vector3d child_pivot, std::string type) {
     name_ = (std::string(name)).c_str();
     parent_ = (std::string(parent_name)).c_str();
     child_ = (std::string(child)).c_str();
     parent_axis_ = parent_axis;
     parent_pivot_ = parent_pivot;
+    child_axis_ = child_axis;
+    child_pivot_ = child_pivot;
     type_ = (std::string(type)).c_str();
 }
 

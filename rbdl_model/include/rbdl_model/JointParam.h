@@ -6,15 +6,21 @@ class JointParam
 {
 public:
     JointParam(YAML::Node jointNode);
-    JointParam(std::string name, std::string parent_name, std::string child, Vector3d parent_axis, Vector3d parent_pivot, std::string type);
+    JointParam(std::string name, std::string parent_name, std::string child, Vector3d parent_axis,
+               Vector3d parent_pivot, Vector3d child_axis, Vector3d child_pivot, std::string type);
 
     ~JointParam(void);
 
     inline std::string Name() { return name_; }
     inline std::string Parent() { return parent_; }
     inline std::string Child() { return child_; }
+
     inline Vector3d ParentAxis() { return parent_axis_; }
     inline Vector3d ParentPivot() { return parent_pivot_; }
+
+    inline Vector3d ChildAxis() { return child_axis_; }
+    inline Vector3d ChildPivot() { return child_pivot_; }
+
     inline std::string Type() { return type_; }
 
 private:
@@ -23,8 +29,8 @@ private:
     std::string child_;
     Vector3d parent_axis_;
     Vector3d parent_pivot_;
-//    Vector3d child_axis_;
-//    Vector3d child_pivot_;
+    Vector3d child_axis_;
+    Vector3d child_pivot_;
 //    double joint_limits_high_{0.0};
 //    double joint_limits_low_{0.0};
 //    bool passive_{false};
