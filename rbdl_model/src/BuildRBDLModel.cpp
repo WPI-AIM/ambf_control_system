@@ -335,9 +335,11 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 //            body1_id = model->AppendBody(SpatialTransform (rot1, Vector3d(0.0, 0.0, 0.0)  ),  joint1, body1  );
         } else {
 //            child_id = RBDLmodel_->AppendBody(Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
-            joint = Joint (JointTypeRevoluteZ);
+//            joint = Joint (JointTypeRevoluteZ);
+            joint = SpatialVector (child_axis[0], child_axis[1], child_axis[2], 0.0, 0.0, 0.0);
         }
         child_id = RBDLmodel_->AddBody(parent_id, SpatialTransform (rotation_matrix, parent_pivot), joint, child_body.get(), child_name.c_str());
+
     }
 //    std::cout << "child_id: " << child_id << std::endl;
 

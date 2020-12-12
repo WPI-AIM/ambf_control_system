@@ -86,29 +86,37 @@ TEST ( TestRBBLBodyToYAML ) {
 }
 */
 
-//TEST ( TestRBBLBodyToAMBF ) {
-//    const string bodyName = "link1";
+TEST ( TestTestTestModelBodyHierarchy ) {
+    BuildRBDLModelPtr rbdlModelPtr = RBDLTestPrep::getInstance()->getRBDLModelInstance();
+    Model model = rbdlModelPtr->getRBDLModel();
 
-//    BuildRBDLModelPtr buildRBDLModelPtr = RBDLTestPrep::getInstance()->getRBDLModelInstance();
-//    boost::optional<rbdlBody> bodyBoostRbdlBody = buildRBDLModelPtr->getRBDLBody(bodyName);
-//    rbdlBody bodyRbdlBody = bodyBoostRbdlBody.get();
+    const std::string base_body = rbdlModelPtr->getBaseRigidBody();
+    const unsigned base_id = model.GetBodyId(base_body.c_str());
+
+    const unsigned root_id = model.GetParentBodyId(base_id);
+
+//    const std::string root_body = model.get_
+//    const unsigned int base_body_parent_id = model.GetParentBodyId());
 
 
-//    ClientPtr clientPtr = RBDLTestPrep::getInstance()->getAMBFClientInstance();
-//    clientPtr->connect();
-////    usleep(20000);
+    std::cout << "model.q_size: " << model.q_size << std::endl;
+//    std::vector<std::string> bodyNames_from_model = rbdlModelPtr->getAllBodyNames();
+//    for(const std::string bodyName : bodyNames_from_model) {
+//        unsigned int body_id = model.GetBodyId(bodyName.c_str());
+//        std::cout << bodyName << ", " << ", body_id: " << body_id << std::endl;
+//    }
+
+    std::string body_name = "link7";
+    unsigned int body_id = model.GetBodyId(body_name.c_str());
+//    while(body_id != model.GetBodyId(base_body.c_str())) {
+    while(body_id != root_id) {
+        unsigned int parent_id = model.GetParentBodyId(body_id);
+        std::string parent_name = model.GetBodyName(parent_id);
+
+        std::cout << "body_name: " << model.GetBodyName(body_id) << ", body_id: " << body_id << ", parent_name: " << parent_name << ", parent_id: " << parent_id << std::endl;
+        body_id = parent_id;
+    }
 
 
-//    rigidBodyPtr body_handler = clientPtr->getARigidBody(bodyName, true);
-//    usleep(250000);
-
-////    std::cout << "get_num_joints(): " << body_handler->get_num_joints() << std::endl;
-
-//    float body_mass = body_handler->get_mass();
-
-//    tf::Vector3 body_inertia(0.0, 0.0, 0.0);
-//    body_inertia = body_handler->get_inertia();
-
-//    CHECK_CLOSE(body_mass, bodyRbdlBody.mMass, TEST_PREC);
-
-//}
+    rbdlModelPtr->cleanUp();
+}

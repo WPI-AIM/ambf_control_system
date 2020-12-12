@@ -39,30 +39,30 @@
 
 //}
 
-TEST( TestRBDLForwardKinematics ) {
-    BuildRBDLModelPtr rbdlModelPtr = RBDLTestPrep::getInstance()->getRBDLModelInstance();
+//TEST( TestRBDLForwardKinematics ) {
+//    BuildRBDLModelPtr rbdlModelPtr = RBDLTestPrep::getInstance()->getRBDLModelInstance();
 
-//    std::cout << "Number of bodies: " <<
+////    std::cout << "Number of bodies: " <<
 
-//    std::vector<std::string> bodyNames = rbdlModelPtr->getAllBodyNames();
+////    std::vector<std::string> bodyNames = rbdlModelPtr->getAllBodyNames();
 
-//    for(std::string bodyName : bodyNames) {
-////        std::cout << bodyName << std::endl;
-//        unsigned int body_id = rbdlModelPtr->getBodyId(bodyName.c_str());
-//        std::cout << bodyName << ", body_id: " << body_id << std::endl;
+////    for(std::string bodyName : bodyNames) {
+//////        std::cout << bodyName << std::endl;
+////        unsigned int body_id = rbdlModelPtr->getBodyId(bodyName.c_str());
+////        std::cout << bodyName << ", body_id: " << body_id << std::endl;
+////    }
+////    std::cout << "------------------------------------------" << std::endl;
+
+
+
+//    Model model = rbdlModelPtr->getRBDLModel();
+
+//    std::cout << "model.q_size: " << model.q_size << std::endl;
+//    std::vector<std::string> bodyNames_from_model = rbdlModelPtr->getAllBodyNames();
+//    for(const std::string bodyName : bodyNames_from_model) {
+//        unsigned int body_id = model.GetBodyId(bodyName.c_str());
+//        std::cout << bodyName << ", " << ", body_id: " << body_id << std::endl;
 //    }
-//    std::cout << "------------------------------------------" << std::endl;
-
-
-
-    Model model = rbdlModelPtr->getRBDLModel();
-
-    std::cout << "model.q_size: " << model.q_size << std::endl;
-    std::vector<std::string> bodyNames_from_model = rbdlModelPtr->getAllBodyNames();
-    for(const std::string bodyName : bodyNames_from_model) {
-        unsigned int body_id = model.GetBodyId(bodyName.c_str());
-        std::cout << bodyName << ", " << ", body_id: " << body_id << std::endl;
-    }
 
 /*
     std::cout << "------------------------------------------" << std::endl;
@@ -102,4 +102,4 @@ TEST( TestRBDLForwardKinematics ) {
     std::cout << "FK value r: "
               << r[0, 0] << ", " << r[0, 1] << ", " << r[0, 2] << std::endl;
 */
-}
+//}

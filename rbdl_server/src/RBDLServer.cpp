@@ -60,7 +60,7 @@ bool  RBDLServer::ForwardDynamics_srv(rbdl_server::RBDLForwardDynamicsRequest& r
     // Need to add some checks on the size of the inputs to make sure they are correct
     if(!have_model)
     {
-        ROS_INFO("Model not set");
+        ROS_INFO("Model not setttt");
         return false;
     }
     if (model->q_size != req.q.size())
