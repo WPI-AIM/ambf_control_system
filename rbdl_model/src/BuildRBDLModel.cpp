@@ -28,6 +28,7 @@ BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) {
     if(!this->findBaseNode()) return;
     this->addDummyBaseJoint();
     this->buildModel();
+    this->make_trial_model();
 }
 
 void BuildRBDLModel::getNamespace() {
@@ -173,8 +174,8 @@ bool BuildRBDLModel::buildModel() {
 
                 std::cout << "buildModel() - parent_name: " << parent_name << ", parent_id: " << parent_id
                           << ", joint_name: " << joint_name << ", child_name: " << child_name
-                          << ", baseRigidBody_: " << baseRigidBody_
-                          << ", << base_parent_name_: " << base_parent_name_
+//                          << ", baseRigidBody_: " << baseRigidBody_
+//                          << ", << base_parent_name_: " << base_parent_name_
                           << std::endl;
 
                 unsigned int child_id = addBodyToRBDL(parent_name, parent_id, joint_name, child_name);
@@ -193,6 +194,65 @@ bool BuildRBDLModel::buildModel() {
 
     return true;
 }
+
+
+void BuildRBDLModel::make_trial_model()
+{
+    model = new Model();
+    model->gravity = Vector3d (0.0, 0.0, -9.81);
+
+    unsigned int body1_id, body2_id, body3_id, body4_id, body5_id, body6_id, body7_id, body8_id ;
+    Body body1, body2, body3, body4, body5, body6, body7, body8;
+
+    Joint joint1, joint2, joint3, joint4, joint5, joint6, joint7, joint8;
+
+    body1 = Body(1.0, Vector3d(0.001,0,0.06), Vector3d(0.01,0.01,0.01) );
+    body2 = Body(1.0, Vector3d(0.0,-0.017,0.134), Vector3d(0.00815814, 0.007363868, 0.003293455) );
+    body3 = Body(1.0, Vector3d(0.0,-0.074,0.009), Vector3d(0.00812252, 0.00329668, 0.00733904) );
+    body4 = Body(1.0, Vector3d(0.0, 0.017, 0.134), Vector3d(0.008159,0.007421,0.00330) );
+    body5 = Body(1.0, Vector3d(-0.001,0.081,0.008), Vector3d(0.0081471,0.003297,0.0073715) );
+    body6 = Body(1.0, Vector3d(0.0,-0.017,0.129), Vector3d(0.0077265,0.006950,0.00329) );
+    body7 = Body(1.0, Vector3d(0.0,0.007,0.068), Vector3d(0.002983,0.003299,0.003146) );
+    body8 = Body(1.0, Vector3d(0.006,0.0,0.015), Vector3d(0.000651,0.0006512,0.001120) );
+
+    joint1 = Joint (JointTypeFixed);
+    joint2 = Joint (JointTypeRevoluteZ);
+    joint3 = Joint (JointTypeRevoluteZ);
+    joint4 = Joint (JointTypeRevoluteZ);
+    joint5 = Joint (JointTypeRevoluteZ);
+    joint6 = Joint (JointTypeRevoluteZ);
+    joint7 = Joint (JointTypeRevoluteZ);
+    joint8 = Joint (JointTypeRevoluteZ);
+
+    Matrix3d rot1 = Matrix3d::Identity(3,3);
+    Matrix3d rot2 = Matrix3d::Identity(3,3);
+    Matrix3d rot3 = Matrix3d::Identity(3,3);
+    rot3(1,2) = -1.0; rot3(2,2) = 0.0; rot3(2,1) = 1.0; rot3(1,1) = 0.0;
+    Matrix3d rot4 = Matrix3d::Identity(3,3);
+    rot4(1,2) = 1.0; rot4(2,2) = 0.0; rot4(2,1) = -1.0; rot4(1,1) = 0.0;
+    Matrix3d rot5 = Matrix3d::Identity(3,3);
+    rot5(1,2) = 1.0; rot5(2,2) = 0.0; rot5(2,1) = -1.0; rot5(1,1) = 0.0;
+    Matrix3d rot6 = Matrix3d::Identity(3,3);
+    rot6(1,2) = -1.0; rot6(2,2) = 0.0; rot6(2,1) = 1.0; rot6(1,1) = 0.0;
+    Matrix3d rot7 = Matrix3d::Identity(3,3);
+    rot7(1,2) = -1.0; rot7(2,2) = 0.0; rot7(2,1) = 1.0; rot7(1,1) = 0.0;
+    Matrix3d rot8 = Matrix3d::Identity(3,3);
+    rot8(1,2) = 1.0; rot4(2,2) = 0.0; rot4(2,1) = -1.0; rot4(1,1) = 0.0;
+
+    body1_id = model->AppendBody(SpatialTransform (rot1, Vector3d(0.0, 0.0, 0.0)  ),  joint1, body1, "base"  );
+    body2_id = model->AppendBody(SpatialTransform (rot2, Vector3d(0.0, 0.0, 0.103)  ),  joint2, body2, "link1"  );
+    body3_id = model->AppendBody(SpatialTransform (rot3, Vector3d(0.0, 0.013, 0.209)  ),  joint3, body3, "link2"  );
+    body4_id = model->AppendBody(SpatialTransform (rot4, Vector3d(0.0, -0.194, -0.009)  ),  joint4, body4, "link3"  );
+    body5_id = model->AppendBody(SpatialTransform (rot5, Vector3d(0.0, -0.013, 0.202)  ),  joint5, body5, "link4"  );
+    body6_id = model->AppendBody(SpatialTransform (rot6, Vector3d(-0.002, 0.202, -0.008)  ),  joint6, body6, "link5"  );
+    body7_id = model->AppendBody(SpatialTransform (rot7, Vector3d(0.002, -0.052, 0.204)  ),  joint7, body7, "link6" );
+    body8_id = model->AppendBody(SpatialTransform (rot8, Vector3d(-0.003, -0.05, 0.053)  ),  joint8, body8, "link7"  );
+
+
+}
+
+
+
 
 
 unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned int parent_id, std::string joint_name, std::string child_name) {
@@ -229,8 +289,9 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 //      if(parent_name == base_parent_name_) {
         if(parent_name == base_parent_name_) {
 //            child_id = RBDLmodel_->AddBody(parent_id, Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
-//            joint = Joint (JointTypeFixed);
-            joint = SpatialVector (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+            std::cout << "addBodyToRBDL() - inside (parent_name == base_parent_name_)" << std::endl;
+            joint = Joint (JointTypeFixed);
+//            joint = SpatialVector (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 //            body1_id = model->AppendBody(SpatialTransform (rot1, Vector3d(0.0, 0.0, 0.0)  ),  joint1, body1  );
         } else {
 //            child_id = RBDLmodel_->AppendBody(Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
@@ -264,9 +325,14 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 //                      << std::endl;
 //        }
     }
-    std::cout << "before addbody() - parent_id: " << parent_id << ", child_name.c_str(): " << child_name.c_str() << std::endl;
+    std::cout << "before addbody() - parent_id: " << parent_id << ", parent_name: " << parent_name
+              << ", child_name.c_str(): " << child_name.c_str()
+              << std::endl;
     child_id = RBDLmodel_->AddBody(parent_id, SpatialTransform (rotation_matrix, parent_pivot), joint, child_body.get(), child_name.c_str());
 //    body_id_emulated[BodyPelvis] = model_emulated->AddBody (0, Xtrans (Vector3d (0., 0., 0.)), free_flyer, pelvis_body, "pelvis");
+    std::cout << "before addbody() - parent_id: " << parent_id << ", parent_name: " << parent_name
+              << ", child_id: " << child_id << ", child_name.c_str(): " << child_name.c_str()
+              << std::endl;
     std::cout << "------addBodyToRBDL - before return child------------" << std::endl;
     return child_id;
 

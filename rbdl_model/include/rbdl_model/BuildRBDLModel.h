@@ -42,6 +42,8 @@ public:
 
     std::unordered_map<std::string, unsigned int> inline getRBDLBodyToIDMap() { return rbdlObjectMap_; }
     Model inline getRBDLModel() { return *RBDLmodel_; }
+    Model inline getTrialRBDLModel() { return *model; }
+
     std::string inline getBaseRigidBody() { return baseRigidBody_; }
 
     std::vector<std::string> getAllBodyNames();
@@ -49,6 +51,7 @@ public:
 
     boost::optional<rbdlBody> getRBDLBody(const std::string bodyName);
     std::unordered_map<std::string, jointParamPtr> getJointChildren(std::string parent);
+
 
 private:
     void getNamespace();
@@ -68,7 +71,7 @@ private:
     const std::string base_parent_name_ = "world";
     std::string base_joint_name_;
     Model *RBDLmodel_ = NULL;
-
+    Model *model = NULL;
     std::unordered_map<std::string, bodyParamPtr> bodyParamObjectMap_;
 
     //                 <parent,                       <jointname, jointParamPtr>>
@@ -84,6 +87,8 @@ private:
     // Below Maps are used for Getters only. They dont play a role in model creation.
 //    std::unordered_map<std::string, rbdlBody> rbdlBodyMap_;
     std::unordered_map<std::string, boost::optional<rbdlBody>> rbdlBodyMap_;
+
+    void make_trial_model();
 
 };
 
