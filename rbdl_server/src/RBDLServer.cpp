@@ -157,7 +157,10 @@ bool RBDLServer::ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest& req, 
         ROS_INFO("Joint length (q) not correct size");
         return false;
     }
-    
+    else
+    {
+        Q =  VectToEigen(req.q);
+    }
     
     for(std::pair<std::string, int> body : body_ids)
     {
