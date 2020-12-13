@@ -1,8 +1,0 @@
-prefix=/localcodebase/ambf_repos/ambf_control_system/build-debug/devel
-
-Name: rbdl_model
-Description: Description of rbdl_model
-Version: 0.0.0
-Cflags: -I/localcodebase/ambf_repos/ambf_control_system/rbdl_model/include
-Libs: -L${prefix}/lib -lrbdl_model
-Requires: 

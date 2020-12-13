@@ -1,8 +1,0 @@
-prefix=/usr/local
-
-Name: controller_modules
-Description: Description of controller_modules
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib -lcontroller_modules
-Requires: geometry_msgs trajectory_msgs tf
