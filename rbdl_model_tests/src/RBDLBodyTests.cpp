@@ -116,21 +116,22 @@ TEST ( TestTestTestModelBodyHierarchy ) {
 
 //    std::cout << "-------------------------------------" << std::endl;
 
-    Model trial_model = rbdlModelPtr->getTrialRBDLModel();
-    std::cout << "trial_model.q_size: " << trial_model.q_size << std::endl;
+//    Model trial_model = rbdlModelPtr->getTrialRBDLModel();
+//    std::cout << "trial_model.q_size: " << trial_model.q_size << std::endl;
 
-    std::map<std::string, unsigned int> mBodyNameMap = trial_model.mBodyNameMap;
+    std::map<std::string, unsigned int> mBodyNameMap;
     std::map<std::string, unsigned int>::iterator itr;
 
-    for (itr = mBodyNameMap.begin(); itr != mBodyNameMap.end(); itr++) {
-        unsigned int parent_id = trial_model.GetParentBodyId(itr->second);
-        std::string parent_name = trial_model.GetBodyName(parent_id);
-        std::cout << "name: " << itr->first << ", id: " << itr->second
-                  << ", parent_name: " << parent_name << ", parent_id: " << parent_id
-                  << std::endl;
-    }
+//    mBodyNameMap = trial_model.mBodyNameMap;
+//    for (itr = mBodyNameMap.begin(); itr != mBodyNameMap.end(); itr++) {
+//        unsigned int parent_id = trial_model.GetParentBodyId(itr->second);
+//        std::string parent_name = trial_model.GetBodyName(parent_id);
+//        std::cout << "name: " << itr->first << ", id: " << itr->second
+//                  << ", parent_name: " << parent_name << ", parent_id: " << parent_id
+//                  << std::endl;
+//    }
 
-    std::cout << "----------------" << std::endl;
+//    std::cout << "----------------" << std::endl;
     Model model = rbdlModelPtr->getRBDLModel();
     std::cout << "model.q_size: " << model.q_size << std::endl;
 

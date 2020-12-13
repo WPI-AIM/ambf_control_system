@@ -277,7 +277,7 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 
 ////    std::cout << "parent_pivot: " << parent_pivot[0] << ", " << parent_pivot[1] << ", " << parent_pivot[2] << std::endl;
 
-    rbdlBodyMap_.insert(std::make_pair(child_name, child_body));
+
 
 
 
@@ -296,6 +296,12 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
         } else {
 //            child_id = RBDLmodel_->AppendBody(Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
 //            joint = Joint (JointTypeRevoluteZ);
+//            if(mostd::numeric_limits<unsigned int>::max())
+            while(RBDLmodel_->GetBodyId(child_name.c_str()) != std::numeric_limits<unsigned int>::max()) {
+                child_name = child_name + "~";
+                std::cout << "Inside dupe child_name check" << std::endl;
+            }
+
             joint = SpatialVector (child_axis[0], child_axis[1], child_axis[2], 0.0, 0.0, 0.0);
 
 //            if(joint_name == "ExoRightHip") {
@@ -325,6 +331,8 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 //                      << std::endl;
 //        }
     }
+
+    rbdlBodyMap_.insert(std::make_pair(child_name, child_body));
     std::cout << "before addbody() - parent_id: " << parent_id << ", parent_name: " << parent_name
               << ", child_name.c_str(): " << child_name.c_str()
               << std::endl;
