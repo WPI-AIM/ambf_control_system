@@ -92,30 +92,50 @@ TEST ( TestTestTestModelBodyHierarchy ) {
 
     const std::string base_body = rbdlModelPtr->getBaseRigidBody();
     const unsigned base_id = model.GetBodyId(base_body.c_str());
-
     const unsigned root_id = model.GetParentBodyId(base_id);
+    const std::string root_body = model.GetBodyName(root_id);
 
-//    const std::string root_body = model.get_
-//    const unsigned int base_body_parent_id = model.GetParentBodyId());
+
+    std::cout << "base_body: " << base_body << ", base_id: " << base_id
+              << ", root_body: " << root_body << ", root_id: " << root_id
+              << std::endl;
 
 
     std::cout << "model.q_size: " << model.q_size << std::endl;
-//    std::vector<std::string> bodyNames_from_model = rbdlModelPtr->getAllBodyNames();
-//    for(const std::string bodyName : bodyNames_from_model) {
-//        unsigned int body_id = model.GetBodyId(bodyName.c_str());
-//        std::cout << bodyName << ", " << ", body_id: " << body_id << std::endl;
+    std::vector<std::string> bodyNames_from_model = rbdlModelPtr->getAllBodyNames();
+//    for(const std::string body_name : bodyNames_from_model) {
+//        unsigned int body_id = model.GetBodyId(body_name.c_str());
+////        std::cout << bodyName << ", body_id: " << body_id << std::endl;
+//        unsigned int parent_id = model.GetParentBodyId(body_id);
+//        std::string parent_name = model.GetBodyName(parent_id);
+//        std::cout << "body_name: " << body_name << ", body_id: " << body_id
+//                  << ", parent_name: " << parent_name << ", parent_id: " << parent_id
+//                  << std::endl;
 //    }
 
-    std::string body_name = "link7";
+
+//    std::cout << "-------------------------------------" << std::endl;
+
+//    std::string body_name = "link7";
+    std::string body_name = "ExoRightFoot";
     unsigned int body_id = model.GetBodyId(body_name.c_str());
-//    while(body_id != model.GetBodyId(base_body.c_str())) {
-    while(body_id != root_id) {
+    while(body_name != "ROOT") {
+        body_name = model.GetBodyName(body_id);
         unsigned int parent_id = model.GetParentBodyId(body_id);
         std::string parent_name = model.GetBodyName(parent_id);
 
-        std::cout << "body_name: " << model.GetBodyName(body_id) << ", body_id: " << body_id << ", parent_name: " << parent_name << ", parent_id: " << parent_id << std::endl;
+        std::cout << "body_name: " << body_name << ", body_id: " << body_id << ", parent_name: " << parent_name << ", parent_id: " << parent_id << std::endl;
         body_id = parent_id;
     }
+
+//    body_name = "ExoRightThigh";
+//    body_id = model.GetBodyId(body_name.c_str());
+//    unsigned int parent_id = model.GetParentBodyId(body_id);
+//    std::string parent_name = model.GetBodyName(parent_id);
+
+//    std::cout << "body_name: " << model.GetBodyName(body_id) << ", body_id: " << body_id
+//              << ", parent_name: " << parent_name << ", parent_id: " << parent_id
+//              << std::endl;
 
 
     rbdlModelPtr->cleanUp();

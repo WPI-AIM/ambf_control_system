@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /localcodebase/ambf_repos/ambf_control_system/build-debug/devel/setup.sh

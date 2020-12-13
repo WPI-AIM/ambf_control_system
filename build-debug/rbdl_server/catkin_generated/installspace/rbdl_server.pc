@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: rbdl_server
+Description: Description of rbdl_server
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib -lrbdl_server -lrbdl_model
+Requires: roscpp rbdl_model
