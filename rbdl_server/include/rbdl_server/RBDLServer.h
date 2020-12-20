@@ -70,7 +70,7 @@ class RBDLServer
     RigidBodyDynamics::Model *model = NULL;
     bool have_model;
     std::unordered_map<std::string, unsigned int> body_ids; //body ids
-    ros::ServiceServer FD_srv, ID_srv, MD_srv, Jac_srv, Kin_srv;
+    ros::ServiceServer FD_srv, ID_srv, MD_srv, Jac_srv, Kin_srv, InvKin_srv;
     VectorNd VectToEigen(const std::vector<double>&);
     RigidBodyDynamics::Model* getModel();
     bool CreateModel_srv(rbdl_server::RBDLModelRequest&, rbdl_server::RBDLModelResponse& ); //parses the AMBF model into  rbdl model

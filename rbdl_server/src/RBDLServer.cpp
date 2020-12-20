@@ -13,6 +13,7 @@ RBDLServer::RBDLServer(ros::NodeHandle* nodehandle):nh_(*nodehandle)
      MD_srv = nh_.advertiseService("CreateModel", &RBDLServer::CreateModel_srv, this);
      Jac_srv = nh_.advertiseService("Jacobian", &RBDLServer::Jacobian_srv, this);
      Kin_srv = nh_.advertiseService("ForwardKinimatics", &RBDLServer::ForwardKinimatics_srv, this);
+     InvKin_srv = nh_.advertiseService("InverseKinimatics", &RBDLServer::InverseKinimatics_srv, this);
      ROS_INFO("RBDL server running");
      ros::spinOnce;
 }
