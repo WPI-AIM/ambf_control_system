@@ -130,6 +130,40 @@ bool RBDLServer::InverseDynamics_srv(rbdl_server::RBDLInverseDynamicsRequest& re
 
 
 ///
+/// \brief RBDLServer::InverseKinimatics_srv
+/// \param req
+/// \param res
+///
+bool RBDLServer::InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest& req, rbdl_server::RBDLInverseKinimaticsResponse& res)
+{
+    
+
+    double ste_tol = 1.0e-12;
+    double lambda = 0.01;
+    unsigned int max_iter = 50;
+    VectorNd Q_res = VectorNd::Zero(model->q_size);
+    VectorNd Q = VectorNd::Zero(model->q_size);
+    Vector3d local_point (0.0, 0.0, 0.0);
+    Vector3d target_point (req.target.x, req.target.y, req.target.z);
+    int id = body_ids[req.body_name];
+    
+    InverseKinematicsConstraintSet cs;
+    cs.AddPointConstraint(id,local_point, target_point );
+
+    bool worked = InverseKinematics(*model, Q_res, cs, Q  );
+
+    if(worked)
+    {
+        std::vector<double> q(&Q[0], Q.data()+Q.cols()*Q.rows());
+        res.q_res = q;
+    }
+
+    res.worked = worked;
+    return true;
+
+}
+
+///
 /// \brief RBDLServer::ForwardKinimatics_srv
 /// \param req
 /// \param res

@@ -43,7 +43,6 @@ bool ControllerManager::calcTauSrv(controller_modules::JointControlRequest& req,
     controller_list[name.c_str()]->update(req.actual, req.desired, thing );
     //std::vector<double> error = controller_list[req.controller_name]->get_error();
     res.control_output.effort = thing;
-    ROS_INFO("bye");
 
     return true;
 }   

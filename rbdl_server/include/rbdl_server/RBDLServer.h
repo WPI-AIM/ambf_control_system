@@ -45,7 +45,10 @@
 #include "rbdl_server/RBDLJacobian.h"
 #include "rbdl_server/RBDLModel.h"
 #include "rbdl_server/RBDLKinimatics.h"
+#include "rbdl_server/RBDLInverseKinimatics.h"
+
 #include "rbdl_server/RBDLBodyNames.h"
+
 #include <unordered_map>
 #include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/Pose.h>
@@ -78,6 +81,8 @@ class RBDLServer
     bool Jacobian_srv(rbdl_server::RBDLJacobianRequest&, rbdl_server::RBDLJacobianResponse&);
     bool GetNames_srv(rbdl_server::RBDLBodyNamesRequest&, rbdl_server::RBDLBodyNamesResponse&);
     void GetNames(std::vector<std::string>&);
+    bool InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest&, rbdl_server::RBDLInverseKinimaticsResponse& );
+
 	
   public:
     RBDLServer(ros::NodeHandle* nodehandle);
