@@ -41,6 +41,7 @@ public:
     std::unordered_map<std::string, bodyParamPtr> inline getRBDLBodyToObjectMap() { return bodyParamObjectMap_; }
 
     std::unordered_map<std::string, unsigned int> inline getRBDLBodyToIDMap() { return rbdlObjectMap_; }
+    std::unordered_map<std::string, unsigned int> inline getRBDLJointToIDMap() { return joint_map; }
     Model inline getRBDLModel() { return *RBDLmodel_; }
     Model inline getTrialRBDLModel() { return *model; }
 
@@ -51,7 +52,7 @@ public:
 
     boost::optional<rbdlBody> getRBDLBody(const std::string bodyName);
     std::unordered_map<std::string, jointParamPtr> getJointChildren(std::string parent);
-
+    std::vector<std::string> getJointNames();
 
 private:
     void getNamespace();
@@ -78,6 +79,7 @@ private:
     std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr>> jointParamObjectMap_;
 
     std::unordered_map<std::string, unsigned int> rbdlObjectMap_;
+    std::unordered_map<std::string, unsigned int> joint_map;
     std::unordered_map<std::string, unsigned int> ::iterator rbdl_object_map_itr_;
 
 

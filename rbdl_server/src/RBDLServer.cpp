@@ -14,6 +14,8 @@ RBDLServer::RBDLServer(ros::NodeHandle* nodehandle):nh_(*nodehandle)
      Jac_srv = nh_.advertiseService("Jacobian", &RBDLServer::Jacobian_srv, this);
      Kin_srv = nh_.advertiseService("ForwardKinimatics", &RBDLServer::ForwardKinimatics_srv, this);
      InvKin_srv = nh_.advertiseService("InverseKinimatics", &RBDLServer::InverseKinimatics_srv, this);
+     JointNames_srv = nh_.advertiseService("JointNames", &RBDLServer::GetJointNames_srv, this);
+     JointAlign_srv = nh_.advertiseService("AMBF2RBDL", &RBDLServer::AMBF2RBDL_srv, this);
      ROS_INFO("RBDL server running");
      ros::spinOnce;
 }
@@ -39,16 +41,59 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
 
     ROS_INFO("Parsing");
     std::string actuator_config_file = req.model;
-;
     BuildRBDLModel  buildRBDLModel(actuator_config_file);
     body_ids = buildRBDLModel.getRBDLBodyToIDMap();
+    joint_names = buildRBDLModel.getJointNames();
     *model = buildRBDLModel.getRBDLModel();
     //buildRBDLModel.cleanUp();
+    joint_map = buildRBDLModel.getRBDLJointToIDMap();
+    std::unordered_map<std::string, unsigned int>::iterator itr;
+   
+   
+    for (itr = joint_map.begin(); itr != joint_map.end(); itr++) 
+    {
+        std::cout << "name: " << itr->first << ", id: " << itr->second<<"\n";
+    }
+
+
+    
     have_model = true;
     ROS_INFO("Parsed");
 
     return true;
 }
+
+ bool RBDLServer::GetJointNames_srv(rbdl_server::RBDLBodyNamesRequest& req, rbdl_server::RBDLBodyNamesResponse& res)
+ {
+     
+     for (auto i = joint_names.begin(); i != joint_names.end(); ++i)
+        std::cout << *i << ' ';
+
+     res.names = joint_names;
+     return true;
+ }
+
+
+ bool RBDLServer::AMBF2RBDL_srv(rbdl_server::RBDLModelAlignmentRequest& req , rbdl_server::RBDLModelAlignmentResponse& res)
+ {
+        
+    std::vector<std::string> names;
+    std::vector<int> ids;
+    std::unordered_map<std::string, unsigned int>::iterator itr;
+   
+   
+    for (itr = joint_map.begin(); itr != joint_map.end(); itr++) 
+    {
+        names.push_back(itr->first);
+        ids.push_back(itr->second);
+    }
+
+    res.names = names;
+    res.ids = ids;
+
+    return true;
+ }
+
 
 
 ///
@@ -104,7 +149,7 @@ bool RBDLServer::InverseDynamics_srv(rbdl_server::RBDLInverseDynamicsRequest& re
     }
     if (model->q_size != req.q.size())
     {
-        ROS_INFO("Joint length (q) not correct size");
+        ROS_INFO("Joint length (q) not correct size %d", model->q_size );
         return false;
     }
     if (model->qdot_size != req.qd.size())
@@ -125,7 +170,6 @@ bool RBDLServer::InverseDynamics_srv(rbdl_server::RBDLInverseDynamicsRequest& re
     InverseDynamics(*model, Q, QDot, QDDot, Tau );
     std::vector<double> tau(&Tau[0], Tau.data()+Tau.cols()*Tau.rows());
     res.tau = tau;
-
     return true;
 }
 
@@ -194,7 +238,7 @@ bool RBDLServer::ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest& req, 
     }
     else
     {
-        Q =  VectToEigen(req.q);
+        Q = VectToEigen(req.q);
     }
     
     for(std::pair<std::string, int> body : body_ids)

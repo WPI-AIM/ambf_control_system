@@ -172,15 +172,22 @@ bool BuildRBDLModel::buildModel() {
                 // Create RBDL Joint between parent and child
                 std::string joint_name = inner_map_itr->first;
 
-                std::cout << "buildModel() - parent_name: " << parent_name << ", parent_id: " << parent_id
-                          << ", joint_name: " << joint_name << ", child_name: " << child_name
-//                          << ", baseRigidBody_: " << baseRigidBody_
-//                          << ", << base_parent_name_: " << base_parent_name_
-                          << std::endl;
+//                 std::cout << "buildModel() - parent_name: " << parent_name << ", parent_id: " << parent_id
+//                           << ", joint_name: " << joint_name << ", child_name: " << child_name
+// //                          << ", baseRigidBody_: " << baseRigidBody_
+// //                          << ", << base_parent_name_: " << base_parent_name_
+//                           << std::endl;
 
                 unsigned int child_id = addBodyToRBDL(parent_name, parent_id, joint_name, child_name);
 
 
+                std::cout << "buildModel() - parent_name: " << parent_name << ", parent_id: " << parent_id
+                << ", joint_name: " << joint_name << ", child_name: " << child_name << ", child_id: " << child_id
+//                          << ", baseRigidBody_: " << baseRigidBody_
+//                          << ", << base_parent_name_: " << base_parent_name_
+                << std::endl;
+
+                joint_map.insert(std::make_pair(joint_name, child_id));
                 rbdl_object_map_itr_ = rbdlObjectMap_.find((child_name));
                 if(rbdl_object_map_itr_ == rbdlObjectMap_.end()) {
                     ancestry_set.emplace(child_name);
@@ -420,7 +427,8 @@ void BuildRBDLModel::printBody() {
     std::cout << std::endl;
 }
 
-void BuildRBDLModel::printJoint() {
+void BuildRBDLModel::printJoint() 
+{
     std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr>>::iterator outter_map_itr;
     std::unordered_map<std::string, jointParamPtr>::iterator inner_map_itr;
 
@@ -437,6 +445,35 @@ void BuildRBDLModel::printJoint() {
         std::cout << std::endl;
     }
 }
+
+
+
+std::vector<std::string> BuildRBDLModel::getJointNames() 
+{
+    std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr>>::iterator outter_map_itr;
+    std::unordered_map<std::string, jointParamPtr>::iterator inner_map_itr;
+    std::vector<std::string> names;
+
+    for (outter_map_itr = jointParamObjectMap_.begin(); outter_map_itr != jointParamObjectMap_.end(); outter_map_itr++) {
+        std::string parent_node_name = outter_map_itr->first;
+        std::cout << ", parent_node_name: " << parent_node_name << std::endl << "child_node_name: " ;
+        for (inner_map_itr = outter_map_itr->second.begin(); inner_map_itr != outter_map_itr->second.end(); inner_map_itr++) {
+            std::string joint_name = inner_map_itr->first;
+            jointParamPtr jointparamPtr = inner_map_itr->second;
+            if (joint_name.find("world") == std::string::npos) 
+            {
+                names.push_back(joint_name);
+            }
+           
+            
+
+        }
+      
+    }
+    return names;
+}
+
+
 
 void BuildRBDLModel::cleanUp() {
     std::unordered_map<std::string, bodyParamPtr>::iterator bodyParamMapIt;

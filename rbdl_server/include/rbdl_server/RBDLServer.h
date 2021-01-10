@@ -46,7 +46,11 @@
 #include "rbdl_server/RBDLModel.h"
 #include "rbdl_server/RBDLKinimatics.h"
 #include "rbdl_server/RBDLInverseKinimatics.h"
+#include "rbdl_server/RBDLModelAlignment.h"
+#include <iostream>
 
+#include <algorithm>
+#include <vector>
 #include "rbdl_server/RBDLBodyNames.h"
 
 #include <unordered_map>
@@ -69,8 +73,10 @@ class RBDLServer
     ros::NodeHandle nh_;
     RigidBodyDynamics::Model *model = NULL;
     bool have_model;
+    std::vector<std::string> joint_names;
+    std::unordered_map<std::string, unsigned int> joint_map;
     std::unordered_map<std::string, unsigned int> body_ids; //body ids
-    ros::ServiceServer FD_srv, ID_srv, MD_srv, Jac_srv, Kin_srv, InvKin_srv;
+    ros::ServiceServer FD_srv, ID_srv, MD_srv, Jac_srv, Kin_srv, InvKin_srv, JointNames_srv, JointAlign_srv;
     VectorNd VectToEigen(const std::vector<double>&);
     RigidBodyDynamics::Model* getModel();
     bool CreateModel_srv(rbdl_server::RBDLModelRequest&, rbdl_server::RBDLModelResponse& ); //parses the AMBF model into  rbdl model
@@ -81,8 +87,9 @@ class RBDLServer
     bool Jacobian_srv(rbdl_server::RBDLJacobianRequest&, rbdl_server::RBDLJacobianResponse&);
     bool GetNames_srv(rbdl_server::RBDLBodyNamesRequest&, rbdl_server::RBDLBodyNamesResponse&);
     void GetNames(std::vector<std::string>&);
+    bool GetJointNames_srv(rbdl_server::RBDLBodyNamesRequest&, rbdl_server::RBDLBodyNamesResponse&);
     bool InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest&, rbdl_server::RBDLInverseKinimaticsResponse& );
-
+    bool AMBF2RBDL_srv(rbdl_server::RBDLModelAlignmentRequest& , rbdl_server::RBDLModelAlignmentResponse& );
 	
   public:
     RBDLServer(ros::NodeHandle* nodehandle);

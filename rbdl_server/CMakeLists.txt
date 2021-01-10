@@ -39,6 +39,7 @@ add_service_files(
   RBDLKinimatics.srv
   RBDLInverseKinimatics.srv
   RBDLBodyNames.srv
+  RBDLModelAlignment.srv
   
 )
 
