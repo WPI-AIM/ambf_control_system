@@ -73,9 +73,17 @@ class RBDLServer
     ros::NodeHandle nh_;
     RigidBodyDynamics::Model *model = NULL;
     bool have_model;
-    std::vector<std::string> joint_names;
-    std::unordered_map<std::string, unsigned int> joint_map;
-    std::unordered_map<std::string, unsigned int> body_ids; //body ids
+
+    const std::string default_name= "default"; 
+    std::unordered_map<std::string, RigidBodyDynamics::Model*> models; 
+    // std::vector<std::string> joint_names;
+    // std::unordered_map<std::string, unsigned int> joint_map;
+    // std::unordered_map<std::string, unsigned int> body_ids; //body ids
+    std::unordered_map<std::string, std::vector<std::string>> joint_names; 
+    std::unordered_map<std::string, std::unordered_map<std::string, unsigned int>> joint_map;
+    std::unordered_map<std::string, std::unordered_map<std::string, unsigned int>> body_ids;
+       
+
     ros::ServiceServer FD_srv, ID_srv, MD_srv, Jac_srv, Kin_srv, InvKin_srv, JointNames_srv, JointAlign_srv;
     VectorNd VectToEigen(const std::vector<double>&);
     RigidBodyDynamics::Model* getModel();
@@ -86,10 +94,11 @@ class RBDLServer
     bool ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest&, rbdl_server::RBDLKinimaticsResponse&);
     bool Jacobian_srv(rbdl_server::RBDLJacobianRequest&, rbdl_server::RBDLJacobianResponse&);
     bool GetNames_srv(rbdl_server::RBDLBodyNamesRequest&, rbdl_server::RBDLBodyNamesResponse&);
-    void GetNames(std::vector<std::string>&);
+    void GetNames(const std::string& name, std::vector<std::string>& names);
     bool GetJointNames_srv(rbdl_server::RBDLBodyNamesRequest&, rbdl_server::RBDLBodyNamesResponse&);
     bool InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest&, rbdl_server::RBDLInverseKinimaticsResponse& );
     bool AMBF2RBDL_srv(rbdl_server::RBDLModelAlignmentRequest& , rbdl_server::RBDLModelAlignmentResponse& );
+    bool checkModelExists(std::string);
 	
   public:
     RBDLServer(ros::NodeHandle* nodehandle);
