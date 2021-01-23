@@ -1,5 +1,6 @@
 string body_name
 geometry_msgs/Point target
+string model_name
 ---
 float64[] q_res
 bool worked

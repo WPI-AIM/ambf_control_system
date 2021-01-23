@@ -1,4 +1,5 @@
 float64[] q
+string model_name
 ---
 string[] names
 geometry_msgs/Point[] points
