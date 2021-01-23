@@ -50,7 +50,7 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
     if( name.empty()  )
     {
         //if there are not models and the name was not set then make it the default one
-        if(have_model)
+        if(!have_model)
         {
             ROS_INFO("Setting the name to default");
             name = default_name;
@@ -67,13 +67,16 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
     models[name] = new Model();
     std::string actuator_config_file = req.model;
     BuildRBDLModel  buildRBDLModel(actuator_config_file);
+    ROS_INFO("ch0");
     body_ids[name] = buildRBDLModel.getRBDLBodyToIDMap();
     joint_names[name] = buildRBDLModel.getJointNames();
-    *model = buildRBDLModel.getRBDLModel();
+    ROS_INFO("ch1");
+    *models[name] = buildRBDLModel.getRBDLModel();
+    ROS_INFO("ch2");
     //buildRBDLModel.cleanUp();
     joint_map[name] = buildRBDLModel.getRBDLJointToIDMap();
     std::unordered_map<std::string, unsigned int>::iterator itr;
-   
+    ROS_INFO("ch3");
    
     for (itr = joint_map[name].begin(); itr != joint_map[name].end(); itr++) 
     {
