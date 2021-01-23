@@ -22,13 +22,16 @@ RBDLServer::RBDLServer(ros::NodeHandle* nodehandle):nh_(*nodehandle)
 
 RBDLServer::~RBDLServer()
 {
-    delete model;
+    for(std::unordered_map<std::string, RigidBodyDynamics::Model*>::iterator itr = models.begin(); itr != models.end(); itr++)
+    {
+        delete(itr->second);
+    }
 }
 
 
-RigidBodyDynamics::Model* RBDLServer::getModel()
+RigidBodyDynamics::Model* RBDLServer::getModel(std::string name)
 {
-    return model;
+    return models[name];
 }
 
 ///
@@ -41,6 +44,7 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
 
     ROS_INFO("Parsing");
     std::string name = req.model_name;
+
 
     //create the name of then model 
     if( name.empty()  )
@@ -86,10 +90,15 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
  bool RBDLServer::GetJointNames_srv(rbdl_server::RBDLBodyNamesRequest& req, rbdl_server::RBDLBodyNamesResponse& res)
  {
 
-     std::string name = req.model_name;
+    std::string name = req.model_name;
+    
+    if(req.model_name.empty())
+    {
+        name = default_name;
+    }
 
-     if (checkModelExists(name))
-     {
+    if (checkModelExists(name))
+    {
         for (auto i = joint_names[name].begin(); i != joint_names[name].end(); ++i)
             std::cout << *i << ' ';
 
@@ -107,12 +116,17 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
 
  bool RBDLServer::AMBF2RBDL_srv(rbdl_server::RBDLModelAlignmentRequest& req , rbdl_server::RBDLModelAlignmentResponse& res)
  {
+
         
     std::vector<std::string> names;
     std::vector<int> ids;
     std::unordered_map<std::string, unsigned int>::iterator itr;
     std::string name = req.model_name;
    
+    if(name.empty())
+    {
+        name = default_name;
+    }
 
     if (checkModelExists(name))
     {
@@ -144,6 +158,11 @@ bool  RBDLServer::ForwardDynamics_srv(rbdl_server::RBDLForwardDynamicsRequest& r
 
     std::string name = req.model_name;
  
+    if(req.model_name.empty())
+    {
+        name = default_name;
+    }
+
     if (!checkModelExists(name))
     {
 
@@ -192,6 +211,12 @@ bool RBDLServer::InverseDynamics_srv(rbdl_server::RBDLInverseDynamicsRequest& re
 
     std::string name = req.model_name;
  
+
+    if(req.model_name.empty())
+    {
+        name = default_name;
+    }
+
     if (!checkModelExists(name))
     {
 
@@ -251,6 +276,12 @@ bool RBDLServer::InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest
     Vector3d local_point (0.0, 0.0, 0.0);
     Vector3d target_point (req.target.x, req.target.y, req.target.z);
 
+    if(req.model_name.empty())
+    {
+        name = default_name;
+    }
+
+
     if (checkModelExists(name))
     {
         int id = body_ids[name][req.body_name];
@@ -294,7 +325,11 @@ bool RBDLServer::ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest& req, 
     geometry_msgs::Pose pose;
     int size = res.points.size();
    
- 
+    
+    if(req.model_name.empty())
+    {
+        name = default_name;
+    }
 
     if (checkModelExists(name))
     {
@@ -353,6 +388,10 @@ bool RBDLServer::Jacobian_srv(rbdl_server::RBDLJacobianRequest& req, rbdl_server
     Vector3d point(req.point.x, req.point.y, req.point.z);
     
  
+    if(req.model_name.empty())
+    {
+        name = default_name;
+    }
 
     if (checkModelExists(name))
     {
@@ -402,6 +441,10 @@ bool RBDLServer::GetNames_srv(rbdl_server::RBDLBodyNamesRequest& req, rbdl_serve
     std::vector<std::string> names;
     std::string name = req.model_name;
  
+    if(req.model_name.empty())
+    {
+        name = default_name;
+    }
 
     if (checkModelExists(name))
     {
@@ -448,7 +491,6 @@ void RBDLServer::GetNames(const std::string& name, std::vector<std::string>& nam
     }
 
 }
-
 
 
 bool RBDLServer::checkModelExists(std::string key) 

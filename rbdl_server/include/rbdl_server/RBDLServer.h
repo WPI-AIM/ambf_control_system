@@ -86,7 +86,7 @@ class RBDLServer
 
     ros::ServiceServer FD_srv, ID_srv, MD_srv, Jac_srv, Kin_srv, InvKin_srv, JointNames_srv, JointAlign_srv;
     VectorNd VectToEigen(const std::vector<double>&);
-    RigidBodyDynamics::Model* getModel();
+    RigidBodyDynamics::Model* getModel(std::string);
     bool CreateModel_srv(rbdl_server::RBDLModelRequest&, rbdl_server::RBDLModelResponse& ); //parses the AMBF model into  rbdl model
     bool CheckSize(int); //need to implement this to find way of checking the msg field sizes
     bool ForwardDynamics_srv(rbdl_server::RBDLForwardDynamicsRequest&, rbdl_server::RBDLForwardDynamicsResponse&  );
