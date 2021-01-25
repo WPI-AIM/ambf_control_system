@@ -1,5 +1,5 @@
-string[] names
 string model_name
+string[] names
 ---
 string[] names
 int32[] ids

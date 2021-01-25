@@ -1,6 +1,6 @@
+string model_name
 float64[] q
 float64[] qd
 float64[] tau
-string model_name
 ---
 float64[] qdd

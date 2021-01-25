@@ -94,7 +94,7 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
  {
 
     std::string name = req.model_name;
-    
+    ROS_INFO("Called Get Joint name Server");
     if(req.model_name.empty())
     {
         name = default_name;
@@ -120,7 +120,7 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
  bool RBDLServer::AMBF2RBDL_srv(rbdl_server::RBDLModelAlignmentRequest& req , rbdl_server::RBDLModelAlignmentResponse& res)
  {
 
-        
+    ROS_INFO("Called AMBF to RBDL Server");        
     std::vector<std::string> names;
     std::vector<int> ids;
     std::unordered_map<std::string, unsigned int>::iterator itr;
@@ -159,6 +159,7 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
 bool  RBDLServer::ForwardDynamics_srv(rbdl_server::RBDLForwardDynamicsRequest& req, rbdl_server::RBDLForwardDynamicsResponse&  res )
 {
 
+    ROS_INFO("Called Forward Dynamics Server");
     std::string name = req.model_name;
  
     if(req.model_name.empty())
@@ -212,6 +213,7 @@ bool  RBDLServer::ForwardDynamics_srv(rbdl_server::RBDLForwardDynamicsRequest& r
 bool RBDLServer::InverseDynamics_srv(rbdl_server::RBDLInverseDynamicsRequest& req, rbdl_server::RBDLInverseDynamicsResponse&  res)
 {
 
+    ROS_INFO("Called Inverse Dynamics Server");
     std::string name = req.model_name;
  
 
@@ -269,6 +271,7 @@ bool RBDLServer::InverseDynamics_srv(rbdl_server::RBDLInverseDynamicsRequest& re
 bool RBDLServer::InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest& req, rbdl_server::RBDLInverseKinimaticsResponse& res)
 {
     
+    ROS_INFO("Called Inverse Kinimatics Server");
     double ste_tol = 1.0e-12;
     double lambda = 0.01;
     unsigned int max_iter = 50;
@@ -316,6 +319,9 @@ bool RBDLServer::InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest
 ///
 bool RBDLServer::ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest& req, rbdl_server::RBDLKinimaticsResponse& res)
 {
+
+    ROS_INFO("Called Forward Kinimatics Server");
+
     std::string key;
     int id;
     std::string name = req.model_name;
@@ -382,6 +388,8 @@ bool RBDLServer::ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest& req, 
 bool RBDLServer::Jacobian_srv(rbdl_server::RBDLJacobianRequest& req, rbdl_server::RBDLJacobianResponse& res)
 {
     
+    ROS_INFO("Called Jacobian Server");
+
     std::vector<std::string> names;
     int id;
     std_msgs::Float64MultiArray msg;
@@ -440,6 +448,7 @@ bool RBDLServer::Jacobian_srv(rbdl_server::RBDLJacobianRequest& req, rbdl_server
 ///
 bool RBDLServer::GetNames_srv(rbdl_server::RBDLBodyNamesRequest& req, rbdl_server::RBDLBodyNamesResponse& res)
 {
+    ROS_INFO("Called Get body name Server");
     
     std::vector<std::string> names;
     std::string name = req.model_name;
