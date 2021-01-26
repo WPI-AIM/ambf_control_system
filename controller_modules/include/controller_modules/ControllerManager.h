@@ -13,6 +13,7 @@ class ControllerManager
 {
     public:
         ControllerManager(ros::NodeHandle*);
+        ControllerManager();
         ~ControllerManager();
         void addController(std::string, boost::shared_ptr<ControllerBase>  );
         std::vector<std::string> getControllerList();

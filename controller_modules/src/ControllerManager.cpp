@@ -8,6 +8,9 @@ ControllerManager::ControllerManager(ros::NodeHandle* n):nh(*n)
     controller_list_srv = nh.advertiseService("ControllerList", &ControllerManager::getControllersListSrv, this);
 }
 
+ControllerManager::ControllerManager() {}
+
+
 ControllerManager::~ControllerManager()
 {
     
