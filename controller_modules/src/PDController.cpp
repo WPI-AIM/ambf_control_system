@@ -8,6 +8,10 @@ PDController::PDController(const Eigen::MatrixXd& _Kp, const Eigen::MatrixXd& _K
     dimensions = Kp.rows();
 }
 
+PDController::PDController()
+{
+
+}
 
 PDController::~PDController()
 {

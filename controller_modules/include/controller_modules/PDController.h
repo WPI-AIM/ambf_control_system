@@ -9,7 +9,8 @@ class PDController : public ControllerBase
      public:
 
           PDController(const Eigen::MatrixXd&, const Eigen::MatrixXd&);
-          ~PDController(void);
+          PDController();
+          ~PDController();
           bool setKp(const Eigen::MatrixXd&);
           bool setKd(const Eigen::MatrixXd&);
           Eigen::MatrixXd getKp();
