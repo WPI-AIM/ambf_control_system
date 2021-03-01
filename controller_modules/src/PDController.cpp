@@ -73,7 +73,7 @@ Eigen::MatrixXd PDController::validateMat(const Eigen::MatrixXd& mat1, const Eig
     int r2 = mat2.rows();
     int c2 = mat2.cols();
 
-    if( r1 == c1 && r1 == r2 && c1 == c2){ //make sure it is square and both are equal
+    if( r1 == r2 && c1 == c2){ //make sure it is square and both are equal
        return mat1;
     }
     else{
@@ -92,14 +92,33 @@ void PDController::calculate_torque(const Eigen::VectorXd &e, const Eigen::Vecto
 void PDController::update(const trajectory_msgs::JointTrajectoryPoint& actual, const trajectory_msgs::JointTrajectoryPoint& desired, std::vector<double>& torque)
 {
     
-    Eigen::VectorXd e = VectToEigen(desired.positions) - VectToEigen(actual.positions);
-    Eigen::VectorXd ed = VectToEigen(desired.velocities) - VectToEigen(actual.velocities); 
-    Eigen::VectorXd tau_(e.rows());
-    calculate_torque(e, ed, tau_);
-    std::vector<double> my_tau(&tau_[0], tau_.data()+tau_.cols()*tau_.rows());
-    tau = my_tau;
-    //error = std::vector<double>(&e[0], e.data()+e.cols()*e.rows());
-    torque = tau;
+    
+
+    int dp_size = desired.positions.size();
+    int ap_size = actual.positions.size();
+    int pv_size = desired.velocities.size();
+    int av_size = actual.velocities.size();
+
+
+    if(dp_size == ap_size && dp_size == pv_size && dp_size == av_size )
+    {
+        Eigen::VectorXd e = VectToEigen(desired.positions) - VectToEigen(actual.positions);
+        Eigen::VectorXd ed = VectToEigen(desired.velocities) - VectToEigen(actual.velocities); 
+        Eigen::VectorXd tau_(e.rows());
+        calculate_torque(e, ed, tau_);
+    
+        if (desired.accelerations.size() == dp_size)
+        {
+            tau_ = tau_ +  VectToEigen(desired.accelerations); 
+        }
+        
+        std::vector<double> my_tau(&tau_[0], tau_.data()+tau_.cols()*tau_.rows());
+        tau = my_tau;
+        //error = std::vector<double>(&e[0], e.data()+e.cols()*e.rows());
+        torque = tau;
+
+    }    
+
     
 }
 

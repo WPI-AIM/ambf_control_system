@@ -82,7 +82,6 @@ set(RBDL_MODEL_TESTS_SOURCE_FILES
     src/main.cpp
     )
 
-find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 include_directories (${GLFW_INCLUDE_DIRS})
 
@@ -112,7 +111,7 @@ ENDIF (RBDL_BUILD_STATIC)
 
 TARGET_LINK_LIBRARIES ( rbdl_model_tests
 # ${AMBF_CLIENT_LIBRARY}
-  ${GLFW_LIBRARIES}
+
   ${Boost_LIBRARIES}
   ${Eigen_LIBRARIES}
   ${RBDL_LIBRARY}
