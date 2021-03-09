@@ -9,6 +9,10 @@
 #include "controller_modules/ControllerList.h"
 #include <vector>
 
+/**
+ * @brief Manages the attached controllers and wrapps them to be called by ros
+ * 
+ */
 class ControllerManager
 {
     public:

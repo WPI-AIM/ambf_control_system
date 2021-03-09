@@ -18,7 +18,6 @@ class PDController : public ControllerBase
           void calculate_torque( const Eigen::VectorXd& e, const  Eigen::VectorXd& ed, Eigen::VectorXd& tau);
           void update(const trajectory_msgs::JointTrajectoryPoint&, const  trajectory_msgs::JointTrajectoryPoint&, std::vector<double>&);
           
-
      private:
 
           Eigen::MatrixXd Kp;

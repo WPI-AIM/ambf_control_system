@@ -4,12 +4,17 @@
 #include <Eigen/Core>
 #include <ros/ros.h>
 
+/**
+ * @brief Base class for controllers to be build
+ * 
+ */
 class ControllerBase
 {
    public:
     ControllerBase(){}
     ~ControllerBase(){}
 
+   //overide function to calculate the controller output
     virtual void update(const trajectory_msgs::JointTrajectoryPoint&, const trajectory_msgs::JointTrajectoryPoint&, std::vector<double>&)=0;
     virtual std::vector<double> get_error(){return error;}
     virtual std::vector<double> get_tau(){return tau;}  
@@ -20,6 +25,7 @@ class ControllerBase
       std::vector<double> error;
       std::vector<double> tau;
      
+      //helper function to convert between the std vectors and Eigen vectors
       template<typename T, typename A>
       Eigen::VectorXd VectToEigen(std::vector<T,A> const& msg )   
       {
