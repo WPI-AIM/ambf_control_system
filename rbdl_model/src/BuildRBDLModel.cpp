@@ -1,7 +1,5 @@
 #include "rbdl_model/BuildRBDLModel.h"
 
-
-
 BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) {
     actuator_config_file_ = actuator_config_file;
 
@@ -9,9 +7,6 @@ BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) {
         baseNode_ = YAML::LoadFile(actuator_config_file_);
 
     } catch (std::exception &e){
-//        std::cerr << "[Exception]: " << e.what() << std::endl;
-//        std::cerr << "ERROR! FAILED TO ACTUATOR CONFIG: " << actuator_config_file_ << std::endl;
-//        return;
 
         std::ostringstream errormsg;
         errormsg <<
@@ -28,7 +23,6 @@ BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) {
     if(!this->findBaseNode()) return;
     this->addDummyBaseJoint();
     this->buildModel();
-    this->make_trial_model();
 }
 
 void BuildRBDLModel::getNamespace() {
@@ -68,7 +62,6 @@ bool BuildRBDLModel::getJoints()
         YAML::Node joint_yaml = baseNode_[joint_name_expanded];
         std::string joint_name;
         if(joint_yaml.IsDefined()) joint_name = utilities.trimTrailingSpaces(joint_yaml["name"]);
-//        std::cout << "joint_name: " << joint_name << std::endl;
         std::string parent_name;
 
         YAML::Node name = baseNode_[joint_name_expanded]["name"];
@@ -117,8 +110,6 @@ bool BuildRBDLModel::findBaseNode() {
 
     std::unordered_set<std::string>::iterator it = parentNodeSet.begin();
     baseRigidBody_ = *it;
-
-//    std::cout << "Base node: " << *it << std::endl;
     return true;
 }
 
@@ -163,29 +154,13 @@ bool BuildRBDLModel::buildModel() {
         outter_map_itr = jointParamObjectMap_.find(parent_name);
         if(outter_map_itr != jointParamObjectMap_.end()) {
             unsigned int parent_id = rbdlObjectMap_[parent_name];
-//            std::cout << "parent_name: " << parent_name << ", parent_id: " << parent_id << ", its children: ";
             for (inner_map_itr = outter_map_itr->second.begin(); inner_map_itr != outter_map_itr->second.end(); inner_map_itr++) {
 
                 std::string child_name = inner_map_itr->second->Child();
-//                std::cout << child_name << ", ";
 
                 // Create RBDL Joint between parent and child
                 std::string joint_name = inner_map_itr->first;
-
-//                 std::cout << "buildModel() - parent_name: " << parent_name << ", parent_id: " << parent_id
-//                           << ", joint_name: " << joint_name << ", child_name: " << child_name
-// //                          << ", baseRigidBody_: " << baseRigidBody_
-// //                          << ", << base_parent_name_: " << base_parent_name_
-//                           << std::endl;
-
                 unsigned int child_id = addBodyToRBDL(parent_name, parent_id, joint_name, child_name);
-
-
-                std::cout << "buildModel() - parent_name: " << parent_name << ", parent_id: " << parent_id
-                << ", joint_name: " << joint_name << ", child_name: " << child_name << ", child_id: " << child_id
-//                          << ", baseRigidBody_: " << baseRigidBody_
-//                          << ", << base_parent_name_: " << base_parent_name_
-                << std::endl;
 
                 joint_map.insert(std::make_pair(joint_name, child_id));
                 rbdl_object_map_itr_ = rbdlObjectMap_.find((child_name));
@@ -194,72 +169,12 @@ bool BuildRBDLModel::buildModel() {
                     rbdlObjectMap_.insert(std::make_pair(child_name, child_id));
                 }
             }
-//            std::cout << std::endl;
         }
 
     }
 
     return true;
 }
-
-
-void BuildRBDLModel::make_trial_model()
-{
-    model = new Model();
-    model->gravity = Vector3d (0.0, 0.0, -9.81);
-
-    unsigned int body1_id, body2_id, body3_id, body4_id, body5_id, body6_id, body7_id, body8_id ;
-    Body body1, body2, body3, body4, body5, body6, body7, body8;
-
-    Joint joint1, joint2, joint3, joint4, joint5, joint6, joint7, joint8;
-
-    body1 = Body(1.0, Vector3d(0.001,0,0.06), Vector3d(0.01,0.01,0.01) );
-    body2 = Body(1.0, Vector3d(0.0,-0.017,0.134), Vector3d(0.00815814, 0.007363868, 0.003293455) );
-    body3 = Body(1.0, Vector3d(0.0,-0.074,0.009), Vector3d(0.00812252, 0.00329668, 0.00733904) );
-    body4 = Body(1.0, Vector3d(0.0, 0.017, 0.134), Vector3d(0.008159,0.007421,0.00330) );
-    body5 = Body(1.0, Vector3d(-0.001,0.081,0.008), Vector3d(0.0081471,0.003297,0.0073715) );
-    body6 = Body(1.0, Vector3d(0.0,-0.017,0.129), Vector3d(0.0077265,0.006950,0.00329) );
-    body7 = Body(1.0, Vector3d(0.0,0.007,0.068), Vector3d(0.002983,0.003299,0.003146) );
-    body8 = Body(1.0, Vector3d(0.006,0.0,0.015), Vector3d(0.000651,0.0006512,0.001120) );
-
-    joint1 = Joint (JointTypeFixed);
-    joint2 = Joint (JointTypeRevoluteZ);
-    joint3 = Joint (JointTypeRevoluteZ);
-    joint4 = Joint (JointTypeRevoluteZ);
-    joint5 = Joint (JointTypeRevoluteZ);
-    joint6 = Joint (JointTypeRevoluteZ);
-    joint7 = Joint (JointTypeRevoluteZ);
-    joint8 = Joint (JointTypeRevoluteZ);
-
-    Matrix3d rot1 = Matrix3d::Identity(3,3);
-    Matrix3d rot2 = Matrix3d::Identity(3,3);
-    Matrix3d rot3 = Matrix3d::Identity(3,3);
-    rot3(1,2) = -1.0; rot3(2,2) = 0.0; rot3(2,1) = 1.0; rot3(1,1) = 0.0;
-    Matrix3d rot4 = Matrix3d::Identity(3,3);
-    rot4(1,2) = 1.0; rot4(2,2) = 0.0; rot4(2,1) = -1.0; rot4(1,1) = 0.0;
-    Matrix3d rot5 = Matrix3d::Identity(3,3);
-    rot5(1,2) = 1.0; rot5(2,2) = 0.0; rot5(2,1) = -1.0; rot5(1,1) = 0.0;
-    Matrix3d rot6 = Matrix3d::Identity(3,3);
-    rot6(1,2) = -1.0; rot6(2,2) = 0.0; rot6(2,1) = 1.0; rot6(1,1) = 0.0;
-    Matrix3d rot7 = Matrix3d::Identity(3,3);
-    rot7(1,2) = -1.0; rot7(2,2) = 0.0; rot7(2,1) = 1.0; rot7(1,1) = 0.0;
-    Matrix3d rot8 = Matrix3d::Identity(3,3);
-    rot8(1,2) = 1.0; rot4(2,2) = 0.0; rot4(2,1) = -1.0; rot4(1,1) = 0.0;
-
-    body1_id = model->AppendBody(SpatialTransform (rot1, Vector3d(0.0, 0.0, 0.0)  ),  joint1, body1, "base"  );
-    body2_id = model->AppendBody(SpatialTransform (rot2, Vector3d(0.0, 0.0, 0.103)  ),  joint2, body2, "link1"  );
-    body3_id = model->AppendBody(SpatialTransform (rot3, Vector3d(0.0, 0.013, 0.209)  ),  joint3, body3, "link2"  );
-    body4_id = model->AppendBody(SpatialTransform (rot4, Vector3d(0.0, -0.194, -0.009)  ),  joint4, body4, "link3"  );
-    body5_id = model->AppendBody(SpatialTransform (rot5, Vector3d(0.0, -0.013, 0.202)  ),  joint5, body5, "link4"  );
-    body6_id = model->AppendBody(SpatialTransform (rot6, Vector3d(-0.002, 0.202, -0.008)  ),  joint6, body6, "link5"  );
-    body7_id = model->AppendBody(SpatialTransform (rot7, Vector3d(0.002, -0.052, 0.204)  ),  joint7, body7, "link6" );
-    body8_id = model->AppendBody(SpatialTransform (rot8, Vector3d(-0.003, -0.05, 0.053)  ),  joint8, body8, "link7"  );
-
-
-}
-
-
-
 
 
 unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned int parent_id, std::string joint_name, std::string child_name) {
@@ -274,113 +189,57 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
 
     Vector3d parent_pivot = (jointParamObjectMap_[parent_name][joint_name])->ParentPivot();
     Vector3d parent_axis = (jointParamObjectMap_[parent_name][joint_name])->ParentAxis();
-
-//    Vector3d child_pivot = (jointParamObjectMap_[parent_name][joint_name])->ChildPivot();
     Vector3d child_axis = (jointParamObjectMap_[parent_name][joint_name])->ChildAxis();
 
-
     Math::Matrix3d rotation_matrix = utilities.rotationMatrixFromVectors(parent_axis, child_axis);
-
-
-////    std::cout << "parent_pivot: " << parent_pivot[0] << ", " << parent_pivot[1] << ", " << parent_pivot[2] << std::endl;
-
-
-
-
 
     unsigned int child_id;
     Joint joint;
 
     // check if the body is base
-//    if(parent_name == base_parent_name_ || (RBDLmodel_->GetBodyId(child_name.c_str()) == UINT_MAX && parent_name != base_parent_name_)) {
-//      if(parent_name == base_parent_name_) {
         if(parent_name == base_parent_name_) {
-//            child_id = RBDLmodel_->AddBody(parent_id, Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
-            std::cout << "addBodyToRBDL() - inside (parent_name == base_parent_name_)" << std::endl;
             joint = Joint (JointTypeFixed);
-//            joint = SpatialVector (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-//            body1_id = model->AppendBody(SpatialTransform (rot1, Vector3d(0.0, 0.0, 0.0)  ),  joint1, body1  );
         } else {
-//            child_id = RBDLmodel_->AppendBody(Xtrans(parent_pivot), joint_rot_z, child_body.get(), child_name.c_str());
-//            joint = Joint (JointTypeRevoluteZ);
-//            if(mostd::numeric_limits<unsigned int>::max())
             while(RBDLmodel_->GetBodyId(child_name.c_str()) != std::numeric_limits<unsigned int>::max()) {
                 child_name = child_name + "~";
                 std::cout << "Inside dupe child_name check" << std::endl;
             }
 
             joint = SpatialVector (child_axis[0], child_axis[1], child_axis[2], 0.0, 0.0, 0.0);
-
-//            if(joint_name == "ExoRightHip") {
-//                std::cout << "addBodyToRBDL inside if - joint_name: " << joint_name
-//                          << ", parent_name: " << parent_name << ", parent_id: " << parent_id
-//                          << ", child_name: " << child_name << std::endl;
-//            }
-//        }
-
-//        if(joint_name == "ExoRightHip") {
-////            parent_id = RBDLmodel_->GetParentBodyId(child_id);
-//            parent_name = RBDLmodel_->GetBodyName(parent_id);
-//            std::cout << "addBodyToRBDL outside if - joint_name: " << joint_name
-//                      << ", parent_name: " << parent_name << ", parent_id: " << parent_id
-//                      << ", child_name: " << child_name
-//                      << std::endl;
-//        }
-
-
-
-//        if(joint_name == "ExoRightHip") {
-//            parent_id = RBDLmodel_->GetParentBodyId(child_id);
-//            parent_name = RBDLmodel_->GetBodyName(parent_id);
-//            std::cout << "addBodyToRBDL - joint_name: " << joint_name
-//                      << ", parent_name: " << parent_name << ", parent_id: " << parent_id
-//                      << ", child_name: " << child_name << ", child_id: " << child_id
-//                      << std::endl;
-//        }
     }
 
     rbdlBodyMap_.insert(std::make_pair(child_name, child_body));
-    std::cout << "before addbody() - parent_id: " << parent_id << ", parent_name: " << parent_name
-              << ", child_name.c_str(): " << child_name.c_str()
-              << std::endl;
-    child_id = RBDLmodel_->AddBody(parent_id, SpatialTransform (rotation_matrix, parent_pivot), joint, child_body.get(), child_name.c_str());
-//    body_id_emulated[BodyPelvis] = model_emulated->AddBody (0, Xtrans (Vector3d (0., 0., 0.)), free_flyer, pelvis_body, "pelvis");
-    std::cout << "before addbody() - parent_id: " << parent_id << ", parent_name: " << parent_name
-              << ", child_id: " << child_id << ", child_name.c_str(): " << child_name.c_str()
-              << std::endl;
-    std::cout << "------addBodyToRBDL - before return child------------" << std::endl;
-    return child_id;
 
-//    return 0;
+    child_id = RBDLmodel_->AddBody(parent_id, SpatialTransform (rotation_matrix, parent_pivot), joint, child_body.get(), child_name.c_str());
+    return child_id;
 }
 
 const rbdlJointType BuildRBDLModel::getRBDLJointType(std::string joint_type) {
-    if (joint_type == "undefined") return JointTypeUndefined; //Not supported
-    else if (joint_type == "revolute") return JointTypeRevolute; //Tested with YAML file and works
-    else if (joint_type == "prismatic") return JointTypePrismatic; //Tested with YAML file and works
-    else if (joint_type == "revoluteX") return JointTypeRevoluteX; //Tested with hard coded values
-    else if (joint_type == "revolutey") return JointTypeRevoluteY; //Tested with hard coded values
-    else if (joint_type == "revoluteZ") return JointTypeRevoluteZ; //Tested with hard coded values
-    else if (joint_type == "spherical") return JointTypeSpherical; //Tested with hard coded values
-    else if (joint_type == "eulerzyx") return JointTypeEulerZYX; //Tested with hard coded values
-    else if (joint_type == "eulerxyz") return JointTypeEulerXYZ; //Tested with hard coded values
-    else if (joint_type == "euleryxz") return JointTypeEulerYXZ; //Tested with hard coded values
-    else if (joint_type == "translationxyz") return JointTypeTranslationXYZ; //Tested with hard coded values
-    else if (joint_type == "base") return JointTypeFloatingBase; //Tested with hard coded values
-    else if (joint_type == "fixed") return JointTypeFixed; //Tested with hard coded values
-    else if (joint_type == "helical") return JointTypeHelical; //Tested with hard coded values
-    else if (joint_type == "1dof") return JointType1DoF; //Not supported
-    else if (joint_type == "2dof") return JointType2DoF; //Tested with hard coded values
-    else if (joint_type == "p2p") return JointType3DoF; //Tested with YAML file and works
-    else if (joint_type == "4dof") return JointType4DoF; //Tested with hard coded values
-    else if (joint_type == "5dof") return JointType5DoF; //Tested with hard coded values
-    else if (joint_type == "6dof") return JointType6DoF; //Tested with hard coded values
-    else if (joint_type == "custom") return JointTypeCustom; //Tested with hard coded values
+    if (joint_type == "undefined") return JointTypeUndefined;
+    else if (joint_type == "revolute") return JointTypeRevolute;
+    else if (joint_type == "prismatic") return JointTypePrismatic;
+    else if (joint_type == "revoluteX") return JointTypeRevoluteX;
+    else if (joint_type == "revolutey") return JointTypeRevoluteY;
+    else if (joint_type == "revoluteZ") return JointTypeRevoluteZ;
+    else if (joint_type == "spherical") return JointTypeSpherical;
+    else if (joint_type == "eulerzyx") return JointTypeEulerZYX;
+    else if (joint_type == "eulerxyz") return JointTypeEulerXYZ;
+    else if (joint_type == "euleryxz") return JointTypeEulerYXZ;
+    else if (joint_type == "translationxyz") return JointTypeTranslationXYZ;
+    else if (joint_type == "base") return JointTypeFloatingBase;
+    else if (joint_type == "fixed") return JointTypeFixed;
+    else if (joint_type == "helical") return JointTypeHelical;
+    else if (joint_type == "1dof") return JointType1DoF;
+    else if (joint_type == "2dof") return JointType2DoF;
+    else if (joint_type == "p2p") return JointType3DoF;
+    else if (joint_type == "4dof") return JointType4DoF;
+    else if (joint_type == "5dof") return JointType5DoF;
+    else if (joint_type == "6dof") return JointType6DoF;
+    else if (joint_type == "custom") return JointTypeCustom;
 }
 
 std::vector<std::string> BuildRBDLModel::getAllBodyNames() {
     std::vector<std::string> bodyNames;
-//    std::transform (objects_map_[msg_type].begin(), objects_map_[msg_type].end(),back_inserter(object_names), [] (std::pair<string, iBaseObjectPtr> const & pair)
     std::transform (bodyParamObjectMap_.begin(), bodyParamObjectMap_.end(), back_inserter(bodyNames), [] (std::pair<std::string, bodyParamPtr> const & pair)
     {
     return pair.first;
@@ -414,8 +273,6 @@ std::unordered_map<std::string, jointParamPtr> BuildRBDLModel::getJointChildren(
     }
 
     std::cout << "Parent: " << parent << " does not have any children in the model" << std::endl;
-
-//    return std::unordered_map<std::string, jointParamPtr>();
     return {};
 }
 
@@ -464,11 +321,7 @@ std::vector<std::string> BuildRBDLModel::getJointNames()
             {
                 names.push_back(joint_name);
             }
-           
-            
-
         }
-      
     }
     return names;
 }

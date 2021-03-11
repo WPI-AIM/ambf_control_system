@@ -43,7 +43,6 @@ public:
     std::unordered_map<std::string, unsigned int> inline getRBDLBodyToIDMap() { return rbdlObjectMap_; }
     std::unordered_map<std::string, unsigned int> inline getRBDLJointToIDMap() { return joint_map; }
     Model inline getRBDLModel() { return *RBDLmodel_; }
-    Model inline getTrialRBDLModel() { return *model; }
 
     std::string inline getBaseRigidBody() { return baseRigidBody_; }
 
@@ -87,11 +86,7 @@ private:
     unsigned int addBodyToRBDL(std::string parent_name, unsigned int parent_id, std::string joint_name, std::string child_name);
 
     // Below Maps are used for Getters only. They dont play a role in model creation.
-//    std::unordered_map<std::string, rbdlBody> rbdlBodyMap_;
     std::unordered_map<std::string, boost::optional<rbdlBody>> rbdlBodyMap_;
-
-    void make_trial_model();
-
 };
 
 #endif // PARSE_YAML_H

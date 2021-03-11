@@ -31,13 +31,7 @@ private:
     Vector3d parent_pivot_;
     Vector3d child_axis_;
     Vector3d child_pivot_;
-//    double joint_limits_high_{0.0};
-//    double joint_limits_low_{0.0};
-//    bool passive_{false};
-//    bool detached_{false};
     std::string type_;
-//    double damping_{0.0};
-//    double offset_{0.0};
 
 
 };
