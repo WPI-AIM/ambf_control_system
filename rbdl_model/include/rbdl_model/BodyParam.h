@@ -3,7 +3,9 @@
 #include <iostream>
 #include <rbdl_model/Utilities.h>
 
-
+/*
+ * BodyParam Class is used to hold values of Body parameter
+ */
 using namespace RBDLModel;
 
 class BodyParam

@@ -32,7 +32,10 @@ void BuildRBDLModel::getNamespace() {
     if(blender_namespace.IsDefined())  blender_namespace_ = utilities.trimTrailingSpaces(blender_namespace);
 }
 
-
+/*
+ * Parse YAML file and create instances of Body class for each body of the model
+ * @return true after successful parsing
+ */
 bool BuildRBDLModel::getBodies()
 {
     Utilities utilities;
@@ -50,6 +53,10 @@ bool BuildRBDLModel::getBodies()
     return true;
 }
 
+/*
+ * Parse YAML file and create instances of Joint class for each Joint of the model
+ * @return true after successful parsing
+ */
 bool BuildRBDLModel::getJoints()
 {
     YAML::Node joints = baseNode_["joints"];
@@ -72,15 +79,21 @@ bool BuildRBDLModel::getJoints()
         parent_name = utilities.trimTrailingSpaces(parent);
         utilities.eraseSubStr(parent_name, "BODY");
 
+        // Children for earch body sorted in a map
         jointParamObjectMap_.insert(std::make_pair(parent_name, std::unordered_map<std::string, jointParamPtr>()));
         jointParamObjectMap_[parent_name].insert(std::make_pair(joint_name, new JointParam(baseNode_[joint_name_expanded])));
     }
     return true;
 }
 
-
+/*
+ * Find the base of the model
+ * @return true after successfully finding the base
+ */
 bool BuildRBDLModel::findBaseNode() {
+    // Holds parent of all the joints.
     std::unordered_set<std::string> parentNodeSet;
+    // Holds children of all the joints
     std::unordered_set<std::string> childNodeSet;
 
     std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr> >::iterator itr;
@@ -89,16 +102,18 @@ bool BuildRBDLModel::findBaseNode() {
     for (itr = jointParamObjectMap_.begin(); itr != jointParamObjectMap_.end(); itr++) {
         for (ptr = itr->second.begin(); ptr != itr->second.end(); ptr++) {
             jointParamPtr jointParamptr = ptr->second;
+
+            // Remove the body names from the parent set which are in child set
             parentNodeSet.emplace(jointParamptr->Parent());
             childNodeSet.emplace(jointParamptr->Child());
         }
     }
 
-
     for (std::unordered_set<std::string>::iterator it=childNodeSet.begin(); it!=childNodeSet.end(); ++it) {
         if(parentNodeSet.find(*it) != parentNodeSet.end()) parentNodeSet.erase(*it);
     }
 
+    // In case multiple body names or body in remaining in the parent set, the root is undetermined.
     if(parentNodeSet.size() < 1) {
         std::cout << "No Base node found, invalid model." << std::endl;
         return false;
@@ -108,11 +123,15 @@ bool BuildRBDLModel::findBaseNode() {
         return false;
     }
 
+    // If only one body name remains in the parent set, that body is set as the root.
     std::unordered_set<std::string>::iterator it = parentNodeSet.begin();
     baseRigidBody_ = *it;
     return true;
 }
 
+/*
+ * Add a dummy parent to Base of the model just to handle RBDL model creation
+ */
 void BuildRBDLModel::addDummyBaseJoint() {
     // Create RBDL Joint for Base
     std::string joint_type = "fixed";
@@ -130,6 +149,10 @@ void BuildRBDLModel::addDummyBaseJoint() {
                                                                                  parent_axis, parent_pivot, child_axis, child_pivot, joint_type)));
 }
 
+/*
+ * Build RBDL Model
+ * @return true after successful RBDL model creation
+ */
 bool BuildRBDLModel::buildModel() {
     rbdl_check_api_version(RBDL_API_VERSION);
 
@@ -142,26 +165,38 @@ bool BuildRBDLModel::buildModel() {
     std::unordered_set<std::string> ancestry_set;
     std::unordered_set<std::string>::iterator ancestry_set_itr;
 
+    // Add Base body to RBDL model
     unsigned int base_id = addBodyToRBDL(base_parent_name_, 0, base_joint_name_, baseRigidBody_);
     rbdlObjectMap_.insert(std::make_pair(baseRigidBody_, base_id));
 
+    // Add base body to ancestry_set
     ancestry_set.emplace(baseRigidBody_);
+
+    // Iterate until ancestry_set is empty
     while(!ancestry_set.empty()) {
+
+        //Get and remove a body from ancestry_set
         ancestry_set_itr = ancestry_set.begin();
         std::string parent_name = *ancestry_set_itr;
         ancestry_set.erase(*ancestry_set_itr);
 
         outter_map_itr = jointParamObjectMap_.find(parent_name);
         if(outter_map_itr != jointParamObjectMap_.end()) {
+
+            // Get RBDL body_id of the Parent body
             unsigned int parent_id = rbdlObjectMap_[parent_name];
+
+            // For every child of Parent body, estabilish parent-child relationship in RBDL Model
             for (inner_map_itr = outter_map_itr->second.begin(); inner_map_itr != outter_map_itr->second.end(); inner_map_itr++) {
 
                 std::string child_name = inner_map_itr->second->Child();
-
-                // Create RBDL Joint between parent and child
                 std::string joint_name = inner_map_itr->first;
+
+                // Estabilish parent-child realationship in RBDL model and get RBDL body id of the child
                 unsigned int child_id = addBodyToRBDL(parent_name, parent_id, joint_name, child_name);
 
+                // Maintain the joint name and child id map. If the child_id doest already exist,
+                // add the child name to ancestry_set
                 joint_map.insert(std::make_pair(joint_name, child_id));
                 rbdl_object_map_itr_ = rbdlObjectMap_.find((child_name));
                 if(rbdl_object_map_itr_ == rbdlObjectMap_.end()) {
@@ -176,44 +211,63 @@ bool BuildRBDLModel::buildModel() {
     return true;
 }
 
-
+/*
+ * Estabilish RBDL Joints between parent and child body
+ * @param parent_name Parent name
+ * @param parent_id   RBDL Parent ID
+ * @param joint_name  Joint name
+ * @param child_name  Child name
+ * @return RBDL Child body id
+ */
 unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned int parent_id, std::string joint_name, std::string child_name) {
     Utilities utilities;
 
-    // Create RBDL body for child joint
+    // Get child body parameters
     double mass = (bodyParamObjectMap_[child_name])->Mass();
     Vector3d com = (bodyParamObjectMap_[child_name])->InertialOffsetPosition();
     Math::Matrix3d inertia = (bodyParamObjectMap_[child_name])->Inertia();
 
+    // Create RBDL child instance
     boost::optional<rbdlBody> child_body = Body(mass, com, inertia);
 
+    // Get child and parent positons for calculating Transformation between them
     Vector3d parent_pivot = (jointParamObjectMap_[parent_name][joint_name])->ParentPivot();
     Vector3d parent_axis = (jointParamObjectMap_[parent_name][joint_name])->ParentAxis();
     Vector3d child_axis = (jointParamObjectMap_[parent_name][joint_name])->ChildAxis();
 
+    // Calculate Rotation between Parent and child
     Math::Matrix3d rotation_matrix = utilities.rotationMatrixFromVectors(parent_axis, child_axis);
 
     unsigned int child_id;
     Joint joint;
 
-    // check if the body is base
-        if(parent_name == base_parent_name_) {
-            joint = Joint (JointTypeFixed);
-        } else {
-            while(RBDLmodel_->GetBodyId(child_name.c_str()) != std::numeric_limits<unsigned int>::max()) {
-                child_name = child_name + "~";
-                std::cout << "Inside dupe child_name check" << std::endl;
-            }
+    // If base joint, make it be fixed with respect to World
+    if(parent_name == base_parent_name_) {
+        joint = Joint (JointTypeFixed);
+    // Handle multiple Parents for a body. Just append ~ to body name.
+    // Otherwise RBDL would just throw duplicate body name exception
+    } else {
+        while(RBDLmodel_->GetBodyId(child_name.c_str()) != std::numeric_limits<unsigned int>::max()) {
+            child_name = child_name + "~";
+        }
 
-            joint = SpatialVector (child_axis[0], child_axis[1], child_axis[2], 0.0, 0.0, 0.0);
+        joint = SpatialVector (child_axis[0], child_axis[1], child_axis[2], 0.0, 0.0, 0.0);
     }
 
+    // This map is just for tracking purpose and not used for RBDL model creation
     rbdlBodyMap_.insert(std::make_pair(child_name, child_body));
 
+    // Crate RBDL Joint between parent and Child with parent_id, Transformation matrix, joint type, rbdl child body, child name
     child_id = RBDLmodel_->AddBody(parent_id, SpatialTransform (rotation_matrix, parent_pivot), joint, child_body.get(), child_name.c_str());
+
     return child_id;
 }
 
+/*
+ * Different joint types suppored by RBDL
+ * @param RBDL Joint tyep
+ * @return String Joint type
+ */
 const rbdlJointType BuildRBDLModel::getRBDLJointType(std::string joint_type) {
     if (joint_type == "undefined") return JointTypeUndefined;
     else if (joint_type == "revolute") return JointTypeRevolute;
@@ -238,6 +292,10 @@ const rbdlJointType BuildRBDLModel::getRBDLJointType(std::string joint_type) {
     else if (joint_type == "custom") return JointTypeCustom;
 }
 
+/*
+ * Get all body Names in RBDL model
+ * @return vector of body names
+ */
 std::vector<std::string> BuildRBDLModel::getAllBodyNames() {
     std::vector<std::string> bodyNames;
     std::transform (bodyParamObjectMap_.begin(), bodyParamObjectMap_.end(), back_inserter(bodyNames), [] (std::pair<std::string, bodyParamPtr> const & pair)
@@ -249,6 +307,11 @@ std::vector<std::string> BuildRBDLModel::getAllBodyNames() {
     return bodyNames;
 }
 
+/*
+ * Get RBDL body id with body name
+ * @param body name
+ * @return RBDL body id
+ */
 unsigned int BuildRBDLModel::getBodyId(const std::string bodyName) {
     if (rbdlObjectMap_.find(bodyName) != rbdlObjectMap_.end()){
         return rbdlObjectMap_[bodyName];
@@ -258,6 +321,11 @@ unsigned int BuildRBDLModel::getBodyId(const std::string bodyName) {
     return -1;
 }
 
+/*
+ * Get RBDL body with body name
+ * @param body name
+ * @return RBDL body
+ */
 boost::optional<rbdlBody> BuildRBDLModel::getRBDLBody(const std::string bodyName) {
     if(rbdlBodyMap_.find(bodyName) != rbdlBodyMap_.end()) {
         return rbdlBodyMap_[bodyName];
@@ -266,7 +334,11 @@ boost::optional<rbdlBody> BuildRBDLModel::getRBDLBody(const std::string bodyName
     return boost::none;
 }
 
-
+/*
+ * Get all children of a joint
+ * @param parent of the joint
+ * @return Joint name and children of the parent
+ */
 std::unordered_map<std::string, jointParamPtr> BuildRBDLModel::getJointChildren(std::string parent) {
     if(jointParamObjectMap_.find(parent) != jointParamObjectMap_.end()) {
         return jointParamObjectMap_[parent];
@@ -276,6 +348,9 @@ std::unordered_map<std::string, jointParamPtr> BuildRBDLModel::getJointChildren(
     return {};
 }
 
+/*
+ * Print all Bodies of the Model
+ */
 void BuildRBDLModel::printBody() {
     std::unordered_map<std::string, bodyParamPtr>::iterator body_map_itr;
     for (body_map_itr = bodyParamObjectMap_.begin(); body_map_itr != bodyParamObjectMap_.end(); body_map_itr++) {
@@ -284,6 +359,9 @@ void BuildRBDLModel::printBody() {
     std::cout << std::endl;
 }
 
+/*
+ * Print all Joints of the Model
+ */
 void BuildRBDLModel::printJoint() 
 {
     std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr>>::iterator outter_map_itr;
@@ -303,7 +381,10 @@ void BuildRBDLModel::printJoint()
     }
 }
 
-
+/*
+ * Get all Joint names of the model
+ * @return Joint name as vector
+ */
 
 std::vector<std::string> BuildRBDLModel::getJointNames() 
 {
@@ -327,7 +408,9 @@ std::vector<std::string> BuildRBDLModel::getJointNames()
 }
 
 
-
+/*
+ * Clean up memory
+ */
 void BuildRBDLModel::cleanUp() {
     std::unordered_map<std::string, bodyParamPtr>::iterator bodyParamMapIt;
     for ( bodyParamMapIt = bodyParamObjectMap_.begin(); bodyParamMapIt != bodyParamObjectMap_.end(); ++bodyParamMapIt ) {
