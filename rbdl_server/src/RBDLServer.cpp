@@ -224,7 +224,7 @@ bool RBDLServer::InverseDynamics_srv(rbdl_server::RBDLInverseDynamicsRequest& re
 
     if (!checkModelExists(name))
     {
-
+        ROS_ERROR("Model not set: %s", name.c_str() );  
         return false;
     }
 
@@ -285,6 +285,7 @@ bool RBDLServer::InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest
     if(req.model_name.empty())
     {
         name = default_name;
+       
     }
 
 
@@ -308,7 +309,8 @@ bool RBDLServer::InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest
     }
     else
     {
-        return false;
+        ROS_ERROR("Model name");
+        return false;   
     }
 }
 
@@ -338,6 +340,8 @@ bool RBDLServer::ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest& req, 
     if(req.model_name.empty())
     {
         name = default_name;
+        ROS_ERROR("Name Wrong");
+        return false;   
     }
 
     if (checkModelExists(name))
