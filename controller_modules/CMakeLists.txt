@@ -19,9 +19,8 @@ find_package(catkin REQUIRED COMPONENTS
 get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
 set (CMAKE_MODULE_PATH ${PARENT_CMAKE} )
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
-find_package(GTest REQUIRED)
 
-include_directories( include ${catkin_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
+include_directories( include ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
 
 ###########
 ## Build ##
@@ -33,7 +32,6 @@ include_directories(
  include
   ${catkin_INCLUDE_DIRS}
   ${GLFW_INCLUDE_DIRS}
-  ${GTEST_INCLUDE_DIRS}
 )
 
 add_service_files(
