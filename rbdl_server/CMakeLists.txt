@@ -10,6 +10,7 @@ project(rbdl_server)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs genmsg)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 
 get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
@@ -105,16 +106,6 @@ set (RBDL_SERVER_INCLUDE_DIRS include)
 set (RBDL_SERVER_LIBRARIES rbdl_server)
 
 
-set(SOURCE_FILES 
-    src/rbdl_server_node.cpp)
-
-add_executable (rbdl_server_node ${SOURCE_FILES})
-target_link_libraries (rbdl_server_node ${PROJECT_NAME})
-
-
-add_executable (rbdl_main src/main.cpp)
-target_link_libraries (rbdl_main ${PROJECT_NAME})
-
 install(
   TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -125,3 +116,14 @@ install(
   DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
+
+
+set(SOURCE_FILES 
+    src/rbdl_server_node.cpp)
+
+add_executable (rbdl_server_node ${SOURCE_FILES})
+target_link_libraries (rbdl_server_node ${PROJECT_NAME})
+
+
+add_executable (rbdl_main src/main.cpp)
+target_link_libraries (rbdl_main ${PROJECT_NAME})

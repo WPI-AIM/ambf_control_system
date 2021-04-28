@@ -9,7 +9,6 @@ project(ambf_control_system)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED)
 
-
 include_directories(
 # include
 # ${catkin_INCLUDE_DIRS}
