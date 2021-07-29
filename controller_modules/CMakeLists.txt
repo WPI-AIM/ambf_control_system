@@ -59,11 +59,13 @@ catkin_package(
 set(SRC_FILES
    src/PDController.cpp
    src/ModelController.cpp
+   src/SMCController.cpp
    src/ControllerManager.cpp)
 
 set (HDR_FILES
    include/${PROJECT_NAME}/ControllerBase.h
    include/${PROJECT_NAME}/PDController.h
+   include/${PROJECT_NAME}/SMCController.h
    include/${PROJECT_NAME}/ModelController.h
    include/${PROJECT_NAME}/ControllerManager.h)
 

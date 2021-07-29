@@ -2,10 +2,10 @@
 
 
 SMCController::SMCController(const Eigen::MatrixXd& _lambda, const Eigen::MatrixXd& _rho):
-   rho(validateMat(_Kp, _Kd)),
-   lambda(validateMat(_Kd, _Kp)) //validate the size of the matrix
+   rho(validateMat(_lambda, _rho)),
+   lambda(validateMat(_rho, _lambda)) //validate the size of the matrix
 {
-    dimensions = Kp.rows();
+    dimensions = lambda.rows();
 }
 
 SMCController::SMCController()
@@ -83,9 +83,23 @@ Eigen::MatrixXd SMCController::validateMat(const Eigen::MatrixXd& mat1, const Ei
 
 }
 
+
+double SMCController::sign_func(double x)
+{
+    if (x > 0)
+        return +1.0;
+    else if (x == 0)
+        return 0.0;
+    else
+        return -1.0;
+}
+
+
 void SMCController::calculate_torque(const Eigen::VectorXd &e, const Eigen::VectorXd &ed, Eigen::VectorXd &torque)
 {
-    torque = Kp*e+ Kd*ed;
+    Eigen::VectorXd sigma =  e + lambda*ed;
+    Eigen::VectorXd sigma_sign = sigma.unaryExpr(std::ptr_fun(sign_func));
+    torque = -lambda*e - rho*sigma_sign;
 }
 
 
