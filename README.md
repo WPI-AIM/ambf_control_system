@@ -2,7 +2,7 @@
 
 ## Authors:
 1. [Nathaniel Goldfarb](https://github.com/nag92) (nagoldfarb@wpi.edu)
-2. [Shreyas Chandra Sekhar](https://github.com/cshreyastech) (cshreyastech@gmail.com)
+2. [Shreyas Chandra Sekhar](https://github.com/cshreyastech) (schandrasekhar@wpi.edu)
 This package contains the RBDL server and Controller server for 
 
 
