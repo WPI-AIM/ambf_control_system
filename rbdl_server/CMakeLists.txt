@@ -54,7 +54,7 @@ generate_messages(
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES rbdl_server rbdl_model
- CATKIN_DEPENDS roscpp
+ CATKIN_DEPENDS roscpp message_runtime
  # DEPENDS system_lib
   DEPENDS Eigen
   DEPENDS rbdl_model

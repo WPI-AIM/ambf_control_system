@@ -10,11 +10,33 @@ project(rbdl_model)
 find_package(catkin REQUIRED COMPONENTS
 )
 
+
+
+get_filename_component(PARENT_DIR ${PROJECT_SOURCE_DIR} DIRECTORY)
+MESSAGE(STATUS "HERE IS THE LOCATION: ${PARENT_DIR}")
+
+# static library external dependencies source files
+include_directories (${PARENT_DIR}/external/Eigen)
+file (GLOB_RECURSE source_eigen     RELATIVE ${PARENT_DIR} ${PARENT_DIR}/external/Eigen/Eigen/*)
+
+
+
+# group source files (MSVC likes this)
+foreach (FILE ${source} ${source_eigen})
+  get_filename_component (PARENT2_DIR "${FILE}" PATH)
+  string (REGEX REPLACE "(\\./)?(src|include)/?" "" GROUP "${PARENT2_DIR}")
+  string (REPLACE "/" "\\" GROUP "${GROUP}")
+  source_group ("${GROUP}" FILES "${FILE}")
+endforeach ()
+
 catkin_package( INCLUDE_DIRS include
   LIBRARIES rbdl_model
 #  CATKIN_DEPENDS
 #  DEPENDS system_lib
 )
+
+
+
 
 #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/home/shreyas/rbdl/CMake/")
 
@@ -22,7 +44,7 @@ catkin_package( INCLUDE_DIRS include
 get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
 set (CMAKE_MODULE_PATH ${PARENT_CMAKE} )
 
-LIST( APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR} )
+LIST( APPEND CMAKE_MODULE_PATH ${PARENT_DIR} )
 find_package(RBDL REQUIRED)
 include_directories(${RBDL_INCLUDE_DIRS})
 
