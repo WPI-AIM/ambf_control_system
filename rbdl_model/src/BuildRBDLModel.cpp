@@ -47,8 +47,23 @@ bool BuildRBDLModel::getBodies()
         std::string body_name_expanded = rigidBodies[i].as<std::string>();
         YAML::Node body_yaml = baseNode_[body_name_expanded];
         std::string body_name;
-        if(body_yaml.IsDefined()) body_name = utilities.trimTrailingSpaces(body_yaml["name"]);
-        bodyParamObjectMap_.insert(std::make_pair(body_name, new BodyParam(baseNode_[body_name_expanded])));
+
+        // Get the name of the body from YAML. Model cannot be processed if the body defined in the list
+        // doenst have parameters defined in the YAML. TBD
+        if(body_yaml.IsDefined())
+            body_name = utilities.trimTrailingSpaces(body_yaml["name"]);
+        else
+        {
+            std::ostringstream errormsg;
+            errormsg <<
+                     "Error: MISSING PARAMETER DEFINITION FOR " + body_name_expanded
+                     << std::endl;
+            throw RBDLModel::ModelErrors::RBDLModelMissingParameterError(errormsg.str());
+            return false;
+        }
+
+        if(body_name.compare("target_ik") != 0 && body_name.compare("target_fk") != 0)
+            bodyParamObjectMap_.insert(std::make_pair(body_name, new BodyParam(baseNode_[body_name_expanded])));
     }
     return true;
 }
@@ -242,7 +257,8 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
     Joint joint;
 
     // If base joint, make it be fixed with respect to World
-    if(parent_name == base_parent_name_) {
+
+    if(parent_name.compare(base_parent_name_) == 0) {
         joint = Joint (JointTypeFixed);
     // Handle multiple Parents for a body. Just append ~ to body name.
     // Otherwise RBDL would just throw duplicate body name exception
@@ -386,18 +402,15 @@ void BuildRBDLModel::printJoint()
  * @return Joint name as vector
  */
 
-std::vector<std::string> BuildRBDLModel::getJointNames() 
+std::vector<std::string> BuildRBDLModel::getAllJointNames()
 {
     std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr>>::iterator outter_map_itr;
     std::unordered_map<std::string, jointParamPtr>::iterator inner_map_itr;
     std::vector<std::string> names;
 
     for (outter_map_itr = jointParamObjectMap_.begin(); outter_map_itr != jointParamObjectMap_.end(); outter_map_itr++) {
-        std::string parent_node_name = outter_map_itr->first;
-        std::cout << ", parent_node_name: " << parent_node_name << std::endl << "child_node_name: " ;
         for (inner_map_itr = outter_map_itr->second.begin(); inner_map_itr != outter_map_itr->second.end(); inner_map_itr++) {
             std::string joint_name = inner_map_itr->first;
-            jointParamPtr jointparamPtr = inner_map_itr->second;
             if (joint_name.find("world") == std::string::npos) 
             {
                 names.push_back(joint_name);

@@ -22,6 +22,7 @@ public:
 private:
 
     std::string name_;
+    // Adding a small mass as RBDL doesnt allow zero mass object.
     double mass_{0.00000001};
     Math::Matrix3d inertia_;
     Vector3d inertial_offset_position_;

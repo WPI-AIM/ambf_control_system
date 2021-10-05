@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(rbdl_model)
 
+
+set(CMAKE_PREFIX_PATH _PATH "/opt/ros/melodic/;${CMAKE_MODULE_PATH}")
+# list(APPEND CMAKE_PREFIX_PATH "/opt/ros/melodic/")
+
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 

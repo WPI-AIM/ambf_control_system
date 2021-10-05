@@ -69,7 +69,7 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
     BuildRBDLModel  buildRBDLModel(actuator_config_file);
     ROS_INFO("ch0");
     body_ids[name] = buildRBDLModel.getRBDLBodyToIDMap();
-    joint_names[name] = buildRBDLModel.getJointNames();
+    joint_names[name] = buildRBDLModel.getAllJointNames();
     ROS_INFO("ch1");
     *models[name] = buildRBDLModel.getRBDLModel();
     ROS_INFO("ch2");

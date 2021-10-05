@@ -51,7 +51,7 @@ public:
 
     boost::optional<rbdlBody> getRBDLBody(const std::string bodyName);
     std::unordered_map<std::string, jointParamPtr> getJointChildren(std::string parent);
-    std::vector<std::string> getJointNames();
+    std::vector<std::string> getAllJointNames();
 
 private:
     void getNamespace();
