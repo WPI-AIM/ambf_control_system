@@ -308,6 +308,11 @@ const rbdlJointType BuildRBDLModel::getRBDLJointType(std::string joint_type) {
     else if (joint_type == "custom") return JointTypeCustom;
 }
 
+Model* BuildRBDLModel::getRBDLModel()
+{
+    return RBDLmodel_;
+}
+
 /*
  * Get all body Names in RBDL model
  * @return vector of body names

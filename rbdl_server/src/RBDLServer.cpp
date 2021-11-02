@@ -66,15 +66,14 @@ bool RBDLServer::CreateModel_srv(rbdl_server::RBDLModelRequest& req, rbdl_server
     
     models[name] = new Model();
     std::string actuator_config_file = req.model;
-    BuildRBDLModel  buildRBDLModel(actuator_config_file);
+    BuildRBDLModel* buildRBDLModel = new BuildRBDLModel(actuator_config_file);
     ROS_INFO("ch0");
-    body_ids[name] = buildRBDLModel.getRBDLBodyToIDMap();
-    joint_names[name] = buildRBDLModel.getAllJointNames();
+    body_ids[name] = buildRBDLModel->getRBDLBodyToIDMap();
+    joint_names[name] = buildRBDLModel->getAllJointNames();
     ROS_INFO("ch1");
-    *models[name] = buildRBDLModel.getRBDLModel();
+    models[name] = buildRBDLModel->getRBDLModel();
     ROS_INFO("ch2");
-    //buildRBDLModel.cleanUp();
-    joint_map[name] = buildRBDLModel.getRBDLJointToIDMap();
+    joint_map[name] = buildRBDLModel->getRBDLJointToIDMap();
     std::unordered_map<std::string, unsigned int>::iterator itr;
     ROS_INFO("ch3");
    
