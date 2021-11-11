@@ -59,36 +59,12 @@ Math::Matrix3d Utilities::rotationMatrixFromVectors(Vector3d vec1, Vector3d vec2
     Math::Matrix3d m;
     m = Math::Matrix3d::Zero(3,3);
 
-//    m(0, 0) = 0.0;
-//    m(0, 1) = 0.0;
-//    m(0, 2) = 0.0;
-
-//    m(1, 0) = 0.0;
-//    m(1, 1) = 0.0;
-//    m(1, 2) = 0.0;
-
-//    m(2, 0) = 0.0;
-//    m(2, 1) = 0.0;
-//    m(2, 2) = 0.0;
-
-
-//    Eigen::VectorXf v_eigen(2);
-//    Eigen::MatrixXf m_eigen(2,2), n(2,2);
-
-
     Vector3d a = vec1 / vec1.norm();
     Vector3d b = vec2 / vec2.norm();
-
-//    std::cout << "a: " << a[0] << "," << a[1] << "," << b[2] << std::endl;
-//    std::cout << "b: " << b[0] << "," << b[1] << "," << b[2] << std::endl;
 
     Vector3d v = a.cross(b);
     double c = a.dot(b);
     double s = v.norm();
-
-//    std::cout << "v: " << v[0] << "," << v[1] << "," << v[2] << std::endl;
-//    std::cout << "c: " << c << std::endl;
-//    std::cout << "s: " << s << std::endl;
 
     Math::Matrix3d kmat;
     kmat = Math::Matrix3d::Zero(3,3);
@@ -102,32 +78,13 @@ Math::Matrix3d Utilities::rotationMatrixFromVectors(Vector3d vec1, Vector3d vec2
     kmat(2, 0) = -v[1];
     kmat(2, 1) = v[0];
 
-//    std::cout << "kmat: " << std::endl
-//              << kmat(0, 0) << ", " << kmat(0, 1) << ", " << kmat(0, 2) << std::endl
-//              << kmat(1, 0) << ", " << kmat(1, 1) << ", " << kmat(1, 2) << std::endl
-//              << kmat(2, 0) << ", " << kmat(2, 1) << ", " << kmat(2, 2) << std::endl
-//              << std::endl;
-
     Math::Matrix3d eye;
     eye = Math::Matrix3d::Identity(3, 3);
 
-//    std::cout << "eye: " << std::endl
-//              << eye(0, 0) << ", " << eye(0, 1) << ", " << eye(0, 2) << std::endl
-//              << eye(1, 0) << ", " << eye(1, 1) << ", " << eye(1, 2) << std::endl
-//              << eye(2, 0) << ", " << eye(2, 1) << ", " << eye(2, 2) << std::endl
-//              << std::endl;
-
     m = eye + kmat + (kmat * kmat) * ((1 - c) / std::pow(s, 2));
 
-//    m = m.unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
     if(m.hasNaN()) m = eye;
 
-
-//    std::cout << "m: " << std::endl
-//              << m(0, 0) << ", " << m(0, 1) << ", " << m(0, 2) << std::endl
-//              << m(1, 0) << ", " << m(1, 1) << ", " << m(1, 2) << std::endl
-//              << m(2, 0) << ", " << m(2, 1) << ", " << m(2, 2) << std::endl
-//              << std::endl;
     return m;
 }
 
