@@ -285,13 +285,13 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
     Math::Matrix3d rotation_matrix = utilities.rotationMatrixFromVectors(parent_axis, child_axis);
 
     unsigned int child_id;
-    Joint joint;
+    //Joint joint;
     RigidBodyDynamics::JointType jointType;
     // If base joint, make it be fixed with respect to World
 
     if(parent_name.compare(base_parent_name_) == 0) {
         
-        joint = Joint (JointTypeFixed);
+        //joint = Joint (JointTypeFixed);
         jointType = JointTypeFixed;
     // Handle multiple Parents for a body. Just append ~ to body name.
     // Otherwise RBDL would just throw duplicate body name exception
@@ -300,7 +300,7 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
             child_name = child_name + "~";
         }
         //joint is not used. can it be removed?
-        joint = Joint(SpatialVector (child_axis[0], child_axis[1], child_axis[2], 0.0, 0.0, 0.0));
+        //joint = Joint(SpatialVector (child_axis[0], child_axis[1], child_axis[2], 0.0, 0.0, 0.0));
         jointType = JointTypeRevoluteZ;
     }
 
