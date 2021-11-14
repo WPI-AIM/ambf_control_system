@@ -2,10 +2,17 @@
 
 TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKAPositionNeutral", "") 
 {
-  // We call ForwardDynamics() as it updates the spatial transformation
-  // matrices
-  ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
+  std::map< std::string, unsigned int > mBodyNameMap = rbdlModel->mBodyNameMap;
+  std::map<std::string, unsigned int>::iterator mBodyNameMapItr;
+  for(mBodyNameMapItr = mBodyNameMap.begin(); mBodyNameMapItr != mBodyNameMap.end(); mBodyNameMapItr++)
+  {
+    std::string bodyName = mBodyNameMapItr->first;
+    unsigned int bodyId = mBodyNameMapItr->second;
+    std::string parentName = rbdlModel->GetBodyName(rbdlModel->GetParentBodyId(bodyId));
+    std::cout << parentName << ", " << bodyName << ", " << bodyId << std::endl;
+  }
 
+  ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
   std::vector<string> joints = baseHandler->get_joint_names();
   std::vector<std::string> baseChildren = baseHandler->get_children_names();
 
@@ -138,13 +145,6 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKARandomPosition", "")
 
 
   std::vector<std::string> baseChildren = baseHandler->get_children_names();
-
-  // std::map< std::string, unsigned int > mBodyNameMap = rbdlModel->mBodyNameMap;
-  // std::map<std::string, unsigned int>::iterator mBodyNameMapItr;
-  // for(mBodyNameMapItr = mBodyNameMap.begin(); mBodyNameMapItr != mBodyNameMap.end(); mBodyNameMapItr++)
-  // {
-  //   std::cout << mBodyNameMapItr->first << ", " << mBodyNameMapItr->second << std::endl;
-  // }
 
   // This will not be true for ECM
   const int nJoints = baseChildren.size();
