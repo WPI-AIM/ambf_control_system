@@ -81,7 +81,7 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKAPositionNeutral", "")
   // matrices
   ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
 
-  std::vector<string> joints = baseHandler->get_joint_names();
+  std::vector<std::string> joints = baseHandler->get_joint_names();
   std::vector<std::string> baseChildren = baseHandler->get_children_names();
 
 //   std::map< std::string, unsigned int > mBodyNameMap = rbdlModel->mBodyNameMap;
@@ -149,7 +149,7 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKAPIbyFourPositionNeutral", "")
   // matrices
   ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
 
-  std::vector<string> joints = baseHandler->get_joint_names();
+  std::vector<std::string> joints = baseHandler->get_joint_names();
   std::vector<std::string> baseChildren = baseHandler->get_children_names();
 
   CHECK (baseChildren.size() == Q.size());
@@ -216,7 +216,7 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKARandomPosition", "")
   // matrices
   ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
 
-  std::vector<string> joints = baseHandler->get_joint_names();
+  std::vector<std::string> joints = baseHandler->get_joint_names();
 
 
   std::vector<std::string> baseChildren = baseHandler->get_children_names();

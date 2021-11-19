@@ -9,16 +9,17 @@
 #include <stdlib.h>
 
 using namespace Eigen;
+// TODO: Use Quaternion instead of Matrix
 class EigenUtilities
 {
 public:
-    EigenUtilities();
-    float get_angle(Vector3f vec_a, Vector3f vec_b, Vector3f up_vector);
-    float get_random_between_range(float low, float high);
-    Eigen::Matrix3d rotationMatrixFromVectors(Eigen::Vector3d vec1, Eigen::Vector3d vec2);
+    EigenUtilities() {}
+    static float get_angle(Vector3f vec_a, Vector3f vec_b, Vector3f up_vector);
+    static float get_random_between_range(float low, float high);
+    static Eigen::Matrix3d rotationMatrixFromVectors(Eigen::Vector3d vec1, Eigen::Vector3d vec2);
 
     template<typename R>
-    R rotation_from_euler(float roll, float pitch, float yaw) {
+    static R rotation_from_euler(float roll, float pitch, float yaw) {
         // roll and pitch and yaw in radians
         float su = std::sin(roll);
         float cu = std::cos(roll);
@@ -44,11 +45,11 @@ public:
 
 
 
-    Eigen::Vector3f rpy_from_rotation(Eigen::Matrix3f R);
+    static Eigen::Vector3f rpy_from_rotation(Eigen::Matrix3f R);
 
 
     template<typename R, typename P, typename T>
-    T get_frame(R r, P p){
+    static T get_frame(R r, P p){
         T Trans;
 
         // template disambiguator

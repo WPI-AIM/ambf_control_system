@@ -29,9 +29,9 @@ struct Kuka {
     
     tf::Vector3 R_0_w_tf = baseHandler->get_rpy();
 
-    Eigen::Matrix3d R_0_w = eigenUtilities.rotation_from_euler<Eigen::Matrix3d>(R_0_w_tf[0], R_0_w_tf[1], R_0_w_tf[2]);
+    Eigen::Matrix3d R_0_w = EigenUtilities::rotation_from_euler<Eigen::Matrix3d>(R_0_w_tf[0], R_0_w_tf[1], R_0_w_tf[2]);
 
-    T_0_w = eigenUtilities.get_frame<Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix4d>(R_0_w, P_0_w);
+    T_0_w = EigenUtilities::get_frame<Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix4d>(R_0_w, P_0_w);
     
     rbdlModel = new Model;
 
@@ -152,7 +152,7 @@ struct Kuka {
   std::unordered_map<std::string, std::vector<float>> KUKA_JOINT_LIMITS;
   std::unordered_map<std::string, std::vector<float>>::iterator KUKA_JOINT_LIMITS_itr;
 
-  EigenUtilities eigenUtilities;
+  //EigenUtilities eigenUtilities;
 
   unsigned int base_id, link1_id, link2_id, link3_id, link4_id, link5_id, link6_id, link7_id;
   Body base, link1, link2, link3, link4, link5, link6, link7;

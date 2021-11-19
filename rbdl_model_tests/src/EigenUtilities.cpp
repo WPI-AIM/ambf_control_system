@@ -1,6 +1,6 @@
 #include "rbdl_model_tests/EigenUtilities.h"
 
-EigenUtilities::EigenUtilities() {}
+// EigenUtilities::EigenUtilities() {}
 
 float EigenUtilities::get_angle(Vector3f vec_a, Vector3f vec_b, Vector3f up_vector) {
     float angle = 0.0;

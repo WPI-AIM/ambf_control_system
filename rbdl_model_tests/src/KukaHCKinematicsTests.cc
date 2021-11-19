@@ -13,7 +13,7 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKAPositionNeutral", "")
   }
 
   ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
-  std::vector<string> joints = baseHandler->get_joint_names();
+  std::vector<std::string> joints = baseHandler->get_joint_names();
   std::vector<std::string> baseChildren = baseHandler->get_children_names();
 
   CHECK (baseChildren.size() == Q.size());
@@ -73,7 +73,7 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKAPIbyFourPositionNeutral", "")
   // matrices
   ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
 
-  std::vector<string> joints = baseHandler->get_joint_names();
+  std::vector<std::string> joints = baseHandler->get_joint_names();
   std::vector<std::string> baseChildren = baseHandler->get_children_names();
 
   CHECK (baseChildren.size() == Q.size());
@@ -141,7 +141,7 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKARandomPosition", "")
   // matrices
   ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
 
-  std::vector<string> joints = baseHandler->get_joint_names();
+  std::vector<std::string> joints = baseHandler->get_joint_names();
 
 
   std::vector<std::string> baseChildren = baseHandler->get_children_names();
@@ -166,7 +166,7 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKARandomPosition", "")
       unsigned int rbdlBodyId = rbdlModel->GetBodyId(body.c_str());
       // body_id starts with 1 in RBDL Model. 
       // Storing corresponding Joint angles with 0 order index.
-      q_desired[--rbdlBodyId] = eigenUtilities.get_random_between_range(low, high);
+      q_desired[--rbdlBodyId] = EigenUtilities::get_random_between_range(low, high);
       usleep(1000000);
     }
 

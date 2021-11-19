@@ -9,7 +9,7 @@ TEST_CASE (__FILE__"_TestKukaBodyMass", "" )
     std::string baseRigidBody = rbdlModelPtr->getBaseRigidBody();
     struct RigidBodyDynamics::Model* rbdlModel = rbdlModelPtr->getRBDLModel();
 
-    vector<string> rigidBodyNamesAmbf = clientPtr->getRigidBodyNames();
+    std::vector<std::string> rigidBodyNamesAmbf = clientPtr->getRigidBodyNames();
 
     for(std::string bodyAMBF : rigidBodyNamesAmbf)
     {
@@ -40,7 +40,7 @@ TEST_CASE (__FILE__"_TestKukaBodyInertia", "" )
     std::string baseRigidBody = rbdlModelPtr->getBaseRigidBody();
     struct RigidBodyDynamics::Model* rbdlModel = rbdlModelPtr->getRBDLModel();
 
-    vector<string> rigidBodyNamesAmbf = clientPtr->getRigidBodyNames();
+    std::vector<std::string> rigidBodyNamesAmbf = clientPtr->getRigidBodyNames();
 
     for(std::string bodyAMBF : rigidBodyNamesAmbf)
     {
