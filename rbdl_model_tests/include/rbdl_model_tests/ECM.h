@@ -2,6 +2,7 @@
 #include "rbdl_model_tests/EigenUtilities.h"
 //#include "rbdl_model_tests/Human36Fixture.h"
 #include <unordered_map>
+#include <Eigen/Geometry> 
 
 //const double TEST_PREC = 1.0e-12;
 const double TEST_LAX = 1.0e-7;
@@ -28,7 +29,7 @@ struct ECM {
     
     tf::Vector3 ryp_0_w_tf = baseHandler->get_rpy();
     Eigen::Matrix3d R_0_w = EigenUtilities::rotation_from_euler<Eigen::Matrix3d>(ryp_0_w_tf[0], ryp_0_w_tf[1], ryp_0_w_tf[2]);
-
+    
     T_0_w = EigenUtilities::get_frame<Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix4d>(R_0_w, P_0_w);
 
     rbdlModel = new Model;
@@ -60,7 +61,7 @@ struct ECM {
 
     Eigen::Matrix3d rotationZ;
     
-    
+
     baseLink_yawLinkST.E =
     EigenUtilities::rotationMatrixFromVectors(Eigen::Vector3d(-0.0002, -1.0, 0.0), 
                                         Eigen::Vector3d(0.0, 0.0, -1.0));
@@ -77,30 +78,83 @@ struct ECM {
     yawLink_pitchBackLinkST.E =
     EigenUtilities::rotationMatrixFromVectors(Eigen::Vector3d(1.0, 0.0, 0.0), 
                                              Eigen::Vector3d(0.0, 0.0, 1.0));
+    // std::cout << std::endl << "EigenUtilities::rotZ(3.1416f): " << std::endl 
+    //           << EigenUtilities::rotZ(3.1416f) << std::endl;
+
     yawLink_pitchBackLinkST.r = RigidBodyDynamics::Math::Vector3d(0.0, -0.0098, 0.1624) +
-                    // added a padding of 0.02 along y so that test cases passes
-                    yawLink_pitchBackLinkST.E * Eigen::Vector3d(0.0, 0.02, 0.0);
-    std::cout <<std::endl << "yawLink_pitchBackLinkST: " << yawLink_pitchBackLinkST 
-          << std::endl;
+                    // added a padding of -0.01 along y so that test cases passes
+                    yawLink_pitchBackLinkST.E * Eigen::Vector3d(0.0, 0.0, 0.0);
+
+    
 
     yawLink_pitchBackLinkJoint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
     pitchBackLinkId = rbdlModel->AddBody(yawLinkId, yawLink_pitchBackLinkST, 
                                       yawLink_pitchBackLinkJoint, pitchBackLink, "pitchbacklink");
     //--------------------------------------------------------------------//
-    // pitchBottomLink = Body (0.359, RigidBodyDynamics::Math::Vector3d (0.1491, -0.0182, 0.0), 
-    //           RigidBodyDynamics::Math::Vector3d (0.0007, 0.019, 0.0192));
-    // pitchBackLink_pitchBottomLinkST.E =
-    // eigenUtilities.rotationMatrixFromVectors(Eigen::Vector3d(0.0, 0.0, 1.0), 
-    //                                          Eigen::Vector3d(0.0, 0.0, 1.0));
-    // pitchBackLink_pitchBottomLinkST.r = RigidBodyDynamics::Math::Vector3d(-0.1028, -0.2867, 0.0) -
-    //                 pitchBackLink_pitchBottomLinkST.E * Eigen::Vector3d(-0.0364, 0.0098, -0.0005);
-    // // std::cout <<std::endl << "pitchBackLink_pitchBottomLinkST: " << pitchBackLink_pitchBottomLinkST 
-    // //           << std::endl;
+    pitchBottomLink = Body (0.359, RigidBodyDynamics::Math::Vector3d (0.1491, -0.0182, 0.0), 
+              RigidBodyDynamics::Math::Vector3d (0.0007, 0.019, 0.0192));
 
-    // pitchBackLink_pitchBottomLinkJoint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    // pitchBottomLinkId = rbdlModel->AddBody(pitchBackLinkId, pitchBackLink_pitchBottomLinkST, 
-    //                                   pitchBackLink_pitchBottomLinkJoint, pitchBottomLink, 
-    //                                   "pitchbottomlink");
+    Eigen::Vector3d m_pvtP = { -0.1028 , -0.2867, 0.0 };
+    //std::cout << std::endl << "m_pvtP: " << m_pvtP << std::endl;
+    // Add -0.13163 for test case to pass
+    Eigen::Vector3d m_pvtC = { -0.0364 , 0.0098, -0.0005 };
+
+    Eigen::Vector3d m_axisP = { 0.0, 0.0, 1.0 };
+    //m_axisP.normalize();
+    Eigen::Vector3d m_axisC = { 0.0, 0.0, 1.0 };
+    //m_axisC.normalize();
+
+    // Eigen::Vector3d ax_jINp = { 0.0, 0.0, 1.0 };
+    // ax_jINp.normalize();
+
+    // Eigen::Matrix3d rot_cINp = EigenUtilities::rotationMatrixFromVectors(m_axisC, m_axisP);
+
+    // Eigen::Matrix3d rot_cOffINp;
+    // //rot_cOffINp = Eigen::AngleAxisd(pitchBackLink_pitchBottomLinkJointOffset, m_axisP);
+    // rot_cOffINp = Eigen::AngleAxisd(0.0, m_axisP);
+
+    // Eigen::Matrix3d rot_jOffINp;
+    // rot_jOffINp = Eigen::AngleAxisd(0.0, m_axisP);
+
+    // Eigen::Matrix3d rot_jINp = EigenUtilities::rotationMatrixFromVectors(ax_jINp, m_axisP);
+    // // Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(ax_jINp, m_axisP));
+    // Eigen::Vector3d a = { 0.043477, 0.036412, 0.998391};
+    // Eigen::Vector3d b = { 0.60958, 0.73540, 0.29597 };
+    // a.normalize();
+    // b.normalize();
+    // // Eigen::Matrix3d r = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(a, b));
+    // Eigen::Matrix3d r = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(ax_jINp, m_axisP));
+    // std::cout << std::endl << "r: " << std::endl << r << std::endl;
+
+    // We need to post-multiply frameA's rot to cancel out the shift in axis, then
+    // the offset along joint axis and finally frameB's axis alignment in frameA.
+    // frameB.setRotation( quat_cINp.inverse() * quat_cOffINp.inverse() * quat_jOffINp * quat_jINp );
+    // frameB.setOrigin(m_pvtB);
+
+    // std::cout << std::endl << "rot_cINp: " << std::endl << rot_cINp << std::endl;
+    // std::cout << std::endl << "rot_cOffINp: " << std::endl << rot_cOffINp << std::endl;
+    // std::cout << std::endl << "rot_jOffINp: " << std::endl << rot_jOffINp << std::endl;
+    // std::cout << std::endl << "rot_jINp: " << std::endl << rot_jINp << std::endl;
+
+    //pitchBackLink_pitchBottomLinkST.E = rot_cINp.inverse() * rot_cOffINp.inverse() * rot_jOffINp * rot_jINp;
+
+    // link1_link2ST.r = RigidBodyDynamics::Math::Vector3d(0., 0.013, 0.209) - 
+    // link1_link2ST.E.inverse() * RigidBodyDynamics::Math::Vector3d(0.0, 0.0, 0.0);
+
+    Eigen::Quaterniond quad = Eigen::Quaterniond::FromTwoVectors(m_axisP, m_axisC);
+    pitchBackLink_pitchBottomLinkST.E = Eigen::Matrix3d(quad);
+    pitchBackLink_pitchBottomLinkST.r = m_pvtP -
+          quad.inverse() * m_pvtC;
+
+    std::cout << std::endl << "pitchBackLink_pitchBottomLinkST: " << std::endl << pitchBackLink_pitchBottomLinkST << std::endl;
+
+    // std::cout <<std::endl << "pitchBackLink_pitchBottomLinkST: " << pitchBackLink_pitchBottomLinkST 
+    //           << std::endl;
+
+    pitchBackLink_pitchBottomLinkJoint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
+    pitchBottomLinkId = rbdlModel->AddBody(pitchBackLinkId, pitchBackLink_pitchBottomLinkST, 
+                                      pitchBackLink_pitchBottomLinkJoint, pitchBottomLink, 
+                                      "pitchbottomlink");
     //--------------------------------------------------------------------//
     // pitchBottomLink_pitchEndLinkST.E = 
     // eigenUtilities.rotationMatrixFromVectors(Eigen::Vector3d(0.0, 0.0, 1.0), 
@@ -220,6 +274,7 @@ struct ECM {
   double baseLinkMScale, pitchEndLinkMScale, mainInsertionLinkMScale, toolLinkMScale, yawLinkMScale, 
             pitchBackLinkMScale, pitchBottomLinkMScale, pitchFrontLinkMScale, pitchTopLinkMScale = 1.0;
 
+
   Joint ROOT_baseLinkJoint, baseLink_pitchEndLinkJoint, pitchEndLink_mainInsertionLinkJoint, 
         mainInsertionLink_toolLinkJoint, baseLink_yawLinkJoint, yawLink_pitchBackLinkJoint,
         pitchBackLink_pitchBottomLinkJoint, pitchBottomLink_pitchEndLinkJoint,
@@ -230,6 +285,19 @@ struct ECM {
         mainInsertionLink_toolLinkST, baseLink_yawLinkST, yawLink_pitchBackLinkST,
         pitchBackLink_pitchBottomLinkST, pitchBottomLink_pitchEndLinkST,yawLink_pitchFrontLinkST, 
         pitchFrontLink_pitchBottomLinkST, pitchFrontLink_pitchTopLinkST, pitchTopLink_pitchEndLinkST;
+
+  const double ROOT_baseLinkJointOffset = 0.0;
+  const double baseLink_pitchEndLinkJointOffset = 0.0;
+  const double pitchEndLink_mainInsertionLinkJointOffset = 0.0;
+  const double mainInsertionLink_toolLinkJointOffset = 0.0;
+  const double baseLink_yawLinkJointOffset = 0.0;
+  const double yawLink_pitchBackLinkJointOffset = 0.0;
+  const double pitchBackLink_pitchBottomLinkJointOffset = 0.0;
+  const double pitchBottomLink_pitchEndLinkJointOffset = 0.0;
+  const double yawLink_pitchFrontLinkJointOffset = 0.0;
+  const double pitchFrontLink_pitchBottomLinkJointOffset = 0.0;
+  const double pitchFrontLink_pitchTopLinkJointOffset = 0.0;
+  const double pitchTopLink_pitchEndLinkJointOffset = 0.0;
 
   VectorNd Q;
   VectorNd QDot;

@@ -36,10 +36,21 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKAPositionNeutral", "")
 
     if(rbdlBodyId < rbdlModel->mBodies.size())
     {
+      std::cout << "Executing Test case for body: "<< body << ", " << rbdlBodyId << std::endl;
+
       rigidBodyPtr rigidBodyHandler = clientPtr->getRigidBody(body, true);
-      
+      // TODO : it should be P_w_n not P_n_w. Change nameing convention
       // n - respective body frame
       const tf::Vector3 P_n_w_tf = rigidBodyHandler->get_pos();
+      Eigen::Vector4d P_n_0_rbd;
+      P_n_0_rbd[0] = P_n_w_tf[0];
+      P_n_0_rbd[1] = P_n_w_tf[1];
+      P_n_0_rbd[2] = P_n_w_tf[2];
+      P_n_0_rbd[3] = 1.0;
+      P_n_0_rbd = T_0_w.inverse() * P_n_0_rbd;
+
+      // std::cout << body << ": " << "P_n_w: " << P_n_w_tf[0] << ", " << P_n_w_tf[1] << ", " << P_n_w_tf[2] << std::endl;
+      // std::cout << body << ": " << "P_n_0: " << P_n_0_rbd[0] << ", " << P_n_0_rbd[1] << ", " << P_n_0_rbd[2] << std::endl;
 
       const RigidBodyDynamics::Math::Vector3d P_n_0_rbd_rbdl = CalcBodyToBaseCoordinates(*rbdlModel, Q, rbdlBodyId, 
                                                               RigidBodyDynamics::Math::Vector3d(0., 0., 0.),true);
@@ -134,7 +145,6 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKAPIbyFourPositionNeutral", "")
   }
 }
 
-
 TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKARandomPosition", "") 
 {
   // We call ForwardDynamics() as it updates the spatial transformation
@@ -204,6 +214,8 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKARandomPosition", "")
       unsigned int rbdlBodyId = rbdlModel->GetBodyId(body.c_str());
       if(rbdlBodyId < rbdlModel->mBodies.size())
       {
+        std::cout << "Executing Test case for body: "<< body << ", " << rbdlBodyId << std::endl;
+        
         const tf::Vector3 P_n_w_tf = P_n_w_rbd_ambf_map[body];
         const RigidBodyDynamics::Math::Vector3d P_n_0_rbd_rbdl = CalcBodyToBaseCoordinates(*rbdlModel, Q, rbdlBodyId, 
                                                                 RigidBodyDynamics::Math::Vector3d(0., 0., 0.),true);

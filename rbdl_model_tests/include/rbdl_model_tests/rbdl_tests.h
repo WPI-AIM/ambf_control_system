@@ -5,6 +5,7 @@
 
 #include "catch2/catch.hpp"
 #include "rbdl/rbdl_math.h"
+#include <Eigen/Geometry>
 
 template <typename T>
 struct IsCloseMatcher : Catch::MatcherBase<T> {

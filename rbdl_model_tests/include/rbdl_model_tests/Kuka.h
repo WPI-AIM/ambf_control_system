@@ -43,7 +43,6 @@ struct Kuka {
     ROOT_baseST.r = RigidBodyDynamics::Math::Vector3dZero;
     base_id = rbdlModel->AddBody(0, ROOT_baseST, ROOT_base, base, "base");
 
-
     link1 = Body (1., RigidBodyDynamics::Math::Vector3d (0., -0.017, 0.134), 
           RigidBodyDynamics::Math::Vector3d (0.0452, 0.0446, 0.0041));
     base_link1 = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
@@ -52,16 +51,18 @@ struct Kuka {
     base_link1ST.r = RigidBodyDynamics::Math::Vector3d(0., 0.0, 0.103);
     link1_id = rbdlModel->AddBody(base_id, base_link1ST, base_link1, link1, "link1");
 
-
     link2 = Body (1., RigidBodyDynamics::Math::Vector3d (0., -0.074, 0.009), 
                   RigidBodyDynamics::Math::Vector3d (0.0227, 0.0037, 0.0224));
     link1_link2 = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
 
-    link1_link2ST.E = RigidBodyDynamics::Math::Matrix3dZero;
-    link1_link2ST.E(0, 0) = 1.0;
-    link1_link2ST.E(1, 2) = -1.0;
-    link1_link2ST.E(2, 1) = 1.0;
-    link1_link2ST.r = RigidBodyDynamics::Math::Vector3d(0., 0.013, 0.209);
+    // Eigen::Matrix3d r = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(ax_jINp, m_axisP));
+    link1_link2ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(
+      RigidBodyDynamics::Math::Vector3d (0.0, 1.0, 0.0), 
+      RigidBodyDynamics::Math::Vector3d (0.0, 0.0, 1.0)));
+
+
+    link1_link2ST.r = RigidBodyDynamics::Math::Vector3d(0., 0.013, 0.209) - 
+        link1_link2ST.E.inverse() * RigidBodyDynamics::Math::Vector3d(0.0, 0.0, 0.0);
 
     link2_id = rbdlModel->AddBody(link1_id, link1_link2ST, link1_link2, link2, "link2");
 
@@ -70,10 +71,13 @@ struct Kuka {
                   RigidBodyDynamics::Math::Vector3d (0.0417, 0.0418, 0.0038));
     link2_link3 = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
 
-    link2_link3ST.E = RigidBodyDynamics::Math::Matrix3dZero;
-    link2_link3ST.E(0, 0) = 1.0;
-    link2_link3ST.E(1, 2) = 1.0;
-    link2_link3ST.E(2, 1) = -1.0;
+    link2_link3ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(
+      RigidBodyDynamics::Math::Vector3d (0.0, -1.0, 0.0), 
+      RigidBodyDynamics::Math::Vector3d (0.0, 0.0, 1.0)));
+    // link2_link3ST.E = RigidBodyDynamics::Math::Matrix3dZero;
+    // link2_link3ST.E(0, 0) = 1.0;
+    // link2_link3ST.E(1, 2) = 1.0;
+    // link2_link3ST.E(2, 1) = -1.0;
     link2_link3ST.r = RigidBodyDynamics::Math::Vector3d(0., -0.194, -0.009);
     link3_id = rbdlModel->AddBody(link2_id, link2_link3ST, link2_link3, link3, "link3");
 
@@ -81,11 +85,13 @@ struct Kuka {
     link4 = Body (1., RigidBodyDynamics::Math::Vector3d (-0.001, 0.081, 0.008), 
                   RigidBodyDynamics::Math::Vector3d (0.0249, 0.0036, 0.0247));
     link3_link4 = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-
-    link3_link4ST.E = RigidBodyDynamics::Math::Matrix3dZero;
-    link3_link4ST.E(0, 0) = 1.0;
-    link3_link4ST.E(1, 2) = 1.0;
-    link3_link4ST.E(2, 1) = -1.0;
+    link3_link4ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(
+      RigidBodyDynamics::Math::Vector3d (0.0, -1.0, 0.0), 
+      RigidBodyDynamics::Math::Vector3d (0.0, 0.0, 1.0)));
+    // link3_link4ST.E = RigidBodyDynamics::Math::Matrix3dZero;
+    // link3_link4ST.E(0, 0) = 1.0;
+    // link3_link4ST.E(1, 2) = 1.0;
+    // link3_link4ST.E(2, 1) = -1.0;
     link3_link4ST.r = RigidBodyDynamics::Math::Vector3d(0., -0.013, 0.202);
     link4_id = rbdlModel->AddBody(link3_id, link3_link4ST, link3_link4, link4, "link4");
 
@@ -93,10 +99,13 @@ struct Kuka {
                   RigidBodyDynamics::Math::Vector3d (0.0363, 0.035, 0.0045));
     link4_link5 = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
 
-    link4_link5ST.E = RigidBodyDynamics::Math::Matrix3dZero;
-    link4_link5ST.E(0, 0) = 1.0;
-    link4_link5ST.E(1, 2) = -1.0;
-    link4_link5ST.E(2, 1) = 1.0;
+    link4_link5ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(
+      RigidBodyDynamics::Math::Vector3d (0.0, 1.0, 0.0), 
+      RigidBodyDynamics::Math::Vector3d (0.0, 0.0, 1.0)));
+    // link4_link5ST.E = RigidBodyDynamics::Math::Matrix3dZero;
+    // link4_link5ST.E(0, 0) = 1.0;
+    // link4_link5ST.E(1, 2) = -1.0;
+    // link4_link5ST.E(2, 1) = 1.0;
     link4_link5ST.r = RigidBodyDynamics::Math::Vector3d(-0.002, 0.202, -0.008);
     link5_id = rbdlModel->AddBody(link4_id, link4_link5ST, link4_link5, link5, "link5");
 
@@ -104,10 +113,13 @@ struct Kuka {
               RigidBodyDynamics::Math::Vector3d (0.0114, 0.0116, 0.0037));
     link5_link6 = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
 
-    link5_link6ST.E = RigidBodyDynamics::Math::Matrix3dZero;
-    link5_link6ST.E(0, 0) = 1.0;
-    link5_link6ST.E(1, 2) = -1.0;
-    link5_link6ST.E(2, 1) = 1.0;
+    link5_link6ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(
+      RigidBodyDynamics::Math::Vector3d (0.0, 1.0, 0.0), 
+      RigidBodyDynamics::Math::Vector3d (0.0, 0.0, 1.0)));
+    // link5_link6ST.E = RigidBodyDynamics::Math::Matrix3dZero;
+    // link5_link6ST.E(0, 0) = 1.0;
+    // link5_link6ST.E(1, 2) = -1.0;
+    // link5_link6ST.E(2, 1) = 1.0;
     link5_link6ST.r = RigidBodyDynamics::Math::Vector3d(0.002, -0.052, 0.204);
     link6_id = rbdlModel->AddBody(link5_id, link5_link6ST, link5_link6, link6, "link6");
 
@@ -115,12 +127,37 @@ struct Kuka {
               RigidBodyDynamics::Math::Vector3d (0.0012, 0.0013, 0.001));
     link6_link7 = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
 
-    link6_link7ST.E = RigidBodyDynamics::Math::Matrix3dZero;
-    link6_link7ST.E(0, 0) = 1.0;
-    link6_link7ST.E(1, 2) = 1.0;
-    link6_link7ST.E(2, 1) = -1.0;
+    link6_link7ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(
+      RigidBodyDynamics::Math::Vector3d (0.0, -1.0, 0.0), 
+      RigidBodyDynamics::Math::Vector3d (0.0, 0.0, 1.0)));
+    // link6_link7ST.E = RigidBodyDynamics::Math::Matrix3dZero;
+    // link6_link7ST.E(0, 0) = 1.0;
+    // link6_link7ST.E(1, 2) = 1.0;
+    // link6_link7ST.E(2, 1) = -1.0;
     link6_link7ST.r = RigidBodyDynamics::Math::Vector3d(-0.003, -0.05, 0.053);
     link6_id = rbdlModel->AddBody(link6_id, link6_link7ST, link6_link7, link7, "link7");
+
+    // std::cout << std::endl << "ROOT_baseST: " << std::endl << ROOT_baseST << std::endl;
+    // std::cout << std::endl << "base_link1ST: " << std::endl << base_link1ST << std::endl;
+    // std::cout << std::endl << "link1_link2ST: " << std::endl << link1_link2ST << std::endl;
+    
+    
+
+
+    // Eigen::Matrix3d R_C_P = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(
+    //   RigidBodyDynamics::Math::Vector3d (0.0, 0.0, 1.0), 
+    //   RigidBodyDynamics::Math::Vector3d (0.0, 1.0, 0.0)));
+    // std::cout << "R_C_P: " << std::endl << R_C_P << std::endl;
+
+    // RigidBodyDynamics::Math::Vector3d P_link2_0_rbd_rbdl = link1_link2ST.r + 
+    // R_C_P.inverse() * RigidBodyDynamics::Math::Vector3d (0.01, -0.01, 0.01);
+    // std::cout << "P_link2_0_rbd_rbdl: " << P_link2_0_rbd_rbdl[0] << ", " << P_link2_0_rbd_rbdl[1] << ", " << P_link2_0_rbd_rbdl[2] << std::endl;
+
+    // std::cout << std::endl << "link2_link3ST: " << std::endl << link2_link3ST << std::endl;
+    // std::cout << std::endl << "link3_link4ST: " << std::endl << link3_link4ST << std::endl;
+    // std::cout << std::endl << "link4_link5ST: " << std::endl << link4_link5ST << std::endl;
+    // std::cout << std::endl << "link5_link6ST: " << std::endl << link5_link6ST << std::endl;
+    // std::cout << std::endl << "link6_link7ST: " << std::endl << link6_link7ST << std::endl;
 
     Q = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
     QDot = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);

@@ -10,7 +10,6 @@ std::chrono::duration<double> RBDLTestPrep::getTime(){
        RBDLTestPrep::getInstance();
   }
   return std::chrono::system_clock::now() - begin;
-
 }
 
 AMBFClientPtr RBDLTestPrep::getAMBFClientInstance(){

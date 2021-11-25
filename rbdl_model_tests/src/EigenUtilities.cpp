@@ -72,6 +72,63 @@ Eigen::Matrix3d EigenUtilities::rotationMatrixFromVectors(Eigen::Vector3d vec1, 
     return m;
 }
 
+Eigen::Matrix3d RodriguesRotationFormula(Eigen::Vector3d vec1, Eigen::Vector3d vec2)
+{
+    vec1.normalize();
+    vec2.normalize();
+    
+    Eigen::Matrix3d out;
+    out.setIdentity();
+    Eigen::Vector3d vCross = vec1.cross(vec2);
+    double vDot = vec1.dot(vec2);
+
+}
+
+Eigen::Matrix3d EigenUtilities::rotX(float theta)
+{
+    Eigen::Matrix3d R;
+    R.setZero();
+    R(0, 0) = 1;
+
+    R(1, 1) =  std::cos(theta);
+    R(1, 2) = -std::sin(theta);
+   
+    R(2, 1) =  std::sin(theta);
+    R(2, 2) =  std::cos(theta);
+
+    return R;
+}
+
+Eigen::Matrix3d EigenUtilities::rotY(float theta)
+{
+    Eigen::Matrix3d R;
+    R.setZero();
+    R(0, 0) =  std::cos(theta);
+    R(0, 2) = -std::sin(theta);
+
+    R(1, 1) = 1;
+
+    R(2, 1) =  std::sin(theta);
+    R(2, 2) =  std::cos(theta);
+
+    return R;
+}
+
+Eigen::Matrix3d EigenUtilities::rotZ(float theta)
+{
+    Eigen::Matrix3d R;
+    R.setZero();
+    R(0, 0) =  std::cos(theta);
+    R(0, 1) =  std::sin(theta);
+    
+    R(1, 0) = -std::sin(theta);
+    R(1, 1) =  std::cos(theta);
+
+    R(2, 2) = 1;
+
+    return R;
+}
+
 Eigen::Vector3f EigenUtilities::rpy_from_rotation(Eigen::Matrix3f R) {
     Eigen::Vector3f rpy;
     rpy[0] = std::atan2(R(2, 1), R(2, 2));
