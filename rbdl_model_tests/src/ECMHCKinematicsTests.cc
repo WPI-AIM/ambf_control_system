@@ -2,7 +2,6 @@
 
 TEST_CASE_METHOD(ECM, __FILE__"_TestECMPositionNeutral", "") 
 {
-
   std::map< std::string, unsigned int > mBodyNameMap = rbdlModel->mBodyNameMap;
   std::map<std::string, unsigned int>::iterator mBodyNameMapItr;
   for(mBodyNameMapItr = mBodyNameMap.begin(); mBodyNameMapItr != mBodyNameMap.end(); mBodyNameMapItr++)
@@ -11,8 +10,11 @@ TEST_CASE_METHOD(ECM, __FILE__"_TestECMPositionNeutral", "")
     unsigned int bodyId = mBodyNameMapItr->second;
     std::string parentName = rbdlModel->GetBodyName(rbdlModel->GetParentBodyId(bodyId));
     std::cout << parentName << ", " << bodyName << ", " << bodyId << std::endl;
+    
   }
   
+  CHECK( "ab" == "abc");
+
   ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
   std::vector<std::string> joints = baseHandler->get_joint_names();
   std::vector<std::string> baseChildren = baseHandler->get_children_names();
@@ -54,9 +56,9 @@ TEST_CASE_METHOD(ECM, __FILE__"_TestECMPositionNeutral", "")
       const RigidBodyDynamics::Math::Vector3d P_n_0_rbdl = CalcBodyToBaseCoordinates(*rbdlModel, Q, rbdlBodyId, 
                                                               RigidBodyDynamics::Math::Vector3d(0., 0., 0.),true);
 
-      // std::cout << body << ": " << "P_n_w: " << P_n_w_tf[0] << ", " << P_n_w_tf[1] << ", " << P_n_w_tf[2] << std::endl;
-      // std::cout << body << ": " << "P_n_0_ambf: " << P_n_0_ambf[0] << ", " << P_n_0_ambf[1] << ", " << P_n_0_ambf[2] << std::endl;
-      // std::cout << body << ": " << "P_n_0_rbdl: " << P_n_0_rbdl[0] << ", " << P_n_0_rbdl[1] << ", " << P_n_0_rbdl[2] << std::endl;
+      std::cout << body << ": " << "P_n_w: " << P_n_w_tf[0] << ", " << P_n_w_tf[1] << ", " << P_n_w_tf[2] << std::endl;
+      std::cout << body << ": " << "P_n_0_ambf: " << P_n_0_ambf[0] << ", " << P_n_0_ambf[1] << ", " << P_n_0_ambf[2] << std::endl;
+      std::cout << body << ": " << "P_n_0_rbdl: " << P_n_0_rbdl[0] << ", " << P_n_0_rbdl[1] << ", " << P_n_0_rbdl[2] << std::endl;
       
 
       RigidBodyDynamics::Math::Vector3d P_n_w_rbd_ambf;
