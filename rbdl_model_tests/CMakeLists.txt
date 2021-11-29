@@ -163,6 +163,7 @@ target_link_libraries (kuka_tests_hc
     )
 ################END################
 
+################START################
 set (ECM_RBDL_MODEL_TESTS_HDR_FILES
     include/${PROJECT_NAME}/ECM.h
     include/${PROJECT_NAME}/EigenUtilities.h
@@ -170,7 +171,6 @@ set (ECM_RBDL_MODEL_TESTS_HDR_FILES
     include/${PROJECT_NAME}/RBDLTestPrep.h    
     )
 
-################START################
 # Executible ECM_tests
 set(ECM_HC_RBDL_MODEL_TESTS_SOURCE_FILES
     #src/ECMHCKinematicsTests.cc
@@ -184,6 +184,38 @@ add_executable (ecm_tests_hc
       ${ECM_RBDL_MODEL_TESTS_HDR_FILES} 
       ${ECM_HC_RBDL_MODEL_TESTS_SOURCE_FILES})
 target_link_libraries (ecm_tests_hc
+    ${AMBF_CLIENT_LIBRARY} 
+    ${RBDL_MODEL_LIBRARY}
+    ${GLFW_LIBRARIES} 
+    ${Boost_LIBRARIES} 
+    ${Eigen_LIBRARIES} 
+    ${UNITTEST++_LIBRARY}
+    ${RBDL_LIBRARY}
+    pthread
+    )
+##############END################
+
+################START################
+set (PS_RBDL_MODEL_TESTS_HDR_FILES
+    include/${PROJECT_NAME}/ParallelStructure.h
+    include/${PROJECT_NAME}/EigenUtilities.h
+    include/${PROJECT_NAME}/rbdl_tests.h
+    include/${PROJECT_NAME}/RBDLTestPrep.h    
+    )
+
+# Executible Parallel_Structure_tests
+set(PS_HC_RBDL_MODEL_TESTS_SOURCE_FILES
+    #src/ECMHCKinematicsTests.cc
+    src/ParallelStructureBodyTest.cc
+    src/EigenUtilities.cpp
+    src/RBDLTestPrep.cc
+    src/main.cc
+    )
+
+add_executable (ps_tests_hc 
+      ${PS_RBDL_MODEL_TESTS_HDR_FILES} 
+      ${PS_HC_RBDL_MODEL_TESTS_SOURCE_FILES})
+target_link_libraries (ps_tests_hc
     ${AMBF_CLIENT_LIBRARY} 
     ${RBDL_MODEL_LIBRARY}
     ${GLFW_LIBRARIES} 
