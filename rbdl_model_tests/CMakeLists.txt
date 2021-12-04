@@ -156,7 +156,7 @@ target_link_libraries (kuka_tests_hc
     ${RBDL_MODEL_LIBRARY}
     ${GLFW_LIBRARIES} 
     ${Boost_LIBRARIES} 
-    ${Eigen_LIBRARIES} 
+    # ${Eigen_LIBRARIES} 
     ${UNITTEST++_LIBRARY}
     ${RBDL_LIBRARY}
     pthread
@@ -188,7 +188,7 @@ target_link_libraries (ecm_tests_hc
     ${RBDL_MODEL_LIBRARY}
     ${GLFW_LIBRARIES} 
     ${Boost_LIBRARIES} 
-    ${Eigen_LIBRARIES} 
+    # ${Eigen_LIBRARIES} 
     ${UNITTEST++_LIBRARY}
     ${RBDL_LIBRARY}
     pthread
@@ -205,8 +205,8 @@ set (PS_RBDL_MODEL_TESTS_HDR_FILES
 
 # Executible Parallel_Structure_tests
 set(PS_HC_RBDL_MODEL_TESTS_SOURCE_FILES
-    #src/ECMHCKinematicsTests.cc
-    src/ParallelStructureBodyTest.cc
+    src/ParallelStructureHCKinematicsTests.cc
+    # src/ParallelStructureBodyTest.cc
     src/EigenUtilities.cpp
     src/RBDLTestPrep.cc
     src/main.cc
@@ -220,7 +220,7 @@ target_link_libraries (ps_tests_hc
     ${RBDL_MODEL_LIBRARY}
     ${GLFW_LIBRARIES} 
     ${Boost_LIBRARIES} 
-    ${Eigen_LIBRARIES} 
+    # ${Eigen_LIBRARIES} 
     ${UNITTEST++_LIBRARY}
     ${RBDL_LIBRARY}
     pthread

@@ -36,18 +36,18 @@ struct ParallelStructure {
 
     rbdlPSModel = new Model;
 
+    rbdlPSModel->gravity = RigidBodyDynamics::Math::Vector3d(0., 0., -9.81);
     // mass, com - inertia offset, inertia
-    world = Body(0.0, RigidBodyDynamics::Math::Vector3d (0.0, 0.000000, 0.0), 
-           RigidBodyDynamics::Math::Vector3d (0.00000, 0.00000, 0.0000));
-    l1    = Body(1.0, RigidBodyDynamics::Math::Vector3d (0.0, -0.34415, 0.0), 
-           RigidBodyDynamics::Math::Vector3d (0.31777, 0.00961, 0.31777));
-    l2    = Body(1.0, RigidBodyDynamics::Math::Vector3d (0.0, -0.34415, 0.0), 
-           RigidBodyDynamics::Math::Vector3d (0.31777, 0.00961, 0.31777));
-    l3    = Body(1.0, RigidBodyDynamics::Math::Vector3d (0.0, -0.34415, 0.0), 
-           RigidBodyDynamics::Math::Vector3d (0.31777, 0.00961, 0.31777));
-    l4    = Body(1.0, RigidBodyDynamics::Math::Vector3d (0.0, -0.34415, 0.0), 
-           RigidBodyDynamics::Math::Vector3d (0.31777, 0.00961, 0.31777));
+    const double mass                         = 1.0;
+    RigidBodyDynamics::Math::Vector3d com     = {     0.0, -0.34415,     0.0 };
+    RigidBodyDynamics::Math::Vector3d inertia = { 0.31777,  0.00961, 0.31777 };
 
+    world = Body(0.0, RigidBodyDynamics::Math::Vector3d (0.0, 0.0, 0.0), 
+           RigidBodyDynamics::Math::Vector3d (0.0, 0.0, 0.0));
+    l1 = Body(mass, com, inertia);
+    l2 = Body(mass, com, inertia);
+    l3 = Body(mass, com, inertia);
+    l4 = Body(mass, com, inertia);
     //--------------------------------------------------------------------//
     ROOT_worldJoint = Joint(JointTypeFixed);
     ROOT_worldST.E = RigidBodyDynamics::Math::Matrix3dIdentity;
@@ -61,12 +61,15 @@ struct ParallelStructure {
     world_l1PA.normalize();
     world_l1CA.normalize();
 
-    world_l1ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(world_l1PA, world_l1CA));
-    world_l1ST.r = world_l1PP - (world_l1ST.E.inverse() * world_l1CP);
+    Eigen::Matrix3d world_l1_Rot = 
+                Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(world_l1PA, world_l1CA));
+    Eigen::Matrix3d world_l1_offset = EigenUtilities::rotZ(3.14189);
+    world_l1ST.E = world_l1_offset * world_l1_Rot ;
+    world_l1ST.r = world_l1PP - (world_l1_Rot.inverse() * world_l1CP);
 
     world_l1Joint = Joint(JointTypeFixed);
     l1Id = rbdlPSModel->AddBody(worldId, world_l1ST, world_l1Joint, l1, "l1");
-    //--------------------------------------------------------------------//
+    //--------------------------------------------------------------------// 
     Eigen::Vector3d l1_l2PA = {   0.0, 0.00016, 1.0 };
     Eigen::Vector3d l1_l2CA = {   0.0, 0.00009, 1.0 };
     Eigen::Vector3d l1_l2PP = { 0.139,   0.138, 0.0 };
@@ -74,37 +77,44 @@ struct ParallelStructure {
     l1_l2PA.normalize();
     l1_l2CA.normalize();
 
-    l1_l2ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(l1_l2PA, l1_l2CA));
-    l1_l2ST.r = l1_l2PP - (l1_l2ST.E.inverse() * l1_l2CP);
+    Eigen::Matrix3d l1_l2_Rot = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(l1_l2PA, l1_l2CA));
+    Eigen::Matrix3d l1_l2_offset = EigenUtilities::rotZ(1.575);
+    l1_l2ST.E = l1_l2_offset * l1_l2_Rot;
+    l1_l2ST.r = l1_l2PP - (l1_l2_Rot.inverse() * l1_l2CP);
 
     l1_l2Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
     l2Id = rbdlPSModel->AddBody(l1Id, l1_l2ST, l1_l2Joint, l2, "l2");
     //--------------------------------------------------------------------//
-    Eigen::Vector3d l2_l3PA = {    0.0,    0.0, 1.0 };
-    Eigen::Vector3d l2_l3CA = {    0.0,    0.0, 1.0 };
-    Eigen::Vector3d l2_l3PP = { -0.141, -0.832, 0.0 };
-    Eigen::Vector3d l2_l3CP = {   0.0,     0.0, 0.0 };
+    Eigen::Vector3d l2_l3PA = {    0.0,    0.0,      1.0 };
+    Eigen::Vector3d l2_l3CA = {    0.0,    0.0, -0.00016 };
+    Eigen::Vector3d l2_l3PP = { -0.141, -0.832,      0.0 };
+    Eigen::Vector3d l2_l3CP = {   0.0,     0.0,      0.0 };
     l2_l3PA.normalize();
     l2_l3CA.normalize();
 
-    l2_l3ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(l2_l3PA, l2_l3CA));
-    l2_l3ST.r = l2_l3PP - (l2_l3ST.E.inverse() * l2_l3CP);
+    Eigen::Matrix3d l2_l3_Rot = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(l2_l3PA, l2_l3CA));
+    Eigen::Matrix3d l2_l3_offset = EigenUtilities::rotZ(-1.575);
+    l2_l3ST.E = l2_l3_offset * l2_l3_Rot;
+    l2_l3ST.r = l2_l3PP - (l2_l3_Rot.inverse() * l2_l3CP);
 
     l2_l3Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
     l3Id = rbdlPSModel->AddBody(l2Id, l2_l3ST, l2_l3Joint, l3, "l3");   
     //--------------------------------------------------------------------//
     Eigen::Vector3d l3_l4PA = {      0.0, 0.00035, 1.0 };
     Eigen::Vector3d l3_l4CA = { -0.00017,     0.0, 1.0 };
-    Eigen::Vector3d l3_l4PP = {    -0.14,   -0.83, 0.0 };
+    // Eigen::Vector3d l3_l4PP = {    -0.14,   -0.83, 0.0 };
+    Eigen::Vector3d l3_l4PP = {    -0.14+0.287025,   -0.83 , 0.0 };
     Eigen::Vector3d l3_l4CP = {      0.0,     0.0, 0.0 };
     l3_l4PA.normalize();
     l3_l4CA.normalize();
 
-    l3_l4ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(l3_l4PA, l3_l4CA));
-    l3_l4ST.r = l3_l4PP - (l3_l4ST.E.inverse() * l3_l4CP);
+    Eigen::Matrix3d l3_l4_Rot = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(l3_l4PA, l3_l4CA));
+    Eigen::Matrix3d l3_l4_offset = EigenUtilities::rotZ(-1.567);
+    l3_l4ST.E = l3_l4_offset * l3_l4_Rot;
+    l3_l4ST.r = l3_l4PP - (l3_l4_Rot.inverse() * l3_l4CP);
 
     l3_l4Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    l3Id = rbdlPSModel->AddBody(l3Id, l3_l4ST, l3_l4Joint, l4, "l4");  
+    l4Id = rbdlPSModel->AddBody(l3Id, l3_l4ST, l3_l4Joint, l4, "l4");  
     //--------------------------------------------------------------------//
     Eigen::Vector3d l1_l4PA = {      0.0, 0.00016,       1.0 };
     Eigen::Vector3d l1_l4CA = {  0.00024,     0.0,       1.0 };
@@ -113,18 +123,25 @@ struct ParallelStructure {
     l1_l4PA.normalize();
     l1_l4CA.normalize();
 
-    l1_l4ST.E = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(l3_l4PA, l3_l4CA));
-    l1_l4ST.r = l1_l4PP - (l1_l4ST.E.inverse() * l1_l4CP);
+    Eigen::Matrix3d l1_l4_Rot = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(l1_l4PA, l1_l4CA));
+    Eigen::Matrix3d l1_l4_offset = EigenUtilities::rotZ(-1.567);
+    l1_l4ST.E = l1_l4_offset * l1_l4_Rot;
+    l1_l4ST.r = l1_l4PP - (l1_l4_Rot.inverse() * l1_l4CP);
 
     l1_l4Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
     rbdlPSModel->AddBody(l1Id, l1_l4ST, l1_l4Joint, l4); 
     //--------------------------------------------------------------------//
+
+    std::cout << "ROOT_worldST: " << std::endl << ROOT_worldST << std::endl;
+    std::cout << "world_l1ST: "   << std::endl << world_l1ST   << std::endl;
+    std::cout << "l1_l2ST: "      << std::endl << l1_l2ST      << std::endl;
+
     Q     = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);
     QDot  = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);
     QDDot = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);
     Tau   = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);
 
-    JOINT_LIMITS[ "l1" ] = {   -1.2f,   1.2f };
+    JOINT_LIMITS[ "l1" ] = {    0.0f,   0.0f };
     JOINT_LIMITS[ "l2" ] = { -1.047f, 1.047f };
     JOINT_LIMITS[ "l3" ] = { -1.047f, 1.047f };
     JOINT_LIMITS[ "l4" ] = { -1.047f, 1.047f }; 
@@ -154,11 +171,8 @@ struct ParallelStructure {
   std::unordered_map<std::string, std::string> reference_hierachy_map;
 
   unsigned int worldId, l1Id, l2Id, l3Id, l4Id;
-
   Body world, l1, l2, l3, l4;
-
   Joint ROOT_worldJoint, world_l1Joint, l1_l2Joint, l2_l3Joint, l3_l4Joint, l1_l4Joint;
-
   SpatialTransform ROOT_worldST, world_l1ST, l1_l2ST, l2_l3ST, l3_l4ST, l1_l4ST;
 
   VectorNd Q;
