@@ -28,7 +28,7 @@ struct ParallelStructure {
     P_0_w[1]= P_0_w_tf[1];
     P_0_w[2]= P_0_w_tf[2];
     
-    const tf::Quaternion rot_quat = baseHandler->get_rot();
+    // const tf::Quaternion rot_quat = baseHandler->get_rot();
     tf::Vector3 ryp_0_w_tf = baseHandler->get_rpy();
     Eigen::Matrix3d R_0_w = EigenUtilities::rotation_from_euler<Eigen::Matrix3d>(ryp_0_w_tf[0], ryp_0_w_tf[1], ryp_0_w_tf[2]);
     
@@ -70,10 +70,10 @@ struct ParallelStructure {
     world_l1Joint = Joint(JointTypeFixed);
     l1Id = rbdlPSModel->AddBody(worldId, world_l1ST, world_l1Joint, l1, "l1");
     //--------------------------------------------------------------------// 
-    Eigen::Vector3d l1_l2PA = {   0.0, 0.00016, 1.0 };
-    Eigen::Vector3d l1_l2CA = {   0.0, 0.00009, 1.0 };
-    Eigen::Vector3d l1_l2PP = { 0.139,   0.138, 0.0 };
-    Eigen::Vector3d l1_l2CP = {   0.0,     0.0, 0.0 };
+    Eigen::Vector3d l1_l2PA = {     0.0, 0.00016, 1.0 };
+    Eigen::Vector3d l1_l2CA = { 0.00009, 0.00000, 1.0 };
+    Eigen::Vector3d l1_l2PP = {   0.139,   0.138, 0.0 };
+    Eigen::Vector3d l1_l2CP = {     0.0,     0.0, 0.0 };
     l1_l2PA.normalize();
     l1_l2CA.normalize();
 
@@ -85,10 +85,10 @@ struct ParallelStructure {
     l1_l2Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
     l2Id = rbdlPSModel->AddBody(l1Id, l1_l2ST, l1_l2Joint, l2, "l2");
     //--------------------------------------------------------------------//
-    Eigen::Vector3d l2_l3PA = {    0.0,    0.0,      1.0 };
-    Eigen::Vector3d l2_l3CA = {    0.0,    0.0, -0.00016 };
-    Eigen::Vector3d l2_l3PP = { -0.141, -0.832,      0.0 };
-    Eigen::Vector3d l2_l3CP = {   0.0,     0.0,      0.0 };
+    Eigen::Vector3d l2_l3PA = {    0.0,      0.0, 1.0 };
+    Eigen::Vector3d l2_l3CA = {    0.0, -0.00016, 1.0 };
+    Eigen::Vector3d l2_l3PP = { -0.141,   -0.832, 0.0 };
+    Eigen::Vector3d l2_l3CP = {    0.0,      0.0, 0.0 };
     l2_l3PA.normalize();
     l2_l3CA.normalize();
 
@@ -102,8 +102,8 @@ struct ParallelStructure {
     //--------------------------------------------------------------------//
     Eigen::Vector3d l3_l4PA = {      0.0, 0.00035, 1.0 };
     Eigen::Vector3d l3_l4CA = { -0.00017,     0.0, 1.0 };
-    // Eigen::Vector3d l3_l4PP = {    -0.14,   -0.83, 0.0 };
-    Eigen::Vector3d l3_l4PP = {    -0.14+0.287025,   -0.83 , 0.0 };
+    Eigen::Vector3d l3_l4PP = {    -0.14,   -0.83, 0.0 };
+    // Eigen::Vector3d l3_l4PP = {    -0.14+0.287025,   -0.83 , 0.0 };
     Eigen::Vector3d l3_l4CP = {      0.0,     0.0, 0.0 };
     l3_l4PA.normalize();
     l3_l4CA.normalize();
@@ -132,9 +132,19 @@ struct ParallelStructure {
     rbdlPSModel->AddBody(l1Id, l1_l4ST, l1_l4Joint, l4); 
     //--------------------------------------------------------------------//
 
-    std::cout << "ROOT_worldST: " << std::endl << ROOT_worldST << std::endl;
-    std::cout << "world_l1ST: "   << std::endl << world_l1ST   << std::endl;
-    std::cout << "l1_l2ST: "      << std::endl << l1_l2ST      << std::endl;
+    // std::cout << "world_l1_Rot: " << std::endl << world_l1_Rot << std::endl;
+    // std::cout << "l1_l2_Rot: " << std::endl << l1_l2_Rot << std::endl;
+    // std::cout << "l2_l3_Rot: " << std::endl << l2_l3_Rot << std::endl;
+    // std::cout << "l3_l4_Rot: " << std::endl << l3_l4_Rot << std::endl;
+    // std::cout << "l1_l4_Rot: " << std::endl << l1_l4_Rot << std::endl;
+    
+
+    // std::cout << "ROOT_worldST: " << std::endl << ROOT_worldST << std::endl;
+    // std::cout << "world_l1ST: "   << std::endl << world_l1ST   << std::endl;
+    // std::cout << "l1_l2ST: "      << std::endl << l1_l2ST      << std::endl;
+    // std::cout << "l2_l3ST: "      << std::endl << l2_l3ST      << std::endl;
+    // std::cout << "l3_l4ST: "      << std::endl << l3_l4ST      << std::endl;
+    // std::cout << "l1_l4ST: "      << std::endl << l1_l4ST      << std::endl;
 
     Q     = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);
     QDot  = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);
