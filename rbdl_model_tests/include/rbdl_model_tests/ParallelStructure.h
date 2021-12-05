@@ -22,16 +22,24 @@ struct ParallelStructure {
     //server side during first execution
     baseHandler->set_joint_pos(base_name, 0.0f); 
 
-    tf::Vector3 P_0_w_tf = baseHandler->get_pos();
-    Eigen::Vector3d P_0_w;
-    P_0_w[0]= P_0_w_tf[0];
-    P_0_w[1]= P_0_w_tf[1];
-    P_0_w[2]= P_0_w_tf[2];
+    const tf::Quaternion quat_0_w_tf = baseHandler->get_rot();
+    const tf::Vector3 P_0_w_tf = baseHandler->get_pos();
+
+    RigidBodyDynamics::Math::Quaternion quat_0_w;
+    quat_0_w(0) = quat_0_w_tf[0];
+    quat_0_w(1) = quat_0_w_tf[1];
+    quat_0_w(2) = quat_0_w_tf[2];
+    quat_0_w(3) = quat_0_w_tf[3];
+
+    const RigidBodyDynamics::Math::Matrix3d R_0_w = quat_0_w.toMatrix();
+
+    RigidBodyDynamics::Math::Vector3d P_0_w;
+    P_0_w.setZero();
     
-    // const tf::Quaternion rot_quat = baseHandler->get_rot();
-    tf::Vector3 ryp_0_w_tf = baseHandler->get_rpy();
-    Eigen::Matrix3d R_0_w = EigenUtilities::rotation_from_euler<Eigen::Matrix3d>(ryp_0_w_tf[0], ryp_0_w_tf[1], ryp_0_w_tf[2]);
-    
+    P_0_w(0) = P_0_w_tf[0];
+    P_0_w(1) = P_0_w_tf[1];
+    P_0_w(2) = P_0_w_tf[2];
+
     T_0_w = EigenUtilities::get_frame<Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix4d>(R_0_w, P_0_w);
 
     rbdlPSModel = new Model;
@@ -131,20 +139,6 @@ struct ParallelStructure {
     l1_l4Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
     rbdlPSModel->AddBody(l1Id, l1_l4ST, l1_l4Joint, l4); 
     //--------------------------------------------------------------------//
-
-    // std::cout << "world_l1_Rot: " << std::endl << world_l1_Rot << std::endl;
-    // std::cout << "l1_l2_Rot: " << std::endl << l1_l2_Rot << std::endl;
-    // std::cout << "l2_l3_Rot: " << std::endl << l2_l3_Rot << std::endl;
-    // std::cout << "l3_l4_Rot: " << std::endl << l3_l4_Rot << std::endl;
-    // std::cout << "l1_l4_Rot: " << std::endl << l1_l4_Rot << std::endl;
-    
-
-    // std::cout << "ROOT_worldST: " << std::endl << ROOT_worldST << std::endl;
-    // std::cout << "world_l1ST: "   << std::endl << world_l1ST   << std::endl;
-    // std::cout << "l1_l2ST: "      << std::endl << l1_l2ST      << std::endl;
-    // std::cout << "l2_l3ST: "      << std::endl << l2_l3ST      << std::endl;
-    // std::cout << "l3_l4ST: "      << std::endl << l3_l4ST      << std::endl;
-    // std::cout << "l1_l4ST: "      << std::endl << l1_l4ST      << std::endl;
 
     Q     = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);
     QDot  = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);

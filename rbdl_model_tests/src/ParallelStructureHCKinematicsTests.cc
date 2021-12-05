@@ -42,13 +42,7 @@ TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSPositionNeutral", "")
       quat_n_w_ambf(2) = quat_n_w_tf[2];
       quat_n_w_ambf(3) = quat_n_w_tf[3];
 
-      // std::cout << std::endl << "quat_n_w_rbdl.toMatrix()" << std::endl 
-      //                        << quat_n_w_rbdl.toMatrix() << std::endl;
-
-      const tf::Vector3 ryp_n_w_tf = rigidBodyHandler->get_rpy();
-
       const RigidBodyDynamics::Math::Matrix3d R_n_w_ambf = quat_n_w_ambf.toMatrix();
-      // EigenUtilities::rotation_from_euler<Eigen::Matrix3d>(ryp_n_w_tf[0], ryp_n_w_tf[1], ryp_n_w_tf[2]);
 
       RigidBodyDynamics::Math::Vector3d P_n_w_ambf;
       P_n_w_ambf.setZero();
@@ -63,21 +57,10 @@ TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSPositionNeutral", "")
                                         CalcBodyToBaseCoordinates(*rbdlPSModel, Q, rbdlBodyId, 
                                             RigidBodyDynamics::Math::Vector3d(0., 0., 0.), true);
 
-      //const RigidBodyDynamics::Math::Matrix3d R_n_w_rbdl = T_0_w.block<3, 3>(0, 0) * R_n_0_rbdl;
       const RigidBodyDynamics::Math::Vector3d P_n_w_rbdl = T_0_w.block<3, 3>(0, 0) * P_n_0_rbdl;
 
-      // const RigidBodyDynamics::Math::Matrix3d R_n_0_ambf = 
-      //                           T_0_w.block<3, 3>(0, 0).transpose() * R_n_w_ambf;
-      // std::cout << std::endl << "R_n_0_ambf: " << std::endl << R_n_0_ambf << std::endl;
-      // std::cout << std::endl << "R_n_0_rbdl: " << std::endl << R_n_0_rbdl << std::endl;
-      // std::cout << std::endl << "diff: " << std::endl << (R_n_0_ambf - R_n_0_rbdl) << std::endl;
-
-      std::cout << std::endl << "R_n_w_ambf: " << std::endl << R_n_w_ambf << std::endl;
-      std::cout << std::endl << "R_n_w_rbdl: " << std::endl << R_n_w_rbdl << std::endl;
-      std::cout << std::endl << "diff: " << std::endl << (R_n_w_ambf - R_n_w_rbdl) << std::endl;
-
       CHECK_THAT(R_n_w_ambf, AllCloseMatrix(R_n_w_rbdl, TEST_PREC, TEST_PREC));
-      // CHECK_THAT(P_n_w_ambf, AllCloseMatrix(P_n_w_rbdl, TEST_PREC, TEST_PREC));
+      CHECK_THAT(P_n_w_ambf, AllCloseMatrix(P_n_w_rbdl, TEST_PREC, TEST_PREC));
     }
   }
 }
