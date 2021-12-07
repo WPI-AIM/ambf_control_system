@@ -252,8 +252,6 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKARandomPosition", "")
       usleep(1000000);
     }
 
-    
-
     for(int j = 0; j < 10; j++)
     {
       for(std::string body : baseChildren)

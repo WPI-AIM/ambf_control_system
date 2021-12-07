@@ -143,10 +143,10 @@ struct ParallelStructure {
     QDDot = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);
     Tau   = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);
 
-    JOINT_LIMITS[ "l1" ] = {    0.0f,   0.0f };
-    JOINT_LIMITS[ "l2" ] = { -1.047f, 1.047f };
-    JOINT_LIMITS[ "l3" ] = { -1.047f, 1.047f };
-    JOINT_LIMITS[ "l4" ] = { -1.047f, 1.047f }; 
+    PS_JOINT_LIMITS[ "l1-l2" ] = {    0.0f,   0.0f };
+    PS_JOINT_LIMITS[ "l2-l3" ] = { -1.047f, 1.047f };
+    PS_JOINT_LIMITS[ "l3-l4" ] = { -1.047f, 1.047f };
+    PS_JOINT_LIMITS[ "l1-l4" ] = { -1.047f, 1.047f }; 
 
     // Child : Parent
     reference_hierachy_map[ "ROOT" ]  = "ROOT";
@@ -170,7 +170,7 @@ struct ParallelStructure {
   rigidBodyPtr baseHandler = nullptr;
   std::string base_name = "world";
   Eigen::Matrix4d T_0_w;
-  std::unordered_map<std::string, std::vector<float>> JOINT_LIMITS;
+  std::unordered_map<std::string, std::vector<float>> PS_JOINT_LIMITS;
   std::unordered_map<std::string, std::string> reference_hierachy_map;
 
   unsigned int worldId, l1Id, l2Id, l3Id, l4Id;
