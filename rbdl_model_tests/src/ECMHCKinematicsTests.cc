@@ -2,6 +2,7 @@
 
 TEST_CASE_METHOD(ECM, __FILE__"_TestECMPositionNeutral", "") 
 {
+  //mBody in RBDL has AMBF Joints
   std::map< std::string, unsigned int > mBodyNameMap = rbdlModel->mBodyNameMap;
   std::map<std::string, unsigned int>::iterator mBodyNameMapItr;
   for(mBodyNameMapItr = mBodyNameMap.begin(); mBodyNameMapItr != mBodyNameMap.end(); mBodyNameMapItr++)
@@ -12,8 +13,6 @@ TEST_CASE_METHOD(ECM, __FILE__"_TestECMPositionNeutral", "")
     std::cout << parentName << ", " << bodyName << ", " << bodyId << std::endl;
     
   }
-  
-  CHECK( "ab" == "abc");
 
   ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
   std::vector<std::string> joints = baseHandler->get_joint_names();
@@ -36,7 +35,7 @@ TEST_CASE_METHOD(ECM, __FILE__"_TestECMPositionNeutral", "")
   for(std::string body : baseChildren)
   {
     unsigned int rbdlBodyId = rbdlModel->GetBodyId(body.c_str());
-    
+
     if(rbdlBodyId < rbdlModel->mBodies.size())
     {
       std::cout << "Executing Test case for body: "<< body << ", " << rbdlBodyId << std::endl;

@@ -23,7 +23,7 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestCalcDynamicPositionNeutral", "")
   
   CHECK_THAT (Tau,
               AllCloseVector(TauInv, TEST_PREC, TEST_PREC));
-  std::vector<string> joints = baseHandler->get_joint_names();
+  std::vector<std::string> joints = baseHandler->get_joint_names();
   std::vector<std::string> baseChildren = baseHandler->get_children_names();
 
   CHECK (baseChildren.size() == Q.size());

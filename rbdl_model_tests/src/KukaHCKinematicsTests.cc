@@ -78,7 +78,7 @@ TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKAPositionNeutral", "")
   }
 }
 
-TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKAPIbyFourPositionNeutral", "") 
+TEST_CASE_METHOD(Kuka, __FILE__"_TestKUKAPIbyFourPosition", "") 
 {
   // We call ForwardDynamics() as it updates the spatial transformation
   // matrices

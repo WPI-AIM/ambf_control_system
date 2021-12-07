@@ -1,6 +1,5 @@
 #include "rbdl_model_tests/RBDLTestPrep.h"
 #include "rbdl_model_tests/EigenUtilities.h"
-//#include "rbdl_model_tests/Human36Fixture.h"
 #include <unordered_map>
 #include <Eigen/Geometry> 
 
@@ -111,7 +110,6 @@ struct ParallelStructure {
     Eigen::Vector3d l3_l4PA = {      0.0, 0.00035, 1.0 };
     Eigen::Vector3d l3_l4CA = { -0.00017,     0.0, 1.0 };
     Eigen::Vector3d l3_l4PP = {    -0.14,   -0.83, 0.0 };
-    // Eigen::Vector3d l3_l4PP = {    -0.14+0.287025,   -0.83 , 0.0 };
     Eigen::Vector3d l3_l4CP = {      0.0,     0.0, 0.0 };
     l3_l4PA.normalize();
     l3_l4CA.normalize();
@@ -167,6 +165,7 @@ struct ParallelStructure {
   }
 
   Model *rbdlPSModel = nullptr;
+  ConstraintSet cs;
   AMBFClientPtr clientPtr = nullptr;
   rigidBodyPtr baseHandler = nullptr;
   std::string base_name = "world";
