@@ -173,8 +173,8 @@ set (ECM_RBDL_MODEL_TESTS_HDR_FILES
 
 # Executible ECM_tests
 set(ECM_HC_RBDL_MODEL_TESTS_SOURCE_FILES
-    #src/ECMHCKinematicsTests.cc
-    src/ECMBodyTests.cc
+    src/ECMHCKinematicsTests.cc
+    # src/ECMBodyTests.cc
     src/EigenUtilities.cpp
     src/RBDLTestPrep.cc
     src/main.cc
