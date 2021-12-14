@@ -1,11 +1,16 @@
 #include "rbdl_model_tests/RBDLTestPrep.h"
 #include "rbdl_model_tests/EigenUtilities.h"
-//#include "rbdl_model_tests/Human36Fixture.h"
 #include <unordered_map>
 #include <Eigen/Geometry> 
 
 //const double TEST_PREC = 1.0e-12;
 const double TEST_LAX = 1.0e-7;
+struct ActivationJoints
+{
+  std::string name;
+  float joint_lower_limit;
+  float joint_upper_limit;
+};
 
 struct ECM {
   ECM () {
@@ -18,9 +23,23 @@ struct ECM {
     baseHandler = clientPtr->getRigidBody(base_name, true);
     usleep(1000000);
 
-    //base is rigid body name, not a joint. This is a hacky way to enable ros topics in the 
-    //server side during first execution
-    baseHandler->set_joint_pos(base_name, 0.0f); 
+    // //base is rigid body name, not a joint. This is a hacky way to enable ros topics in the 
+    // //server side during first execution
+    // baseHandler->set_joint_pos(base_name, 0.0f); 
+
+    for(bodyJointsMapItr = bodyJointsMap.begin(); bodyJointsMapItr != bodyJointsMap.end(); bodyJointsMapItr++)
+    {
+      std::string parentBody = bodyJointsMapItr->first;
+    
+      std::cout << "parentBody: " << parentBody << std::endl; 
+      rigidBodyPtr parentHandler = clientPtr->getRigidBody(parentBody, true);
+      usleep(1000000);
+      // Set ROS topics active
+      if(!parentHandler->is_joint_idx_valid(0))
+      {
+        parentHandler->set_joint_pos(0, 0.0f);
+      }
+    }
 
     const tf::Quaternion quat_0_w_tf = baseHandler->get_rot();
     const tf::Vector3 P_0_w_tf = baseHandler->get_pos();
@@ -176,26 +195,6 @@ struct ECM {
                                       pitchEndLink_mainInsertionLinkJoint, mainInsertionLink, 
                                       "maininsertionlink");
     //--------------------------------------------------------------------//
-    // Rotation fails
-    // Eigen::Vector3d mainInsertionLink_toolLinkPA = {     1.0,     0.0,    0.0 };
-    // Eigen::Vector3d mainInsertionLink_toolLinkCA = {     0.0,     0.0,   -1.0 };
-    // Eigen::Vector3d mainInsertionLink_toolLinkPP = { -0.0108,  -0.062,    0.0 };
-    // Eigen::Vector3d mainInsertionLink_toolLinkCP = { -0.0001, -0.0002, 0.0118 };
-    // mainInsertionLink_toolLinkPA.normalize();
-    // mainInsertionLink_toolLinkCA.normalize();
-
-    // Eigen::Matrix3d mainInsertionLink_toolLinkRot = 
-    //       Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(mainInsertionLink_toolLinkPA, mainInsertionLink_toolLinkCA));
-    // Eigen::Matrix3d mainInsertionLink_toolLink_offset = EigenUtilities::rotZ(-1.5708);
-
-    // mainInsertionLink_toolLinkST.E = mainInsertionLink_toolLink_offset * mainInsertionLink_toolLinkRot;
-    // mainInsertionLink_toolLinkST.r = mainInsertionLink_toolLinkPP - 
-    //                       (mainInsertionLink_toolLinkRot.inverse() * mainInsertionLink_toolLinkCP);
-
-    // mainInsertionLink_toolLinkJoint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    // toolLinkId = rbdlECMModel->AddBody(mainInsertionLinkId, mainInsertionLink_toolLinkST, 
-    //                                   mainInsertionLink_toolLinkJoint, toolLink, "toollink");
-    //--------------------------------------------------------------------//
     Eigen::Vector3d yawLink_pitchFrontLinkPA = { 1.0, 0.0,   0.0 };
     Eigen::Vector3d yawLink_pitchFrontLinkCA = { 0.0, 0.0,   1.0 };
     Eigen::Vector3d yawLink_pitchFrontLinkPP = { 0.0, 0.0, 0.199 };
@@ -294,34 +293,10 @@ struct ECM {
     toolLinkId = rbdlECMModel->AddBody(mainInsertionLinkId, mainInsertionLink_toolLinkST, 
                                       mainInsertionLink_toolLinkJoint, toolLink, "toollink");
     //--------------------------------------------------------------------//
-    
     Q = VectorNd::Constant ((size_t) rbdlECMModel->dof_count, 0.);
     QDot = VectorNd::Constant ((size_t) rbdlECMModel->dof_count, 0.);
     QDDot = VectorNd::Constant ((size_t) rbdlECMModel->dof_count, 0.);
-    Tau = VectorNd::Constant ((size_t) rbdlECMModel->dof_count, 0.);
-
-    KUKA_JOINT_LIMITS[ "link1" ] = { -2.094f, 2.094f };
-    KUKA_JOINT_LIMITS[ "link2" ] = { -2.094f, 2.094f };
-    KUKA_JOINT_LIMITS[ "link3" ] = { -2.094f, 2.094f };
-    KUKA_JOINT_LIMITS[ "link4" ] = { -2.094f, 2.094f }; 
-    KUKA_JOINT_LIMITS[ "link5" ] = { -2.094f, 2.094f }; 
-    KUKA_JOINT_LIMITS[ "link6" ] = { -2.094f, 2.094f }; 
-    KUKA_JOINT_LIMITS[ "link7" ] = { -3.054f, 3.054f }; 
-
-    // Child : Parent
-    reference_hierachy_map[ "ROOT" ]              = "ROOT";
-    reference_hierachy_map[ "baselink" ]          = "ROOT";
-    reference_hierachy_map[ "pitchendlink" ]      = "pitchbottomlink";
-    reference_hierachy_map[ "yawlink" ]           = "ROOT";
-    reference_hierachy_map[ "pitchbacklink" ]     = "yawlink";
-    reference_hierachy_map[ "pitchbottomlink" ]   = "pitchbacklink";
-    //reference_hierachy_map[ "pitchendlink" ]      = "pitchbottomlink";
-    reference_hierachy_map[ "maininsertionlink" ] = "pitchendlink";
-    reference_hierachy_map[ "toollink" ]          = "maininsertionlink";
-    reference_hierachy_map[ "pitchfrontlink" ]    = "yawlink";
-    //reference_hierachy_map[ "pitchbottomlink" ]   = "pitchfrontlink";
-    reference_hierachy_map[ "pitchtoplink" ]      = "pitchfrontlink";
-    //reference_hierachy_map[ "pitchendlink" ]      = "pitchtoplink";
+    Tau = VectorNd::Constant ((size_t) rbdlECMModel->dof_count, 0.); 
 
     ClearLogOutput();
   }
@@ -335,10 +310,50 @@ struct ECM {
   AMBFClientPtr clientPtr = nullptr;
   rigidBodyPtr baseHandler = nullptr;
   std::string base_name = "baselink";
+
   Eigen::Matrix4d T_0_w;
-  std::unordered_map<std::string, std::vector<float>> KUKA_JOINT_LIMITS;
-  std::unordered_map<std::string, std::vector<float>>::iterator KUKA_JOINT_LIMITS_itr;
-  std::unordered_map<std::string, std::string> reference_hierachy_map;
+  // Child : Parent
+  std::unordered_map<std::string, std::string> hierachyMap =
+  {
+    {               "ROOT", "ROOT"              },
+    {           "baselink", "ROOT"              },
+    {       "pitchendlink", "pitchbottomlink"   },
+    {            "yawlink", "ROOT"              },
+    {      "pitchbacklink", "yawlink"           },
+    {    "pitchbottomlink", "pitchbacklink"     },
+    {  "maininsertionlink", "pitchendlink"      },
+    {           "toollink", "maininsertionlink" },
+    {     "pitchfrontlink", "yawlink"           },
+    // { "pitchbottomlink", "pitchfrontlink"    },
+    {       "pitchtoplink", "pitchfrontlink"    },
+    // {    "pitchendlink", { "pitchtoplink"    }
+  };
+
+  const std::vector<ActivationJoints> ecmControllableJoints =
+  {
+    {               "baselink-yawlink", -1.595, 1.595 }, 
+    {          "yawlink-pitchbacklink", -0.784, 1.158 }, 
+    { "pitchendlink-maininsertionlink", 0.0000, 0.254 }, 
+    {     "maininsertionlink-toollink", -1.553, 1.567 }
+  };
+
+
+  std::unordered_map<std::string, std::vector<std::string>> bodyJointsMap =
+  {
+    { 
+      "baselink", {"pitchbacklink-pitchbottomlink", "yawlink-pitchfrontlink", "pitchfrontlink-pitchtoplink"} 
+    },
+    { 
+      "yawlink", {"pitchbottomlink-pitchendlink"} 
+    },
+    { 
+      "pitchfrontlink", {"pitchfrontlink-pitchbottomlink"} 
+    },
+    { 
+      "pitchtoplink", {"pitchtoplink-pitchendlink"} 
+    }
+  };
+  std::unordered_map<std::string, std::vector<std::string>>::iterator bodyJointsMapItr;
 
   unsigned int baseLinkId, pitchEndLinkId, mainInsertionLinkId, toolLinkId, yawLinkId, 
             pitchBackLinkId, pitchBottomLinkId, pitchFrontLinkId, pitchTopLinkId;
@@ -348,7 +363,6 @@ struct ECM {
 
   double baseLinkMScale, pitchEndLinkMScale, mainInsertionLinkMScale, toolLinkMScale, yawLinkMScale, 
             pitchBackLinkMScale, pitchBottomLinkMScale, pitchFrontLinkMScale, pitchTopLinkMScale = 1.0;
-
 
   Joint ROOT_baseLinkJoint, baseLink_pitchEndLinkJoint, pitchEndLink_mainInsertionLinkJoint, 
         mainInsertionLink_toolLinkJoint, baseLink_yawLinkJoint, yawLink_pitchBackLinkJoint,
