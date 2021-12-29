@@ -106,7 +106,7 @@ find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 include_directories (${GLFW_INCLUDE_DIRS})
 
 set (KUKA_RBDL_MODEL_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/Kuka.h
+    include/${PROJECT_NAME}/KUKA.h
     include/${PROJECT_NAME}/EigenUtilities.h
     include/${PROJECT_NAME}/rbdl_tests.h
     include/${PROJECT_NAME}/RBDLTestPrep.h    
@@ -143,6 +143,7 @@ set (KUKA_RBDL_MODEL_TESTS_HDR_FILES
 set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
     #src/KukaHCDynamicsTests.cc
     src/KukaHCKinematicsTests.cc
+    # src/KUKABodyTests.cc
     src/EigenUtilities.cpp
     src/RBDLTestPrep.cc
     src/main.cc
@@ -197,7 +198,8 @@ target_link_libraries (ecm_tests_hc
 
 ################START################
 set (PS_RBDL_MODEL_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/ParallelStructure.h
+    include/${PROJECT_NAME}/ParallelStructureCL.h
+    # include/${PROJECT_NAME}/ParallelStructure.h
     include/${PROJECT_NAME}/EigenUtilities.h
     include/${PROJECT_NAME}/rbdl_tests.h
     include/${PROJECT_NAME}/RBDLTestPrep.h    
@@ -205,7 +207,8 @@ set (PS_RBDL_MODEL_TESTS_HDR_FILES
 
 # Executible Parallel_Structure_tests
 set(PS_HC_RBDL_MODEL_TESTS_SOURCE_FILES
-    src/ParallelStructureHCKinematicsTests.cc
+    src/ParallelStructureCLHCKinematicsTests.cc
+    # src/ParallelStructureHCKinematicsTests.cc
     # src/ParallelStructureBodyTest.cc
     src/EigenUtilities.cpp
     src/RBDLTestPrep.cc

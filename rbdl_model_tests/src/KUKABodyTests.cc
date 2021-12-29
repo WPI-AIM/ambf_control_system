@@ -1,5 +1,8 @@
 #include "rbdl_model_tests/RBDLTestPrep.h"
+#include "rbdl_model_tests/KUKA.h"
 
+
+/*
 TEST_CASE (__FILE__"_TestKukaBodyMass", "" )
 {
     AMBFClientPtr clientPtr = RBDLTestPrep::getInstance()->getAMBFClientInstance();
@@ -29,7 +32,6 @@ TEST_CASE (__FILE__"_TestKukaBodyMass", "" )
     rbdlModelPtr->~BuildRBDLModel();
     clientPtr->cleanUp();
 }
-
 
 TEST_CASE (__FILE__"_TestKukaBodyInertia", "" )
 {
@@ -69,4 +71,29 @@ TEST_CASE (__FILE__"_TestKukaBodyInertia", "" )
     rbdlModelPtr->~BuildRBDLModel();
     clientPtr->cleanUp();
 }
+*/
 
+TEST_CASE_METHOD(KUKA, __FILE__"_TestKUKAPositionNeutral", "") 
+{
+  std::map< std::string, unsigned int > mBodyNameMap = rbdlModel->mBodyNameMap;
+  std::map<std::string, unsigned int>::iterator mBodyNameMapItr;
+
+//   for(mBodyNameMapItr = mBodyNameMap.begin(); mBodyNameMapItr != mBodyNameMap.end(); mBodyNameMapItr++)
+//   {
+//     std::string bodyName = mBodyNameMapItr->first;
+//     unsigned int bodyId = mBodyNameMapItr->second;
+//     std::string parentName = rbdlModel->GetBodyName(rbdlModel->GetParentBodyId(bodyId));
+//     std::cout << parentName << ", " << bodyName << ", " << bodyId << std::endl;
+//   }
+
+  for(mBodyNameMapItr = mBodyNameMap.begin(); mBodyNameMapItr != mBodyNameMap.end(); mBodyNameMapItr++)
+  {
+    std::string bodyName = mBodyNameMapItr->first;
+    unsigned int bodyId = mBodyNameMapItr->second;
+    std::string parentName = rbdlModel->GetBodyName(rbdlModel->GetParentBodyId(bodyId));
+    
+    // std::cout << bodyId << ", " << bodyName << ": " << parentName 
+    // << ", " << hierachyMap[bodyName] << std::endl;
+    CHECK( parentName == hierachyMap[bodyName]);
+  }
+}
