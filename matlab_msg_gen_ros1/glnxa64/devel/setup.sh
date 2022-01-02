@@ -11,7 +11,7 @@
 
 # since this file is sourced either use the provided _CATKIN_SETUP_DIR
 # or fall back to the destination set at configure time
-: ${_CATKIN_SETUP_DIR:=/home/nathaniel/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/devel}
+: ${_CATKIN_SETUP_DIR:=/home/nathanielgoldfarb/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/devel}
 _SETUP_UTIL="$_CATKIN_SETUP_DIR/_setup_util.py"
 unset _CATKIN_SETUP_DIR
 
