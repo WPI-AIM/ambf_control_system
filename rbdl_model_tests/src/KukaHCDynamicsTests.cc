@@ -3,7 +3,7 @@
 
 #include "rbdl/Model.h"
 #include "rbdl/Dynamics.h"
-
+#include <ros/ros.h>
 #include "rbdl_model_tests/DynamicTesting.h"
 
 #ifndef USE_SLOW_SPATIAL_ALGEBRA
@@ -42,7 +42,6 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPositionNeutral", "")
     usleep(250000);
   }
 }
- #endif
 
 
 
@@ -57,17 +56,21 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   VectorNd QDDot  = VectorNd::Constant (dof, 0.);
   VectorNd Tau    = VectorNd::Constant (dof, 0.);
   VectorNd TauInv = VectorNd::Constant (dof, 0.);
+  ros::Rate loop_rate(1000);
 
   // hold some information
   VectorNd q   = VectorNd::Zero (dof);
   VectorNd qd  = VectorNd::Zero (dof);
   std::vector<std::vector< double > > trajData;
+  std::vector<std::vector< float > > AMBFTrajData;
+  std::vector<std::vector< float > > tauData;
   std::vector< double > rowData(2*dof+1);
-
+  std::vector< float > tauRowData(dof);
+  
   //problem specific constants
-  int     nPts    = 100;
+  int     nPts    = 1000;
   double  t0      = 0;
-  double  t1      = 3;
+  double  t1      = 1.0;// 1s
 
 
   double t        = 0;             //time
@@ -98,8 +101,6 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   }
 
 
-  
-
   controlled_stepper_type controlled_stepper(
                                              default_error_checker< double , range_algebra , default_operations >
                                              ( absTolVal , relTolVal , a_x , a_dxdt ) 
@@ -109,25 +110,58 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   for(int i = 0; i < nPts; i++)
   {
 
-      t = t0 + dt*i;
-     vector<double> times;
-      vector<state_type> x_vec;
+      for(unsigned int j=0; j<dof; ++j)
+      {
+        Q[j] = xState[j];
+        QDot[j] = xState[j+dof];
+        QDDot[j] = 0.0;
+        Tau[j] = 0.0;
+      }
+      // try to do gravity compenstation
+      InverseDynamics(*rbdlModel,Q,QDot,QDDot,Tau);
+      //update the torque somehow
+      rbdlBoostModel.setTorque(Tau);
+      
       //3h. Here we integrate forward in time between a series of nPts from
       //    t0 to t1
-      vector<float> tau = {0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-
-      rbdlBoostModel.setTorque(tau);
+      t = t0 + dt*i;
+      vector<double> times;
+      vector<state_type> x_vec;
+      
       integrate_adaptive(controlled_stepper , rbdlBoostModel , xState , tp , t , (t-tp)/10 , pushBackStateAndTime( x_vec , times ) );
-
       tp = t;
 
+      // save the data
       rowData[0] = t;
       for(unsigned int z=0; z < 2*dof; z++){
           rowData[z+1] = xState[z];
       }
       trajData.push_back(rowData);
+
+      //lets save the applied torque
+      for(unsigned int z=0; z < dof; z++){
+          tauRowData[z] = (float)Tau[i];
+      }
+      tauData.push_back(tauRowData);
      
+     
+  }
+
+  //set the joint position to 0
+  std::vector<float> init_pos(dof, 0);
+
+  baseHandler->set_all_joint_pos(init_pos);
+  int count = 0;
+  //open loop control of the model
+  while(ros::ok())
+  {
+    std::vector< float > current_tau = tauData[count];
+    baseHandler->set_all_joint_effort(current_tau);
+    std::vector<float> curr = baseHandler->get_all_joint_pos();
+    AMBFTrajData.push_back(curr);
+    loop_rate.sleep();
   }
 
 
 }
+ #endif

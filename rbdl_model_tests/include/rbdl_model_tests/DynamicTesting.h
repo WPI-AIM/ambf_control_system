@@ -39,7 +39,7 @@ class rbdlToBoost {
 
         }
 
-        void setTorque(std::vector<float> my_tau)
+        void setTorque(const Math::VectorNd &my_tau)
         {
             //3e. Here we set the applied generalized forces to the value
             for(int i=0; i<model->dof_count; i++){                
