@@ -39,6 +39,14 @@ class rbdlToBoost {
 
         }
 
+        void setTorque(std::vector<float> my_tau)
+        {
+            //3e. Here we set the applied generalized forces to the value
+            for(int i=0; i<model->dof_count; i++){                
+                tau[i] = my_tau[i];
+            }
+        }
+
         //3c. Boost uses this 'operator()' function to evaluate the state
         //    derivative of the pendulum.
         void operator() (const state_type &x, 
@@ -60,10 +68,7 @@ class rbdlToBoost {
                 j++;
             }
 
-            //3e. Here we set the applied generalized forces to zero
-            for(int i=0; i<model->dof_count; i++){                
-                tau[i] = 0;
-            }
+            
 
             //3f. RBDL's ForwardDynamics function is used to evaluate
             //    qdd (generalized accelerations)
@@ -87,6 +92,7 @@ class rbdlToBoost {
     private:
         Model* model;
         VectorNd q, qd, qdd, tau;
+        std::vector<float> my_tau;
 };
 
 struct pushBackStateAndTime

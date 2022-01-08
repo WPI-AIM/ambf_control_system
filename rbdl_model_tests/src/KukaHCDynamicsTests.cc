@@ -58,8 +58,11 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   VectorNd Tau    = VectorNd::Constant (dof, 0.);
   VectorNd TauInv = VectorNd::Constant (dof, 0.);
 
+  // hold some information
   VectorNd q   = VectorNd::Zero (dof);
   VectorNd qd  = VectorNd::Zero (dof);
+  std::vector<std::vector< double > > trajData;
+  std::vector< double > rowData(2*dof+1);
 
   //problem specific constants
   int     nPts    = 100;
@@ -82,15 +85,20 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   state_type xState(dof*2);
   int steps = 0;
 
+
+  std::vector<float> joints_positions = baseHandler->get_all_joint_pos();
+  std::vector<float> joints_velocity = baseHandler->get_all_joint_pos();
+
   for(unsigned int i=0; i < 2*dof; ++i)
   {
-    q[i] = 0.0;
-    qd[i+dof] = 0.0;
+    q[i] = (double)joints_positions[i];
+    qd[i+dof] = (double)joints_velocity[i];
     xState[i] = q[i];
     xState[i+dof] = q[i+dof];
   }
 
 
+  
 
   controlled_stepper_type controlled_stepper(
                                              default_error_checker< double , range_algebra , default_operations >
@@ -98,28 +106,26 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
                                              );
 
         
-
   for(int i = 0; i < nPts; i++)
   {
 
       t = t0 + dt*i;
-
+     vector<double> times;
+      vector<state_type> x_vec;
       //3h. Here we integrate forward in time between a series of nPts from
       //    t0 to t1
-      integrate_adaptive( 
-          controlled_stepper ,
-          rbdlBoostModel , xState , tp , t , (t-tp)/10 );
+      vector<float> tau = {0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+
+      rbdlBoostModel.setTorque(tau);
+      integrate_adaptive(controlled_stepper , rbdlBoostModel , xState , tp , t , (t-tp)/10 , pushBackStateAndTime( x_vec , times ) );
 
       tp = t;
 
-
-      for(unsigned int i=0; i < 2*dof; ++i)
-      {
-        q[i] = xState[i];
-        qd[i+dof] = xState[i+dof];
+      rowData[0] = t;
+      for(unsigned int z=0; z < 2*dof; z++){
+          rowData[z+1] = xState[z];
       }
-
-
+      trajData.push_back(rowData);
      
   }
 
