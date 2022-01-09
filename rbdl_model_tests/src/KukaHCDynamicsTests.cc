@@ -58,7 +58,7 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   VectorNd TauInv = VectorNd::Constant (dof, 0.);
   ros::Rate loop_rate(1000);
 
-  // hold some information
+  // // hold some information
   VectorNd q   = VectorNd::Zero (dof);
   VectorNd qd  = VectorNd::Zero (dof);
   std::vector<std::vector< double > > trajData;
@@ -67,7 +67,7 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   std::vector< double > rowData(2*dof+1);
   std::vector< float > tauRowData(dof);
   
-  //problem specific constants
+  // //problem specific constants
   int     nPts    = 1000;
   double  t0      = 0;
   double  t1      = 1.0;// 1s
@@ -84,7 +84,7 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   double a_x = 1.0 , a_dxdt = 1.0;
   rbdlToBoost rbdlBoostModel(rbdlModel);
 
-  // model setup 
+  // // model setup 
   state_type xState(dof*2);
   int steps = 0;
 
@@ -92,12 +92,12 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   std::vector<float> joints_positions = baseHandler->get_all_joint_pos();
   std::vector<float> joints_velocity = baseHandler->get_all_joint_pos();
 
-  for(unsigned int i=0; i < 2*dof; ++i)
+  for(unsigned int i=0; i < dof; ++i)
   {
     q[i] = (double)joints_positions[i];
-    qd[i+dof] = (double)joints_velocity[i];
+    qd[i] = (double)joints_velocity[i];
     xState[i] = q[i];
-    xState[i+dof] = q[i+dof];
+    xState[i+dof] = qd[i];
   }
 
 
@@ -106,60 +106,69 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
                                              ( absTolVal , relTolVal , a_x , a_dxdt ) 
                                              );
 
-        
+  
+
+
+  for(unsigned int j=0; j<dof; ++j)
+  {
+    Q[j] = 0;
+    QDot[j] = 0;
+    QDDot[j] = 0.0;
+    Tau[j] = 0.0;
+  }
+    // try to do gravity compenstation
+  InverseDynamics(*rbdlModel,Q,QDot,QDDot,Tau);
+
   for(int i = 0; i < nPts; i++)
   {
+    //update the torque somehow
+     rbdlBoostModel.setTorque(Tau);
+    
+  //   //3h. Here we integrate forward in time between a series of nPts from
+  //   //    t0 to t1
+    t = t0 + dt*i;
+    vector<double> times;
+    vector<state_type> x_vec;
+    
+    integrate_adaptive(controlled_stepper , rbdlBoostModel , xState , tp , t , (t-tp)/10 , pushBackStateAndTime( x_vec , times ) );
+    tp = t;
 
-      for(unsigned int j=0; j<dof; ++j)
-      {
-        Q[j] = xState[j];
-        QDot[j] = xState[j+dof];
-        QDDot[j] = 0.0;
-        Tau[j] = 0.0;
-      }
-      // try to do gravity compenstation
-      InverseDynamics(*rbdlModel,Q,QDot,QDDot,Tau);
-      //update the torque somehow
-      rbdlBoostModel.setTorque(Tau);
-      
-      //3h. Here we integrate forward in time between a series of nPts from
-      //    t0 to t1
-      t = t0 + dt*i;
-      vector<double> times;
-      vector<state_type> x_vec;
-      
-      integrate_adaptive(controlled_stepper , rbdlBoostModel , xState , tp , t , (t-tp)/10 , pushBackStateAndTime( x_vec , times ) );
-      tp = t;
+  //   // save the data
+    rowData[0] = t;
+    for(unsigned int z=0; z < 2*dof; ++z){
+        rowData[z+1] = xState[z];
+    }
+    trajData.push_back(rowData);
 
-      // save the data
-      rowData[0] = t;
-      for(unsigned int z=0; z < 2*dof; z++){
-          rowData[z+1] = xState[z];
-      }
-      trajData.push_back(rowData);
-
-      //lets save the applied torque
-      for(unsigned int z=0; z < dof; z++){
-          tauRowData[z] = (float)Tau[i];
-      }
-      tauData.push_back(tauRowData);
-     
+  // //   //lets save the applied torque
+    for(unsigned int z=0; z < dof; ++z){
+        tauRowData[z] = (float)Tau[z];
+        
+    }
+    tauData.push_back(tauRowData);
+    
      
   }
 
-  //set the joint position to 0
+  // //set the joint position to 0
   std::vector<float> init_pos(dof, 0);
 
   baseHandler->set_all_joint_pos(init_pos);
   int count = 0;
   //open loop control of the model
-  while(ros::ok())
+  ros::WallTime start_, end_;
+  double execution_time = 0.0;
+  start_ = ros::WallTime::now();
+
+  while( execution_time <= 1.0  )
   {
     std::vector< float > current_tau = tauData[count];
     baseHandler->set_all_joint_effort(current_tau);
     std::vector<float> curr = baseHandler->get_all_joint_pos();
     AMBFTrajData.push_back(curr);
     loop_rate.sleep();
+    end_ = ros::WallTime::now();
+    execution_time = (end_ - start_).toNSec() * 1e-6;
   }
 
 
