@@ -1,6 +1,8 @@
-#include "rbdl_model_tests/ParallelStructure.h"
+// #include "rbdl_model_tests/ParallelStructure.h"
 
-TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSPositionNeutral", "") 
+#include "rbdl_model_tests/ParallelStructureCL.h"
+
+TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSHierachy", "") 
 {
   std::map< std::string, unsigned int > mBodyNameMap = rbdlPSModel->mBodyNameMap;
   std::map<std::string, unsigned int>::iterator mBodyNameMapItr;
@@ -9,6 +11,7 @@ TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSPositionNeutral", "")
     std::string bodyName = mBodyNameMapItr->first;
     unsigned int bodyId = mBodyNameMapItr->second;
     std::string parentName = rbdlPSModel->GetBodyName(rbdlPSModel->GetParentBodyId(bodyId));
+    // std::cout << parentName << ", " << bodyName << ": " << bodyId << std::endl;
     
     CHECK( parentName == reference_hierachy_map[bodyName]);
   }

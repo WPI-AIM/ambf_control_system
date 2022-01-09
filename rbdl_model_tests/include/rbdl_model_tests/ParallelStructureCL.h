@@ -10,36 +10,36 @@ struct ParallelStructure {
   ParallelStructure () {
     ClearLogOutput();
 
-    clientPtr = RBDLTestPrep::getInstance()->getAMBFClientInstance();
-    clientPtr->connect();
+    //clientPtr = RBDLTestPrep::getInstance()->getAMBFClientInstance();
+    // clientPtr->connect();
 
 
-    baseHandler = clientPtr->getRigidBody(base_name, true);
-    usleep(1000000);
+    // baseHandler = clientPtr->getRigidBody(base_name, true);
+    // usleep(1000000);
 
-    //base is rigid body name, not a joint. This is a hacky way to enable ros topics in the 
-    //server side during first execution
-    baseHandler->set_joint_pos(base_name, 0.0f); 
+    // //base is rigid body name, not a joint. This is a hacky way to enable ros topics in the 
+    // //server side during first execution
+    // baseHandler->set_joint_pos(base_name, 0.0f); 
 
-    const tf::Quaternion quat_0_w_tf = baseHandler->get_rot();
-    const tf::Vector3 P_0_w_tf = baseHandler->get_pos();
+    // const tf::Quaternion quat_0_w_tf = baseHandler->get_rot();
+    // const tf::Vector3 P_0_w_tf = baseHandler->get_pos();
 
-    RigidBodyDynamics::Math::Quaternion quat_0_w;
-    quat_0_w(0) = quat_0_w_tf[0];
-    quat_0_w(1) = quat_0_w_tf[1];
-    quat_0_w(2) = quat_0_w_tf[2];
-    quat_0_w(3) = quat_0_w_tf[3];
+    // RigidBodyDynamics::Math::Quaternion quat_0_w;
+    // quat_0_w(0) = quat_0_w_tf[0];
+    // quat_0_w(1) = quat_0_w_tf[1];
+    // quat_0_w(2) = quat_0_w_tf[2];
+    // quat_0_w(3) = quat_0_w_tf[3];
 
-    const RigidBodyDynamics::Math::Matrix3d R_0_w = quat_0_w.toMatrix();
+    // const RigidBodyDynamics::Math::Matrix3d R_0_w = quat_0_w.toMatrix();
 
-    RigidBodyDynamics::Math::Vector3d P_0_w;
-    P_0_w.setZero();
+    // RigidBodyDynamics::Math::Vector3d P_0_w;
+    // P_0_w.setZero();
     
-    P_0_w(0) = P_0_w_tf[0];
-    P_0_w(1) = P_0_w_tf[1];
-    P_0_w(2) = P_0_w_tf[2];
+    // P_0_w(0) = P_0_w_tf[0];
+    // P_0_w(1) = P_0_w_tf[1];
+    // P_0_w(2) = P_0_w_tf[2];
 
-    T_0_w = EigenUtilities::get_frame<Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix4d>(R_0_w, P_0_w);
+    // T_0_w = EigenUtilities::get_frame<Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix4d>(R_0_w, P_0_w);
 
     rbdlPSModel = new Model;
 
@@ -137,29 +137,45 @@ struct ParallelStructure {
     l1_l4Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
     vId = rbdlPSModel->AddBody(l1Id, l1_l4ST, l1_l4Joint, l4); 
     //--------------------------------------------------------------------//
-    SpatialTransform X_zero = Xtrans(Math::Vector3d(0.,0.,0.));
-    bool baumgarteEnabled = false;
+    SpatialTransform X_zero = Xtrans(Math::Vector3d(1.,0.,0.));
+    bool baumgarteEnabled = true;
     double timeStabilityInverse = 0.1;
 
-    cs.AddLoopConstraint(l1Id, vId, X_zero,X_zero,
+    actuation.resize(rbdlPSModel->qdot_size);
+    for(unsigned int i=0; i<actuation.size();++i){
+      actuation[i] = false;
+    }
+
+    unsigned int activationJointId = rbdlPSModel->GetBodyId(activationJoint.c_str());
+    actuation[activationJointId] = true;
+    cs.SetActuationMap(*rbdlPSModel,actuation);
+
+    SpatialTransform X;
+    X.r.setZero();
+    X.E = Eigen::Matrix3d::Identity();
+    cs.AddLoopConstraint(0, l2Id, X, X,
                                       SpatialVector(0,0,0,1,0,0),
                                       baumgarteEnabled,timeStabilityInverse);
-    cs.AddLoopConstraint(l1Id, vId, X_zero,X_zero,
-                                      SpatialVector(0,0,0,0,1,0),
+    cs.AddLoopConstraint(0, l2Id, X, X,
+                                      SpatialVector(0,1,0,0,0,0),
                                       baumgarteEnabled,timeStabilityInverse);
-    cs.AddLoopConstraint(l1Id, vId, X_zero,X_zero,
-                                      SpatialVector(0,0,0,0,0,1),
-                                      baumgarteEnabled,timeStabilityInverse);
-    cs.AddLoopConstraint(l1Id, vId, X_zero,X_zero,
-                                      SpatialVector(1,0,0,0,0,0),
-                                      baumgarteEnabled,timeStabilityInverse);
-    // cs.AddLoopConstraint(l4Id, l1Id, X_zero,X_zero,
+
+    // cs.AddLoopConstraint(l2Id, l4Id, X_zero,X_zero,
+    //                                   SpatialVector(0,0,0,0,1,0),
+    //                                   baumgarteEnabled,timeStabilityInverse);
+    // cs.AddLoopConstraint(l2Id, l4Id, X_zero,X_zero,
+    //                                   SpatialVector(0,0,0,0,0,1),
+    //                                   baumgarteEnabled,timeStabilityInverse);
+    // cs.AddLoopConstraint(0, l4Id, X_zero,X_zero,
+    //                                   SpatialVector(1,0,0,0,0,0),
+    //                                   baumgarteEnabled,timeStabilityInverse);
+    // cs.AddLoopConstraint(l2Id, l4Id, X_zero,X_zero,
     //                                   SpatialVector(0,1,0,0,0,0),
     //                                   baumgarteEnabled,timeStabilityInverse);
-    // cs.AddLoopConstraint(l4Id, l1Id, X_zero,X_zero,
+    // cs.AddLoopConstraint(l2Id, l4Id, X_zero,X_zero,
     //                                   SpatialVector(0,0,1,0,0,0),
     //                                   baumgarteEnabled,timeStabilityInverse);
-    cs.Bind(*rbdlPSModel);
+    // cs.Bind(*rbdlPSModel);
     
     //--------------------------------------------------------------------//
 
@@ -186,11 +202,14 @@ struct ParallelStructure {
 
   ~ParallelStructure () {
     delete rbdlPSModel;
-    clientPtr->cleanUp();
+    //clientPtr->cleanUp();
   }
 
   Model *rbdlPSModel = nullptr;
   RigidBodyDynamics::ConstraintSet cs;
+  std::vector<bool> actuation;
+  const std::string activationJoint = "l4";
+
   AMBFClientPtr clientPtr = nullptr;
   rigidBodyPtr baseHandler = nullptr;
   std::string base_name = "world";

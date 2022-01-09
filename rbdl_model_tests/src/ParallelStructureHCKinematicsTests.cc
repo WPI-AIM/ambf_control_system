@@ -1,5 +1,6 @@
 #include "rbdl_model_tests/ParallelStructure.h"
 
+/*
 TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSNeutralPosition", "") 
 {
   ForwardDynamics(*rbdlPSModel, Q, QDot, Tau, QDDot);
@@ -65,6 +66,8 @@ TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSNeutralPosition", "")
   }
 }
 
+*/
+
 TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSPIbyFourPosition", "") 
 {
   //mBody in RBDL has AMBF Joints
@@ -120,6 +123,8 @@ TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSPIbyFourPosition", "")
       std::string body = q_desiredItr->first;
       float joint_angle = q_desiredItr->second;
 
+      std::cout << "body: " << body << ", joint_angle: " << joint_angle << std::endl;
+      
       unsigned int rbdlBodyId = rbdlPSModel->GetBodyId(body.c_str());
       if(rbdlBodyId != std::numeric_limits<unsigned int>::max() && rbdlBodyId < rbdlPSModel->mBodies.size())
       {
@@ -127,6 +132,8 @@ TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSPIbyFourPosition", "")
         Q[rbdlBodyId] = joint_angle;
       }
     }
+
+    // std::cout << "Q: " << std::endl << Q << std::endl;
 
     for(std::string body : baseChildren)
     {
@@ -174,6 +181,7 @@ TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSPIbyFourPosition", "")
   }
 }
 
+/*
 TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSRandomPosition", "") 
 {
   //mBody in RBDL has AMBF Joints
@@ -304,3 +312,4 @@ TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSRandomPosition", "")
     }
   }
 }
+*/

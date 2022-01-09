@@ -141,7 +141,7 @@ set (KUKA_RBDL_MODEL_TESTS_HDR_FILES
 ################START################
 #Executible kuka_hc_tests
 set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
-    #src/KukaHCDynamicsTests.cc
+    # src/KukaHCDynamicsTests.cc
     src/KukaHCKinematicsTests.cc
     # src/KUKABodyTests.cc
     src/EigenUtilities.cpp
@@ -207,8 +207,8 @@ set (PS_RBDL_MODEL_TESTS_HDR_FILES
 
 # Executible Parallel_Structure_tests
 set(PS_HC_RBDL_MODEL_TESTS_SOURCE_FILES
-    src/ParallelStructureCLHCKinematicsTests.cc
-    # src/ParallelStructureHCKinematicsTests.cc
+    # src/ParallelStructureCLHCKinematicsTests.cc
+    src/ParallelStructureHCKinematicsTests.cc
     # src/ParallelStructureBodyTest.cc
     src/EigenUtilities.cpp
     src/RBDLTestPrep.cc
