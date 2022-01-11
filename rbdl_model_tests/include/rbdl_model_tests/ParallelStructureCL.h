@@ -59,7 +59,7 @@ struct ParallelStructure {
     ROOT_worldJoint = Joint(JointTypeFixed);
     ROOT_worldST.E = RigidBodyDynamics::Math::Matrix3dIdentity;
     ROOT_worldST.r = RigidBodyDynamics::Math::Vector3dZero;
-    worldId = rbdlPSModel->AddBody(0, ROOT_worldST, ROOT_worldJoint, world, "world");
+    worldId = rbdlPSModel->AddBody(0, ROOT_worldST, ROOT_worldJoint, world, "ROOT-world");
     //--------------------------------------------------------------------//
     Eigen::Vector3d world_l1PA = {   1.0,      0.0,    0.0 };
     Eigen::Vector3d world_l1CA = {   0.0, -0.00011,    1.0 };
@@ -75,7 +75,7 @@ struct ParallelStructure {
     world_l1ST.r = world_l1PP - (world_l1_Rot.inverse() * world_l1CP);
 
     world_l1Joint = Joint(JointTypeFixed);
-    l1Id = rbdlPSModel->AddBody(worldId, world_l1ST, world_l1Joint, l1, "l1");
+    l1Id = rbdlPSModel->AddBody(worldId, world_l1ST, world_l1Joint, l1, "world-l1");
     //--------------------------------------------------------------------// 
     Eigen::Vector3d l1_l2PA = {     0.0, 0.00016, 1.0 };
     Eigen::Vector3d l1_l2CA = { 0.00009, 0.00000, 1.0 };
@@ -90,7 +90,7 @@ struct ParallelStructure {
     l1_l2ST.r = l1_l2PP - (l1_l2_Rot.inverse() * l1_l2CP);
 
     l1_l2Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    l2Id = rbdlPSModel->AddBody(l1Id, l1_l2ST, l1_l2Joint, l2, "l2");
+    l2Id = rbdlPSModel->AddBody(l1Id, l1_l2ST, l1_l2Joint, l2, "l1-l2");
     //--------------------------------------------------------------------//
     Eigen::Vector3d l2_l3PA = {    0.0,      0.0, 1.0 };
     Eigen::Vector3d l2_l3CA = {    0.0, -0.00016, 1.0 };
@@ -105,7 +105,7 @@ struct ParallelStructure {
     l2_l3ST.r = l2_l3PP - (l2_l3_Rot.inverse() * l2_l3CP);
 
     l2_l3Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    l3Id = rbdlPSModel->AddBody(l2Id, l2_l3ST, l2_l3Joint, l3, "l3");   
+    l3Id = rbdlPSModel->AddBody(l2Id, l2_l3ST, l2_l3Joint, l3, "l2-l3");   
     //--------------------------------------------------------------------//
     Eigen::Vector3d l3_l4PA = {      0.0, 0.00035, 1.0 };
     Eigen::Vector3d l3_l4CA = { -0.00017,     0.0, 1.0 };
@@ -120,7 +120,7 @@ struct ParallelStructure {
     l3_l4ST.r = l3_l4PP - (l3_l4_Rot.inverse() * l3_l4CP);
 
     l3_l4Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    l4Id = rbdlPSModel->AddBody(l3Id, l3_l4ST, l3_l4Joint, l4, "l4");  
+    l4Id = rbdlPSModel->AddBody(l3Id, l3_l4ST, l3_l4Joint, l4, "l3-l4");  
     //--------------------------------------------------------------------//
     Eigen::Vector3d l1_l4PA = {      0.0, 0.00016,       1.0 };
     Eigen::Vector3d l1_l4CA = {  0.00024,     0.0,       1.0 };
@@ -135,7 +135,7 @@ struct ParallelStructure {
     l1_l4ST.r = l1_l4PP - (l1_l4_Rot.inverse() * l1_l4CP);
 
     l1_l4Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    vId = rbdlPSModel->AddBody(l1Id, l1_l4ST, l1_l4Joint, l4); 
+    vId = rbdlPSModel->AddBody(l1Id, l1_l4ST, l1_l4Joint, l4, "l1-l4"); 
     //--------------------------------------------------------------------//
     SpatialTransform X_zero = Xtrans(Math::Vector3d(1.,0.,0.));
     bool baumgarteEnabled = true;

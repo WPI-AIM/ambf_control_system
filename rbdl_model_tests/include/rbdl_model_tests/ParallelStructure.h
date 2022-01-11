@@ -59,7 +59,7 @@ struct ParallelStructure {
     ROOT_worldJoint = Joint(JointTypeFixed);
     ROOT_worldST.E = RigidBodyDynamics::Math::Matrix3dIdentity;
     ROOT_worldST.r = RigidBodyDynamics::Math::Vector3dZero;
-    worldId = rbdlPSModel->AddBody(0, ROOT_worldST, ROOT_worldJoint, world, "world");
+    worldId = rbdlPSModel->AddBody(0, ROOT_worldST, ROOT_worldJoint, world, "ROOT-world");
     //--------------------------------------------------------------------//
     Eigen::Vector3d world_l1PA = {   1.0,      0.0,    0.0 };
     Eigen::Vector3d world_l1CA = {   0.0, -0.00011,    1.0 };
@@ -75,7 +75,7 @@ struct ParallelStructure {
     world_l1ST.r = world_l1PP - (world_l1_Rot.inverse() * world_l1CP);
 
     world_l1Joint = Joint(JointTypeFixed);
-    l1Id = rbdlPSModel->AddBody(worldId, world_l1ST, world_l1Joint, l1, "l1");
+    l1Id = rbdlPSModel->AddBody(worldId, world_l1ST, world_l1Joint, l1, "world-l1");
     //--------------------------------------------------------------------// 
     Eigen::Vector3d l1_l2PA = {     0.0, 0.00016, 1.0 };
     Eigen::Vector3d l1_l2CA = { 0.00009, 0.00000, 1.0 };
@@ -90,7 +90,7 @@ struct ParallelStructure {
     l1_l2ST.r = l1_l2PP - (l1_l2_Rot.inverse() * l1_l2CP);
 
     l1_l2Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    l2Id = rbdlPSModel->AddBody(l1Id, l1_l2ST, l1_l2Joint, l2, "l2");
+    l2Id = rbdlPSModel->AddBody(l1Id, l1_l2ST, l1_l2Joint, l2, "l1-l2");
     //--------------------------------------------------------------------//
     Eigen::Vector3d l2_l3PA = {    0.0,      0.0, 1.0 };
     Eigen::Vector3d l2_l3CA = {    0.0, -0.00016, 1.0 };
@@ -105,7 +105,7 @@ struct ParallelStructure {
     l2_l3ST.r = l2_l3PP - (l2_l3_Rot.inverse() * l2_l3CP);
 
     l2_l3Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    l3Id = rbdlPSModel->AddBody(l2Id, l2_l3ST, l2_l3Joint, l3, "l3");   
+    l3Id = rbdlPSModel->AddBody(l2Id, l2_l3ST, l2_l3Joint, l3, "l2-l3");   
     //--------------------------------------------------------------------//
     Eigen::Vector3d l3_l4PA = {      0.0, 0.00035, 1.0 };
     Eigen::Vector3d l3_l4CA = { -0.00017,     0.0, 1.0 };
@@ -120,7 +120,7 @@ struct ParallelStructure {
     l3_l4ST.r = l3_l4PP - (l3_l4_Rot.inverse() * l3_l4CP);
 
     l3_l4Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    l4Id = rbdlPSModel->AddBody(l3Id, l3_l4ST, l3_l4Joint, l4, "l4");  
+    l4Id = rbdlPSModel->AddBody(l3Id, l3_l4ST, l3_l4Joint, l4, "l3-l4");  
     //--------------------------------------------------------------------//
     Eigen::Vector3d l1_l4PA = {      0.0, 0.00016,       1.0 };
     Eigen::Vector3d l1_l4CA = {  0.00024,     0.0,       1.0 };
@@ -135,7 +135,7 @@ struct ParallelStructure {
     l1_l4ST.r = l1_l4PP - (l1_l4_Rot.inverse() * l1_l4CP);
 
     l1_l4Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    rbdlPSModel->AddBody(l1Id, l1_l4ST, l1_l4Joint, l4); 
+    l4vId = rbdlPSModel->AddBody(l1Id, l1_l4ST, l1_l4Joint, l4, "l1-l4"); 
     //--------------------------------------------------------------------//
 
     Q     = VectorNd::Constant ((size_t) rbdlPSModel->dof_count, 0.);
@@ -164,6 +164,38 @@ struct ParallelStructure {
     clientPtr->cleanUp();
   }
 
+  /***
+   * AMBF
+   *  - Rigid body handler has both Rigid body names and joint names. 
+   *  - Joint names or Joint Ids are used set joint angles
+   *  - Bodies as children are used to get rigid body poses by creating its own handler
+   * 
+   * RBDL
+   *  - RBDL had body names which are acutally joints.
+   *  - There are no seperate names for body.
+   *  - Both Joint angles and body poses are provided referencing the same body name (which are joint names) 
+   * 
+   * Tagging AMBF and RBDL Models
+   *  - Often Kinematics and Dynamics test cases handling both AMBF and RBDL models and tagging the 
+   *    corresponding bodies and joints between the model. RBDL body names (which are acutally joints ) are 
+   *    named as parentname-child name. This coressponds to AMBF model too. 
+   *    
+   *    RBDL addBody() will have joint name (parent-child) which would match AMBF joint name.
+   *    Below data structure is used to map ambf body to child body. 
+   ***/
+  // Child : Parent
+  std::unordered_map<std::string, std::string> ambfRBDLBodyMap =
+  {
+    { "l1", "world-l1" },
+    { "l2", "l1-l2"    },
+    { "l3", "l2-l3"    },
+    { "l4", "l3-l4"    },
+    { "l2", "l1-l4"    },
+
+  };
+
+  std::unordered_map<std::string, std::string>::iterator ambfRBDLBodyMapItr;
+
   Model *rbdlPSModel = nullptr;
   ConstraintSet cs;
   AMBFClientPtr clientPtr = nullptr;
@@ -173,7 +205,7 @@ struct ParallelStructure {
   std::unordered_map<std::string, std::vector<float>> PS_JOINT_LIMITS;
   std::unordered_map<std::string, std::string> reference_hierachy_map;
 
-  unsigned int worldId, l1Id, l2Id, l3Id, l4Id;
+  unsigned int worldId, l1Id, l2Id, l3Id, l4Id, l4vId;
   Body world, l1, l2, l3, l4;
   Joint ROOT_worldJoint, world_l1Joint, l1_l2Joint, l2_l3Joint, l3_l4Joint, l1_l4Joint;
   SpatialTransform ROOT_worldST, world_l1ST, l1_l2ST, l2_l3ST, l3_l4ST, l1_l4ST;
