@@ -42,7 +42,8 @@ public:
 
     std::unordered_map<std::string, unsigned int> inline getRBDLBodyToIDMap() { return rbdlObjectMap_; }
     std::unordered_map<std::string, unsigned int> inline getRBDLJointToIDMap() { return joint_map; }
-    Model inline getRBDLModel() { return *RBDLmodel_; }
+
+    Model* getRBDLModel();
 
     std::string inline getBaseRigidBody() { return baseRigidBody_; }
 
@@ -71,7 +72,6 @@ private:
     const std::string base_parent_name_ = "world";
     std::string base_joint_name_;
     Model *RBDLmodel_ = NULL;
-    Model *model = NULL;
     std::unordered_map<std::string, bodyParamPtr> bodyParamObjectMap_;
 
     //                 <parent,                       <jointname, jointParamPtr>>

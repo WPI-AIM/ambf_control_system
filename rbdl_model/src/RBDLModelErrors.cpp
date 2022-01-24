@@ -14,6 +14,7 @@ const char* RBDLModelError::what() const noexcept
 
 RBDLModelInvalidFilePathError::RBDLModelInvalidFilePathError(std::string text) :RBDLModelError(text) {}
 RBDLModelMissingParameterError::RBDLModelMissingParameterError(std::string text) :RBDLModelError(text) {}
+RBDLModelUnsupportedJointTypeError::RBDLModelUnsupportedJointTypeError(std::string text) :RBDLModelError(text) {}
 
 }
 }

@@ -57,6 +57,17 @@ public:
   RBDLModelMissingParameterError(std::string text);
 };
 
+/** \brief Thrown if unsupported joint type not found
+ *
+ * This error class is thrown if a joint type is other than prismatic or revolute.
+ * Currenlty supports 1DoF on X or Y or Z
+ * 
+ */
+class RBDLModelUnsupportedJointTypeError : public RBDLModelError
+{
+public:
+  RBDLModelUnsupportedJointTypeError(std::string text);
+};
 
 }
 }

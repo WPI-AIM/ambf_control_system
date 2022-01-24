@@ -33,7 +33,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ambf_control_system)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_model)
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_model_tests)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_model_tests)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_server)
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rbdl_model_test)
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/trajectory_generator)

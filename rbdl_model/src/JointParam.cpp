@@ -37,6 +37,11 @@ JointParam::JointParam(YAML::Node jointNode)
 
     YAML::Node type = jointNode["type"];
     if(!type.IsDefined()) utilities.throwExceptionMessage("joint name: " + name_ + ", type in Joint Params");
+    
+    // ToDo: Make sure that only supported joints are included in the model
+    // std::string joint_type = type.as<std::string>();
+    // if(!(joint_type.compare("revolute") || !(joint_type.compare("prismatic"))
+    //     utilities.throwExceptionMessage("joint name: " + name_ + ", child axis in Joint Params");
     type_ = utilities.trimTrailingSpaces(type);
 }
 

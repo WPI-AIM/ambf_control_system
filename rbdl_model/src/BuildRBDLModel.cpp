@@ -227,6 +227,37 @@ bool BuildRBDLModel::buildModel() {
 }
 
 /*
+ * Different joint types suppored by RBDL
+ * @param RBDL Joint tyep
+ * @return String Joint type
+ */
+const rbdlJointType BuildRBDLModel::getRBDLJointType(std::string joint_type) {
+    if (joint_type == "undefined") return JointTypeUndefined;
+    else if (joint_type == "revolute") return JointTypeRevolute;
+    else if (joint_type == "prismatic") return JointTypePrismatic;
+    else if (joint_type == "revoluteX") return JointTypeRevoluteX;
+    else if (joint_type == "revolutey") return JointTypeRevoluteY;
+    else if (joint_type == "revoluteZ") return JointTypeRevoluteZ;
+    else if (joint_type == "spherical") return JointTypeSpherical;
+    else if (joint_type == "eulerzyx") return JointTypeEulerZYX;
+    else if (joint_type == "eulerxyz") return JointTypeEulerXYZ;
+    else if (joint_type == "euleryxz") return JointTypeEulerYXZ;
+    else if (joint_type == "translationxyz") return JointTypeTranslationXYZ;
+    else if (joint_type == "base") return JointTypeFloatingBase;
+    else if (joint_type == "fixed") return JointTypeFixed;
+    else if (joint_type == "helical") return JointTypeHelical;
+    else if (joint_type == "1dof") return JointType1DoF;
+    else if (joint_type == "2dof") return JointType2DoF;
+    else if (joint_type == "p2p") return JointType3DoF;
+    else if (joint_type == "4dof") return JointType4DoF;
+    else if (joint_type == "5dof") return JointType5DoF;
+    else if (joint_type == "6dof") return JointType6DoF;
+    else if (joint_type == "custom") return JointTypeCustom;
+    return JointTypeUndefined;
+}
+
+
+/*
  * Estabilish RBDL Joints between parent and child body
  * @param parent_name Parent name
  * @param parent_id   RBDL Parent ID
@@ -254,58 +285,43 @@ unsigned int  BuildRBDLModel::addBodyToRBDL(std::string parent_name, unsigned in
     Math::Matrix3d rotation_matrix = utilities.rotationMatrixFromVectors(parent_axis, child_axis);
 
     unsigned int child_id;
-    Joint joint;
-
+    //Joint joint;
+    RigidBodyDynamics::JointType jointType;
     // If base joint, make it be fixed with respect to World
 
     if(parent_name.compare(base_parent_name_) == 0) {
-        joint = Joint (JointTypeFixed);
+        
+        //joint = Joint (JointTypeFixed);
+        jointType = JointTypeFixed;
     // Handle multiple Parents for a body. Just append ~ to body name.
     // Otherwise RBDL would just throw duplicate body name exception
     } else {
         while(RBDLmodel_->GetBodyId(child_name.c_str()) != std::numeric_limits<unsigned int>::max()) {
             child_name = child_name + "~";
         }
-
-        joint = SpatialVector (child_axis[0], child_axis[1], child_axis[2], 0.0, 0.0, 0.0);
+        //joint is not used. can it be removed?
+        //joint = Joint(SpatialVector (child_axis[0], child_axis[1], child_axis[2], 0.0, 0.0, 0.0));
+        jointType = JointTypeRevoluteZ;
     }
 
     // This map is just for tracking purpose and not used for RBDL model creation
     rbdlBodyMap_.insert(std::make_pair(child_name, child_body));
 
     // Crate RBDL Joint between parent and Child with parent_id, Transformation matrix, joint type, rbdl child body, child name
-    child_id = RBDLmodel_->AddBody(parent_id, SpatialTransform (rotation_matrix, parent_pivot), joint, child_body.get(), child_name.c_str());
+    // SpatialTransform jointST;
+    // jointST.E = rotation_matrix;
+    // jointST.r = parent_pivot;
+
+    //child_id = RBDLmodel_->AddBody(parent_id, SpatialTransform (rotation_matrix, parent_pivot), joint, child_body.get(), child_name.c_str());
+    child_id = RBDLmodel_->AddBody(parent_id, SpatialTransform (rotation_matrix, parent_pivot), 
+                                jointType, child_body.get(), child_name.c_str());
 
     return child_id;
 }
 
-/*
- * Different joint types suppored by RBDL
- * @param RBDL Joint tyep
- * @return String Joint type
- */
-const rbdlJointType BuildRBDLModel::getRBDLJointType(std::string joint_type) {
-    if (joint_type == "undefined") return JointTypeUndefined;
-    else if (joint_type == "revolute") return JointTypeRevolute;
-    else if (joint_type == "prismatic") return JointTypePrismatic;
-    else if (joint_type == "revoluteX") return JointTypeRevoluteX;
-    else if (joint_type == "revolutey") return JointTypeRevoluteY;
-    else if (joint_type == "revoluteZ") return JointTypeRevoluteZ;
-    else if (joint_type == "spherical") return JointTypeSpherical;
-    else if (joint_type == "eulerzyx") return JointTypeEulerZYX;
-    else if (joint_type == "eulerxyz") return JointTypeEulerXYZ;
-    else if (joint_type == "euleryxz") return JointTypeEulerYXZ;
-    else if (joint_type == "translationxyz") return JointTypeTranslationXYZ;
-    else if (joint_type == "base") return JointTypeFloatingBase;
-    else if (joint_type == "fixed") return JointTypeFixed;
-    else if (joint_type == "helical") return JointTypeHelical;
-    else if (joint_type == "1dof") return JointType1DoF;
-    else if (joint_type == "2dof") return JointType2DoF;
-    else if (joint_type == "p2p") return JointType3DoF;
-    else if (joint_type == "4dof") return JointType4DoF;
-    else if (joint_type == "5dof") return JointType5DoF;
-    else if (joint_type == "6dof") return JointType6DoF;
-    else if (joint_type == "custom") return JointTypeCustom;
+Model* BuildRBDLModel::getRBDLModel()
+{
+    return RBDLmodel_;
 }
 
 /*
@@ -391,7 +407,6 @@ void BuildRBDLModel::printJoint()
             std::cout << "joint_name: " << joint_name;
             jointParamPtr jointparamPtr = inner_map_itr->second;
             std::cout << jointparamPtr->Child() << ", ";
-
         }
         std::cout << std::endl;
     }
