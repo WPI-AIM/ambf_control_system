@@ -16,9 +16,12 @@ include_directories(
 # ${catkin_INCLUDE_DIRS}
 )
 include_directories (${PROJECT_SOURCE_DIR}/external/Eigen)
+# include_directories (${PROJECT_SOURCE_DIR}/external/Eigen)
+
 
 # static library external dependencies source files
 file (GLOB_RECURSE source_eigen     RELATIVE ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/external/Eigen/Eigen/*)
+# file (GLOB_RECURSE source_eigen     RELATIVE ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/external/Eigen/Eigen/*)
 
 # group source files (MSVC likes this)
 foreach (FILE ${source} ${source_eigen})
@@ -27,6 +30,14 @@ foreach (FILE ${source} ${source_eigen})
   string (REPLACE "/" "\\" GROUP "${GROUP}")
   source_group ("${GROUP}" FILES "${FILE}")
 endforeach ()
+
+# add_library(eigen3 STATIC ${source_eigen} )
+
+# # AMBF library exports
+# set (Eigen_INCLUDE_DIRS
+#     "${PROJECT_SOURCE_DIR}/external/Eigen"
+#     "${Boost_INCLUDE_DIRS}")
+
 
 # output location
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)

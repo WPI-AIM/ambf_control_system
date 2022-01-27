@@ -14,25 +14,6 @@ set(CMAKE_PREFIX_PATH _PATH "/opt/ros/melodic/;${CMAKE_MODULE_PATH}")
 find_package(catkin REQUIRED COMPONENTS
 )
 
-
-
-get_filename_component(PARENT_DIR ${PROJECT_SOURCE_DIR} DIRECTORY)
-MESSAGE(STATUS "HERE IS THE LOCATION: ${PARENT_DIR}")
-
-# static library external dependencies source files
-include_directories (${PARENT_DIR}/external/Eigen)
-file (GLOB_RECURSE source_eigen     RELATIVE ${PARENT_DIR} ${PARENT_DIR}/external/Eigen/Eigen/*)
-
-
-
-# group source files (MSVC likes this)
-foreach (FILE ${source} ${source_eigen})
-  get_filename_component (PARENT2_DIR "${FILE}" PATH)
-  string (REGEX REPLACE "(\\./)?(src|include)/?" "" GROUP "${PARENT2_DIR}")
-  string (REPLACE "/" "\\" GROUP "${GROUP}")
-  source_group ("${GROUP}" FILES "${FILE}")
-endforeach ()
-
 catkin_package( INCLUDE_DIRS include
   LIBRARIES rbdl_model
 #  CATKIN_DEPENDS
@@ -93,7 +74,15 @@ add_dependencies(rbdl_model ${catkin_EXPORTED_TARGETS})
 
 #add_executable (${PROJECT_NAME} ${HDR_FILES} ${SOURCE_FILES})
 ## Specify libraries to link a library or executable target against
-target_link_libraries(rbdl_model ${catkin_LIBRARIES} ${GLFW_LIBRARIES} ${Boost_LIBRARIES} ${Eigen_LIBRARIES} ${RBDL_LIBRARY} ${YAML_CPP_LIBRARIES} pthread)
+target_link_libraries(rbdl_model 
+  ${catkin_LIBRARIES} 
+  # ${GLFW_LIBRARIES} 
+  ${Boost_LIBRARIES} 
+  ${Eigen_LIBRARIES}
+  ${RBDL_LIBRARY} 
+  ${YAML_CPP_LIBRARIES} 
+  pthread
+  )
 
 set (RBDL_MODEL_INCLUDE_DIRS include)
 set (RBDL_MODEL_LIBRARIES rbdl_model)
