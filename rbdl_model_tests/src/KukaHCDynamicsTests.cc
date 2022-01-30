@@ -209,8 +209,14 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
 
   }
 
-  float* rms = calcEERMS(AMBFTrajData, trajData  );
+  
+  double error = calcEERMS(AMBFTrajData, trajData);
 
+  std::cout<<error<<std::endl;
+  // for(unsigned int i = 0; i <7; i++)
+  // {
+  //   std::cout<<rms[i]<<std::endl;
+  // }
 
 
 }

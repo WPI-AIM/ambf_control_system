@@ -2,6 +2,8 @@
 #include "rbdl_model_tests/EigenUtilities.h"
 #include <unordered_map>
 #include <Eigen/Geometry> 
+#include <boost/range/combine.hpp>
+#include <math.h>
 
 //const double TEST_PREC = 1.0e-12;
 const double TEST_LAX = 1.0e-7;
@@ -15,11 +17,19 @@ struct ActivationJoints
 struct KUKA {
   KUKA () {
     ClearLogOutput();
-
+    usleep(1000000);
     clientPtr = RBDLTestPrep::getInstance()->getAMBFClientInstance();
     clientPtr->connect();
+    std::cout<<base_name<<"\n";
+    vector<string> my_names = clientPtr->getRigidBodyNames();
 
-    baseHandler = clientPtr->getRigidBody(base_name, true);
+
+    for(auto & name: my_names )
+    {
+      std::cout<<name<<"\n";
+    }
+
+    baseHandler = clientPtr->getRigidBody(base_name, false);
     usleep(1000000);
 
     // //base is rigid body name, not a joint. This is a hacky way to enable ros topics in the 
@@ -288,3 +298,66 @@ struct KUKA {
   VectorNd QDDot;
   VectorNd Tau;
 };
+
+double calcEERMS(std::vector<std::vector< float > > ambf_position, std::vector<std::vector< double > > forward_sim_position  )
+{
+
+  int N = ambf_position.size();
+  int M = forward_sim_position.size();
+  double error[7] = {0,0,0,0,0,0,0};
+  double rms[7] = {0,0,0,0,0,0,0};
+  double totalerror = 0;
+
+  std::cout<<N<<std::endl;
+  std::cout<<M<<std::endl;
+  // for(auto outer_vec: forward_sim_position)
+  // {
+  //   std::cout<<"lllllllllllllllllllllllllllllllllllllllllllllllllll"<<std::endl;
+  //   for(auto innter_vec: outer_vec)
+  //   {
+  //     std::cout<<innter_vec << " , ";
+  //   }
+  //   std::cout<<std::endl;
+
+
+  // }
+
+
+  for( int i = 0; i<M; i++)
+  {
+
+    std::vector< float > current_ambf = ambf_position[i];
+    std::vector< double > current_sim = forward_sim_position[i];
+    std::vector< double > diff;
+    
+    
+    for(int j = 0; j <7; j++)
+    {
+      double de = ((double)current_ambf[j] - current_sim[j]);
+      diff.push_back( de*de  );
+    }
+
+
+    for(unsigned int k=0; k<7; ++k)
+    {
+      error[k]+=diff[k]/N;
+    }
+
+    for(unsigned int l=0; l<7; ++l)
+    {
+      rms[l]= std::sqrt(error[l]);
+    }
+    
+  }
+
+
+  for( unsigned int i= 0; i < 7; i++)
+  {
+    totalerror +=rms[i];
+  }
+
+
+  return totalerror;
+
+
+}
