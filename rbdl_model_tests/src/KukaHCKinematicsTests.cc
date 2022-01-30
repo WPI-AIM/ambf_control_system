@@ -171,6 +171,7 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestKUKAPIbyFourPosition", "")
 
       const RigidBodyDynamics::Math::Matrix3d R_n_w_rbdl =
               CalcBodyWorldOrientation(*rbdlModel, Q, rbdlBodyId, true);
+              
       const RigidBodyDynamics::Math::Vector3d P_n_0_rbd_rbdl = 
               CalcBodyToBaseCoordinates(*rbdlModel, Q, rbdlBodyId, 
                                     RigidBodyDynamics::Math::Vector3d(0., 0., 0.),true);

@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 2.80)
 project(rbdl_model_tests)
-
+# add_compile_options(-std=c++11)
 list(APPEND CMAKE_PREFIX_PATH "/opt/ros/melodic/")
 
 
@@ -9,12 +9,12 @@ list(APPEND CMAKE_PREFIX_PATH "/opt/ros/melodic/")
 get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
 set (CMAKE_MODULE_PATH ${PARENT_CMAKE} )
 
-set (RBDL_MODEL_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/build/devel/lib/librbdl_model.so")
+set (RBDL_MODEL_LIBRARY "~/catkin_ws/devel/lib/librbdl_model.so")
 LIST( APPEND CMAKE_MODULE_PATH ${PARENT_DIR} )
 find_package(RBDL REQUIRED)
 include_directories(${RBDL_INCLUDE_DIRS})
 
-include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/rbdl_model/include/")
+include_directories("~/catkin_ws/src/ambf_control_system/rbdl_model/include/")
 
 FIND_PACKAGE (rbdl_model REQUIRED)
 include_directories(${RBDL_MODEL})
@@ -24,12 +24,12 @@ include_directories(rbdl_model)
 
 set (ambf_msgs_DIR ${CMAKE_MODULE_PATH})
 
-set (AMBF_CLIENT_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/lib/libambf_client_cpp.so")
+set (AMBF_CLIENT_LIBRARY "~/ambf/build/devel/lib/libambf_client_cpp.so")
 
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 #find_package(GTest REQUIRED)
 
-include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/")
+include_directories("~/ambf/ambf_ros_modules/ambf_client/include/")
 FIND_PACKAGE (ambf_client REQUIRED)
 include_directories(${AMBF_CLIENT_INCLUDE_DIR})
 
@@ -39,6 +39,7 @@ find_package(catkin REQUIRED COMPONENTS
    geometry_msgs
    message_generation
    tf
+   roscpp
 )
 
 
@@ -110,39 +111,54 @@ set (KUKA_RBDL_MODEL_TESTS_HDR_FILES
     include/${PROJECT_NAME}/EigenUtilities.h
     include/${PROJECT_NAME}/rbdl_tests.h
     include/${PROJECT_NAME}/RBDLTestPrep.h    
+    include/${PROJECT_NAME}/DynamicTesting.h    
     )
 
 # ################START################
-# # Executible kuka_tests
-# set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
-#     src/KukaKinematicsTests.cc
-#     #src/KukaBodyTests.cc
-#     src/EigenUtilities.cpp
-#     src/RBDLTestPrep.cc
-#     src/main.cc
-#     )
+# Executible kuka_tests
+set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
+    src/KukaKinematicsTests.cc
+    src/KukaHCDynamicsTests.cc
+    # src/KukaBodyTests.cc
+    src/EigenUtilities.cpp
+    src/RBDLTestPrep.cc
+    src/main.cc
+    )
 
-# add_executable (kuka_tests 
-      #${KUKA_RBDL_MODEL_TESTS_HDR_FILES} 
-      #${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES})
-# target_link_libraries (kuka_tests 
-#     ${AMBF_CLIENT_LIBRARY} 
-#     ${RBDL_MODEL_LIBRARY}
-#     ${GLFW_LIBRARIES} 
-#     ${Boost_LIBRARIES} 
-#     ${Eigen_LIBRARIES} 
-#     ${UNITTEST++_LIBRARY}
-#     ${RBDL_LIBRARY}
-#     pthread
-#     )
+add_executable (kuka_tests 
+      ${KUKA_RBDL_MODEL_TESTS_HDR_FILES} 
+      ${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES})
+
+target_link_libraries (kuka_tests 
+    ${AMBF_CLIENT_LIBRARY} 
+    ${catkin_LIBRARIES}
+    ${RBDL_MODEL_LIBRARY}
+    ${GLFW_LIBRARIES} 
+    ${Boost_LIBRARIES} 
+    ${Eigen_LIBRARIES} 
+    ${UNITTEST++_LIBRARY}
+    ${RBDL_LIBRARY}
+    pthread
+    )
+
+
+add_executable (tempDyn src/tempDyn.cpp)
+target_link_libraries (tempDyn  ${AMBF_CLIENT_LIBRARY} 
+${RBDL_MODEL_LIBRARY}
+${GLFW_LIBRARIES} 
+${Boost_LIBRARIES} 
+${Eigen_LIBRARIES} 
+${UNITTEST++_LIBRARY}
+${RBDL_LIBRARY}
+pthread)
 ################END################
 
 
 ################START################
 #Executible kuka_hc_tests
 set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
-    #src/KukaHCDynamicsTests.cc
-    src/KukaHCKinematicsTests.cc
+    src/KukaHCDynamicsTests.cc
+    # src/KukaHCKinematicsTests.cc
     # src/KUKABodyTests.cc
     src/EigenUtilities.cpp
     src/RBDLTestPrep.cc
@@ -153,6 +169,7 @@ add_executable (kuka_tests_hc
 ${KUKA_RBDL_MODEL_TESTS_HDR_FILES} 
 ${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES})
 target_link_libraries (kuka_tests_hc
+    ${catkin_LIBRARIES}
     ${AMBF_CLIENT_LIBRARY} 
     ${RBDL_MODEL_LIBRARY}
     ${GLFW_LIBRARIES} 
@@ -189,6 +206,7 @@ target_link_libraries (ecm_tests_hc
     ${RBDL_MODEL_LIBRARY}
     ${GLFW_LIBRARIES} 
     ${Boost_LIBRARIES} 
+    ${catkin_LIBRARIES}
     # ${Eigen_LIBRARIES} 
     ${UNITTEST++_LIBRARY}
     ${RBDL_LIBRARY}

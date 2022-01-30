@@ -7,41 +7,41 @@
 #include "rbdl_model_tests/DynamicTesting.h"
 
 #ifndef USE_SLOW_SPATIAL_ALGEBRA
-// TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPositionNeutral", "") 
-// {
-//     // We call ForwardDynamics() as it updates the spatial transformation
-//     // matrices
-//   // Initialization of the input vectors
-//   VectorNd Q      = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
-//   VectorNd QDot   = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
-//   VectorNd QDDot  = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
-//   VectorNd Tau    = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
-//   VectorNd TauInv = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
+TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPositionNeutral", "") 
+{
+    // We call ForwardDynamics() as it updates the spatial transformation
+    // matrices
+  // Initialization of the input vectors
+  VectorNd Q      = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
+  VectorNd QDot   = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
+  VectorNd QDDot  = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
+  VectorNd Tau    = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
+  VectorNd TauInv = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
 
-//   ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
-//   InverseDynamics(*rbdlModel, Q, QDot, QDDot, TauInv);
+  ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
+  InverseDynamics(*rbdlModel, Q, QDot, QDDot, TauInv);
 
   
-//   CHECK_THAT (Tau,
-//               AllCloseVector(TauInv, TEST_PREC, TEST_PREC));
-//   std::vector<std::string> joints = baseHandler->get_joint_names();
-//   std::vector<std::string> baseChildren = baseHandler->get_children_names();
+  CHECK_THAT (Tau,
+              AllCloseVector(TauInv, TEST_PREC, TEST_PREC));
+  std::vector<std::string> joints = baseHandler->get_joint_names();
+  std::vector<std::string> baseChildren = baseHandler->get_children_names();
 
-//   CHECK (baseChildren.size() == Q.size());
+  CHECK (baseChildren.size() == Q.size());
 
-//   // Set to home pose
-//   for(int i = 0; i < 10; i++)
-//   {
-//     for(std::string joint : joints)
-//     {
-//       baseHandler->set_joint_pos<std::string>(joint, 0.0f);
-//       baseHandler->set_joint_effort<std::string>(joint, 0.0f);
-//       float joint_effort = baseHandler->get_joint_effort<std::string>(joint);
-//     }
+  // Set to home pose
+  for(int i = 0; i < 10; i++)
+  {
+    for(std::string joint : joints)
+    {
+      baseHandler->set_joint_pos<std::string>(joint, 0.0f);
+      baseHandler->set_joint_effort<std::string>(joint, 0.0f);
+      float joint_effort = baseHandler->get_joint_effort<std::string>(joint);
+    }
 
-//     usleep(250000);
-//   }
-// }
+    usleep(250000);
+  }
+}
 
 
 
@@ -66,7 +66,8 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   std::vector<std::vector< float > > tauData;
   std::vector< double > rowData(2*dof+1);
   std::vector< float > tauRowData(dof);
-  
+
+
   // //problem specific constants
   int     nPts    = 1000;
   double  t0      = 0;
@@ -185,6 +186,7 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
   double execution_time = 0.0;
   start_ = ros::WallTime::now();
 
+
   while( execution_time <= 1000.0  )
   {
     std::vector< float > current_tau = tauData[count];
@@ -194,8 +196,10 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
     {
       std::cout<<current_tau[count]<<" , ";
       baseHandler->set_joint_effort<std::string>(joint,current_tau[count]);
+
       count++; 
     }
+
     std::cout<<""<<std::endl;
     std::vector<float> curr = baseHandler->get_all_joint_pos();
     AMBFTrajData.push_back(curr);
@@ -204,6 +208,9 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestCalcDynamicPosition", "")
     loop_rate.sleep();
 
   }
+
+  float* rms = calcEERMS(AMBFTrajData, trajData  );
+
 
 
 }
