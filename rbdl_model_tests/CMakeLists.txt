@@ -24,12 +24,6 @@ set (AMBF_CLIENT_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/am
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 #find_package(GTest REQUIRED)
 
-
-
-
-
-
-
 include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/")
 FIND_PACKAGE (ambf_client REQUIRED)
 include_directories(${AMBF_CLIENT_INCLUDE_DIR})
@@ -71,7 +65,7 @@ include_directories( include
 
 
 #find_package (ambf_client REQUIRED)
-find_package (GLFW REQUIRED)
+# find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 
 ## Specify additional locations of header files
@@ -85,29 +79,7 @@ include_directories (${GLFW_INCLUDE_DIRS}
                      ${PROJECT_NAME}/include
 )
 
-
-# set (HDR_FILES
-#     include/${PROJECT_NAME}/rbdl_model_test.h)
-
-# set(SOURCE_FILES
-#     src/rbdl_model_test.cpp
-#     #src/main.cpp
-#     )
-
-
-# set (RBDL_MODEL_TESTS_HDR_FILES
-# #    include/${PROJECT_NAME}/RBDLBodyTests.h
-#     include/${PROJECT_NAME}/RBDLTestPrep.h
-#     )
-
-# set(RBDL_MODEL_TESTS_SOURCE_FILES
-#     src/RBDLBodyTests.cpp
-#     src/RBDLJointTests.cpp
-#     src/RBDLTestPrep.cpp
-#     src/main.cpp
-#     )
-
-find_package (GLFW REQUIRED)
+# find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 include_directories (${GLFW_INCLUDE_DIRS})
 
@@ -117,32 +89,6 @@ set (KUKA_RBDL_MODEL_TESTS_HDR_FILES
     include/${PROJECT_NAME}/rbdl_tests.h
     include/${PROJECT_NAME}/RBDLTestPrep.h    
     )
-
-# ################START################
-# # Executible kuka_tests
-# set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
-#     src/KukaKinematicsTests.cc
-#     #src/KukaBodyTests.cc
-#     src/EigenUtilities.cpp
-#     src/RBDLTestPrep.cc
-#     src/main.cc
-#     )
-
-# add_executable (kuka_tests 
-      #${KUKA_RBDL_MODEL_TESTS_HDR_FILES} 
-      #${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES})
-# target_link_libraries (kuka_tests 
-#     ${AMBF_CLIENT_LIBRARY} 
-#     ${RBDL_MODEL_LIBRARY}
-#     ${GLFW_LIBRARIES} 
-#     ${Boost_LIBRARIES} 
-#     ${Eigen_LIBRARIES} 
-#     ${UNITTEST++_LIBRARY}
-#     ${RBDL_LIBRARY}
-#     pthread
-#     )
-################END################
-
 
 ################START################
 #Executible kuka_hc_tests
@@ -169,70 +115,8 @@ target_link_libraries (kuka_tests_hc
     pthread
     )
 
+set_target_properties(kuka_tests_hc PROPERTIES
+    CXX_STANDARD 17
+    CXX_EXTENSIONS OFF
+    )
 ################END################
-
-# ################START################
-# set (ECM_RBDL_MODEL_TESTS_HDR_FILES
-#     include/${PROJECT_NAME}/ECM.h
-#     include/${PROJECT_NAME}/EigenUtilities.h
-#     include/${PROJECT_NAME}/rbdl_tests.h
-#     include/${PROJECT_NAME}/RBDLTestPrep.h    
-#     )
-
-# # Executible ECM_tests
-# set(ECM_HC_RBDL_MODEL_TESTS_SOURCE_FILES
-#     src/ECMHCKinematicsTests.cc
-#     # src/ECMBodyTests.cc
-#     src/EigenUtilities.cpp
-#     src/RBDLTestPrep.cc
-#     src/main.cc
-#     )
-
-# add_executable (ecm_tests_hc 
-#       ${ECM_RBDL_MODEL_TESTS_HDR_FILES} 
-#       ${ECM_HC_RBDL_MODEL_TESTS_SOURCE_FILES})
-# target_link_libraries (ecm_tests_hc
-#     ${AMBF_CLIENT_LIBRARY} 
-#     ${RBDL_MODEL_LIBRARY}
-#     ${GLFW_LIBRARIES} 
-#     ${Boost_LIBRARIES} 
-#     # ${Eigen_LIBRARIES} 
-#     ${UNITTEST++_LIBRARY}
-#     ${RBDL_LIBRARY}
-#     pthread
-#     )
-# ##############END################
-
-# ################START################
-# set (PS_RBDL_MODEL_TESTS_HDR_FILES
-#     include/${PROJECT_NAME}/ParallelStructureCL.h
-#     # include/${PROJECT_NAME}/ParallelStructure.h
-#     include/${PROJECT_NAME}/EigenUtilities.h
-#     include/${PROJECT_NAME}/rbdl_tests.h
-#     include/${PROJECT_NAME}/RBDLTestPrep.h    
-#     )
-
-# # Executible Parallel_Structure_tests
-# set(PS_HC_RBDL_MODEL_TESTS_SOURCE_FILES
-#     # src/ParallelStructureCLHCKinematicsTests.cc
-#     src/ParallelStructureHCKinematicsTests.cc
-#     # src/ParallelStructureBodyTest.cc
-#     src/EigenUtilities.cpp
-#     src/RBDLTestPrep.cc
-#     src/main.cc
-#     )
-
-# add_executable (ps_tests_hc 
-#       ${PS_RBDL_MODEL_TESTS_HDR_FILES} 
-#       ${PS_HC_RBDL_MODEL_TESTS_SOURCE_FILES})
-# target_link_libraries (ps_tests_hc
-#     ${AMBF_CLIENT_LIBRARY} 
-#     ${RBDL_MODEL_LIBRARY}
-#     ${GLFW_LIBRARIES} 
-#     ${Boost_LIBRARIES} 
-#     # ${Eigen_LIBRARIES} 
-#     ${UNITTEST++_LIBRARY}
-#     ${RBDL_LIBRARY}
-#     pthread
-#     )
-# ##############END################

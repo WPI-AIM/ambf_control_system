@@ -138,4 +138,46 @@ Eigen::Vector3f EigenUtilities::rpy_from_rotation(Eigen::Matrix3f R) {
     return rpy;
 }
 
+// By Cameron Buie's answer trace is equals to 1+2cos(θ) where θ is the angle of rotation. 
+// θ can then be determined up to sign which will depend on the orientation of the 
+// axis of rotation chosen.
+float EigenUtilities::MatrixRotationAngle(Eigen::Matrix3d R)
+{
+    // TODO: Check if this is rotation matrix
+    float rTrace = R.trace();
+    float rAngleOfRoation = std::acos((rTrace - 1.0) / 2.0);
+
+    return rAngleOfRoation;
+}
+
+// S=.5(R−RT)
+// Then if S=(aij), the rotation axis with magnitude sinθ is (a21,a02,a10).
+void EigenUtilities::MatrixAxisOfRotation(Eigen::Matrix3d R)
+{
+    const Eigen::Matrix3d S = 0.5 * (R - R.transpose());
+    std::cout << "EigenUtilities - S" << std::endl << S << std::endl;
+}
+
+const Eigen::Vector3d EigenUtilities::tfToEigenVector(const tf::Vector3 vec_tf)
+{
+    Eigen::Vector3d vec_e;
+    vec_e(0) = vec_tf[0];
+    vec_e(1) = vec_tf[1];
+    vec_e(2) = vec_tf[2];
+
+    return vec_e;
+}
+
+const Eigen::Quaterniond EigenUtilities::tfToEigenQuaternion(const tf::Quaternion quat_tf)
+{
+    // Eigen::Quaternion quat_e;
+    Eigen::Quaterniond quat_e;
+    quat_e.x() = quat_tf[0];
+    quat_e.y() = quat_tf[1];
+    quat_e.z() = quat_tf[2];
+    quat_e.w() = quat_tf[3];
+
+    return quat_e;
+}
+
 EigenUtilities::~EigenUtilities(void) {}

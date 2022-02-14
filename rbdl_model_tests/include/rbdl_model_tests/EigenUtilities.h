@@ -7,6 +7,8 @@
 #include<Eigen/Core>
 #include<cmath>
 #include <stdlib.h>
+#include <tf/LinearMath/Transform.h>
+#include <algorithm>
 
 using namespace Eigen;
 // TODO: Use Quaternion instead of Matrix
@@ -61,6 +63,64 @@ public:
 
         return Trans;
     }
+
+    static float MatrixRotationAngle(Eigen::Matrix3d R);
+    static void MatrixAxisOfRotation(Eigen::Matrix3d R);
+    static const Eigen::Vector3d tfToEigenVector(const tf::Vector3 vec_tf);
+    static const Eigen::Quaterniond tfToEigenQuaternion(const tf::Quaternion quat_tf);
+
+    // https://www.techiedelight.com/check-vector-contains-given-element-cpp/
+    struct compare
+    {
+        std::string key;
+        compare(std::string const &str): key(str){}
+
+        bool operator()(std::string const &str)
+        {
+            return (str == key);
+        }
+    };
+
+    /** 
+     * https://stackoverflow.com/questions/15482498/how-to-resize-a-vector-in-eigen3
+     * To be upgraded to c++ 20 to support double template. 
+     * https://stackoverflow.com/questions/2183087/why-cant-i-use-float-value-as-a-template-parameter
+     **/
+    template <bool COND, int A, int B>
+    struct IF
+    {
+    enum { val = A };
+    };
+
+    template <int A, int B>
+    struct IF<false, A, B>
+    {
+    enum { val = B };
+    };
+
+    template <int A, int B>
+    struct MIN : IF<A < B, A, B>
+    {
+    };
+
+    template <typename T,int dim,int newDim>
+    static Eigen::Matrix<T,newDim,1> to(Eigen::Matrix<T,dim,1> p)
+    {
+    Eigen::Matrix<int,newDim,1> newp =
+        // Eigen::Matrix<T,newDim,1>::Zero();
+        Eigen::Matrix<T,newDim,1>::Ones();;
+    newp.template head< MIN<dim,newDim>::val >() =
+        p.template head< MIN<dim,newDim>::val >();
+
+    return newp;
+    }
+
+    // Eigen::Vector2i p_2i(1,2);
+    // Eigen::Vector3i p_3i(3,4,5);
+
+    // std::cout << EigenUtilities::to<int, 2, 3>(p_2i) << std::endl << std::endl;
+    // std::cout << EigenUtilities::to<int, 3, 2>(p_3i) << std::endl << std::endl;
+
 
     ~EigenUtilities(void);
 };
