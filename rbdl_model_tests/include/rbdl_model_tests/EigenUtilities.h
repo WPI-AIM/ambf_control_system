@@ -9,6 +9,14 @@
 #include <stdlib.h>
 #include <tf/LinearMath/Transform.h>
 #include <algorithm>
+#include <math.h>
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
+#include "rbdl/Model.h"
+#include "rbdl/Joint.h"
+#include "rbdl/rbdl_mathutils.h"
+#include "rbdl/rbdl_eigenmath.h"
+#include "rbdl_model_tests/RBDLTestPrep.h"
 
 using namespace Eigen;
 // TODO: Use Quaternion instead of Matrix
@@ -81,6 +89,9 @@ public:
         }
     };
 
+
+    static RigidBodyDynamics::Joint RotationMatrixToRBDLJoint(const Eigen::Matrix3d R, 
+                                                        RigidBodyDynamics::JointType jointType);
     /** 
      * https://stackoverflow.com/questions/15482498/how-to-resize-a-vector-in-eigen3
      * To be upgraded to c++ 20 to support double template. 

@@ -1,6 +1,6 @@
 #include "rbdl_model_tests/EigenUtilities.h"
 
-// EigenUtilities::EigenUtilities() {}
+
 
 float EigenUtilities::get_angle(Vector3f vec_a, Vector3f vec_b, Vector3f up_vector) {
     float angle = 0.0;
@@ -38,15 +38,16 @@ float EigenUtilities::get_random_between_range(float low, float high) {
     return seed;
 }
 
-Eigen::Matrix3d EigenUtilities::rotationMatrixFromVectors(Eigen::Vector3d vec1, Eigen::Vector3d vec2)
+Eigen::Matrix3d EigenUtilities::rotationMatrixFromVectors(Eigen::Vector3d vec1, 
+                                                                Eigen::Vector3d vec2)
 {
     Eigen::Matrix3d m;
     m = Eigen::Matrix3d::Zero(3,3);
 
-    Vector3d a = vec1 / vec1.norm();
-    Vector3d b = vec2 / vec2.norm();
+    Eigen::Vector3d a = vec1 / vec1.norm();
+    Eigen::Vector3d b = vec2 / vec2.norm();
 
-    Vector3d v = a.cross(b);
+    Eigen::Vector3d v = a.cross(b);
     double c = a.dot(b);
     double s = v.norm();
 
@@ -178,6 +179,125 @@ const Eigen::Quaterniond EigenUtilities::tfToEigenQuaternion(const tf::Quaternio
     quat_e.w() = quat_tf[3];
 
     return quat_e;
+}
+
+// https://rip94550.wordpress.com/2008/05/20/axis-and-angle-of-rotation/
+RigidBodyDynamics::Joint EigenUtilities::RotationMatrixToRBDLJoint(const Eigen::Matrix3d R, 
+                                                        RigidBodyDynamics::JointType jointType)
+{
+    
+    EigenSolver<Eigen::Matrix3d> es(R);
+    double angle = acos((R.trace() - 1.0) * 0.5);
+    RigidBodyDynamics::Math::Vector3d jointAxis;
+    if(angle == 0.0)
+    {
+        // RBDL has Z axis as default.
+        jointAxis = { 0.0, 0.0, 1.0 };
+        // return RigidBodyDynamics::Joint(jointType, jointAxis);
+        return RigidBodyDynamics::Joint(SpatialVector(0., 0., 1., 0., 0., 0.));
+    }
+
+    const Eigen::Vector3d eigenvalues = es.eigenvalues().real();
+    const Eigen::Matrix3d eigenvectors = es.eigenvectors().real();
+
+    // evMaxCoeff = 
+    // VectorXf maxVal = eigenvalues.rowwise().maxCoeff();
+    // const Eigen::Vector3d maxEigenVector = 
+    
+
+    std::cout << "angle: " << angle << std::endl;
+    std::cout << "eigenvalues" << std::endl << eigenvalues << std::endl;
+    std::cout << "eigenvectors" << std::endl << eigenvectors << std::endl;
+    
+    // MatrixXf::Index   maxIndex[3];
+    // VectorXf maxVal(3);
+    // for(int i=0;i<3;++i)
+    //     maxVal(i) = eigenvectors.row(i).maxCoeff( &maxIndex[i] );
+
+    int maxEigenValueIndex;
+    double maxEigenValue;
+    maxEigenValue = eigenvalues.col(0).maxCoeff(&maxEigenValueIndex);
+
+    Eigen::Vector3d dominantEigenVector = eigenvectors.block<3, 1>(0, maxEigenValueIndex);
+    dominantEigenVector.normalize();
+
+    std::cout << "maxEigenValue" << std::endl << maxEigenValue << std::endl;
+    std::cout << "maxEigenValueIndex" << std::endl << maxEigenValueIndex << std::endl;
+    std::cout << "dominantEigenVector" << std::endl << dominantEigenVector << std::endl;
+
+    // clockwise and anti-clockwise
+    const std::vector<double> rotationDirections = 
+                                { angle, -angle, std::numeric_limits<double>::min() };
+
+    /***orientation
+     * For a non-zero rotation first find the axis of rotation with eigen value.
+     * The direction of rotation can be clockwise(cw) or counter clockwise(ccw).
+     * To find this lets reconstruct the rotation matrix using Eigen vector 
+     * corresponding to eigen value 1. We will have two Rotation matricies corresponding
+     * to cw and ccw rotation. The calculated rotation matrix which matches the orgional 
+     * rotaion matrix give the direction of rotation.
+     * 
+     * R = I + sin(theta) * N + (1 - cos(theta)) * N^2
+     *  N = [
+	 *        0,  c, -b,
+	 *       -c,  0,  a,
+	 *        b, -a,  0
+     *      ]
+     * where N is roation of base frame w.r.t body frame. 
+     * We would need -N to find the rotation of body frame w.r.t base frame.
+     ***/
+    double a = dominantEigenVector(0);
+    double b = dominantEigenVector(1);
+    double c = dominantEigenVector(2);
+
+    std::cout << a << ", " << b << ", " << c << std::endl;
+
+    Eigen::Matrix3d N;
+    N.setZero();
+    // Rotation of base frame w.r.t body frame
+    N << 
+        0.0,   c,  -b, 
+         -c, 0.0,   a, 
+          b,  -a, 0.0;
+
+    // std::cout << "N " << std::endl << N << std::endl;
+    // Roatation of body frame w.r.t base frame
+    N = -N;
+
+    for( double theta : rotationDirections )
+    {
+        if(theta == std::numeric_limits<double>::min())
+        {
+            std::cout << "Rotation matrix could not be reconstruced. Invalid joint orientation."
+                    << std::endl;
+            return RigidBodyDynamics::JointTypeUndefined;
+        }
+
+        const Eigen::Matrix3d R_cal = 
+            Eigen::Matrix3d::Identity() + sin(theta) * N + (1 - cos(theta)) * N * N;
+
+        std::cout << "direction: " << theta << std::endl 
+                  << "R_cal" << std::endl << R_cal << std::endl;
+        if(R_cal.isApprox(R, 1e-5f))
+        {// J = EigenUtilities::RotationMatrixToRBDLJoint(R, RigidBodyDynamics::JointType::JointTypeRevolute);
+            // Found the rotation direction
+            angle = theta;
+
+            std::cout << "found match: " << angle << std::endl;
+
+            break;
+        }
+        std::cout << "----------------------" << std::endl;
+    }
+
+    Math::Vector3d joint_axis = Math::Vector3d::Zero();
+    joint_axis(maxEigenValueIndex) = 1.0;
+    
+    
+    
+
+    return RigidBodyDynamics::JointTypeRevoluteX;
+    // return RigidBodyDynamics::Joint(jointType, joint_axis);
 }
 
 EigenUtilities::~EigenUtilities(void) {}
