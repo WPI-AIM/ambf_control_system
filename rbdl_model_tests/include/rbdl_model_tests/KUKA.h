@@ -79,18 +79,13 @@ struct KUKA {
 
     base_link1ST.E = base_link1_offset * base_link1Rot;
     base_link1ST.r = base_link1PP - (base_link1Rot.inverse() * base_link1CP);
-    
 
-    // std::cout << "base_link1ST.E" << std::endl << base_link1ST.E << std::endl;
-    // EigenUtilities::RotationMatrixToRBDLJoint(base_link1ST.E, 
-    //                       RigidBodyDynamics::JointType::JointTypeRevolute);
-    
-    base_link1Joint  = Joint(SpatialVector (0., 0., 1., 0., 0., 0.));
+    base_link1Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link1ST.E.transpose().block<3, 1>(0, 2).transpose());
     
     const Eigen::Vector3d P_base_link1_base =  base * base_link1ST.r;
     base_link1ID = rbdlModel->AddBody(0, 
       RigidBodyDynamics::Math::Xtrans(P_base_link1_base), base_link1Joint, link1Body, "base-link1");
-    std::cout << "-----------------------------------------------" << std::endl;
     //--------------------------------------------------------------------//
     Eigen::Vector3d link1_link2PA = { 00.000, 01.000, 00.000 };
     Eigen::Vector3d link1_link2CA = { 00.000, 00.000, 01.000 };
@@ -108,89 +103,12 @@ struct KUKA {
     
     const SpatialTransform base_link2ST = base_link1ST * link1_link2ST;
 
+    link1_link2Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link2ST.E.transpose().block<3, 1>(0, 2).transpose());
+
     const Eigen::Vector3d P_base_link2_base = base_link1ST.E.inverse() * link1_link2ST.r;
-    link1_link2Joint = Joint(SpatialVector (0., 1., 0., 0., 0., 0.));
-
-    RigidBodyDynamics::Joint J;
-    // std::cout << "base_link2ST.E." << std::endl << base_link2ST.E << std::endl;
-    // J = EigenUtilities::RotationMatrixToRBDLJoint(base_link2ST.E, 
-    //                                   RigidBodyDynamics::JointType::JointTypeRevolute);
-    // std::cout << "-----------------------------------------------" << std::endl;
-    std::cout << "base_link2ST.E.transpose()" << std::endl << base_link2ST.E.transpose() << std::endl;
-    J = EigenUtilities::RotationMatrixToRBDLJoint(base_link2ST.E.transpose(), 
-                                      RigidBodyDynamics::JointType::JointTypeRevolute);
-
     link1_link2ID = rbdlModel->AddBody(base_link1ID, 
       RigidBodyDynamics::Math::Xtrans(P_base_link2_base), link1_link2Joint, link2Body, "link1-link2");
-    std::cout << "-----------------------------------------------" << std::endl;
-    //--------------------------------------------------------------------//
-
-    Eigen::Matrix3d R;
-    // RigidBodyDynamics::Joint J;
-    // R <<  0.90956,  -0.414415, -0.0310051,
-    //      0.414851,   0.909845, 0.00899314,
-    //     0.0244829, -0.0210423,   0.999479;
-
-    // std::cout << "R" << std::endl << R << std::endl;
-
-    // J = EigenUtilities::RotationMatrixToRBDLJoint(R, RigidBodyDynamics::JointType::JointTypeRevolute);
-
-
-    // std::cout << "-----------------------------------------------" << std::endl;
-    // X pi/2
-    R.setIdentity();
-    R(1, 1) =  0.0;
-    R(1, 2) = -1.0;
-
-    R(2, 2) =  0.0;
-    R(2, 1) =  1.0;
-    std::cout << "Rx(pi/2)" << std::endl << R << std::endl;
-    J = EigenUtilities::RotationMatrixToRBDLJoint(R, RigidBodyDynamics::JointType::JointTypeRevolute);
-    std::cout << "-----------------------------------------------" << std::endl;
-    // X -pi/2
-    R.setIdentity();
-    R(1, 1) =  0.0;
-    R(1, 2) =  1.0;
-
-    R(2, 1) = -1.0;
-    R(2, 2) =  0.0;
-    std::cout << "Rx(-pi/2)" << std::endl << R << std::endl;
-    J = EigenUtilities::RotationMatrixToRBDLJoint(R, RigidBodyDynamics::JointType::JointTypeRevolute);
-    std::cout << "-----------------------------------------------" << std::endl;
-    // Y pi/2
-    R.setIdentity();
-    R(0, 0) =  0.0;
-    R(0, 2) =  1.0;
-
-    R(2, 0) = -1.0;
-    R(2, 2) =  0.0;
-    std::cout << "Ry(pi/2)" << std::endl << R << std::endl;
-    J = EigenUtilities::RotationMatrixToRBDLJoint(R, RigidBodyDynamics::JointType::JointTypeRevolute);
-    std::cout << "-----------------------------------------------" << std::endl;
-    // Y -pi/2
-    R.setIdentity();
-    R(0, 0) =  0.0;
-    R(0, 2) = -1.0;
-
-    R(2, 0) =  1.0;
-    R(2, 2) =  0.0;
-    std::cout << "Ry(-pi/2)" << std::endl << R << std::endl;
-    J = EigenUtilities::RotationMatrixToRBDLJoint(R, RigidBodyDynamics::JointType::JointTypeRevolute);
-    std::cout << "-----------------------------------------------" << std::endl;
-    // // Z
-    // R.setIdentity();
-    // std::cout << "Rz(pi/2)" << std::endl << R << std::endl;
-    // J = EigenUtilities::RotationMatrixToRBDLJoint(R, RigidBodyDynamics::JointType::JointTypeRevolute);
-    // std::cout << "-----------------------------------------------" << std::endl;
-    // // -Z
-    // R.setIdentity();
-    // R(0, 0) = -1.0;
-    // R(1, 1) = -1.0;
-    // std::cout << "Rz(-pi/2)" << std::endl << R << std::endl;
-    // J = EigenUtilities::RotationMatrixToRBDLJoint(R, RigidBodyDynamics::JointType::JointTypeRevolute);
-    // std::cout << "-----------------------------------------------" << std::endl;
-    // std::cout << "J.mJointAxes" << std::endl << J.mJointAxes[0]  << std::endl;
-
     //--------------------------------------------------------------------//
     Eigen::Vector3d link2_link3PA = { 00.000, -1.000, 00.000 };
     Eigen::Vector3d link2_link3CA = { 00.000, 00.000, 01.000 };
@@ -208,14 +126,12 @@ struct KUKA {
 
     const SpatialTransform base_link3ST = base_link2ST * link2_link3ST;
 
-    // std::cout << "base_link3ST" << std::endl << base_link2ST.E << std::endl;
-    // EigenUtilities::RotationMatrixToAxisOfRotation(base_link3ST.E);
+    link2_link3Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link3ST.E.transpose().block<3, 1>(0, 2).transpose());
 
     const Eigen::Vector3d P_base_link3_base = base_link2ST.E.inverse() * link2_link3ST.r;
-    link2_link3Joint = Joint(SpatialVector (0., 0., 1., 0., 0., 0.));
     link2_link3ID = rbdlModel->AddBody(link1_link2ID, 
       RigidBodyDynamics::Math::Xtrans(P_base_link3_base), link2_link3Joint, link3Body, "link2-link3");
-    std::cout << "-----------------------------------------------" << std::endl;
     //--------------------------------------------------------------------//
     Eigen::Vector3d link3_link4PA = { 00.000, -1.000, 00.000 };
     Eigen::Vector3d link3_link4CA = { 00.000, 00.000, 01.000 };
@@ -233,95 +149,91 @@ struct KUKA {
 
     const SpatialTransform base_link4ST = base_link3ST * link3_link4ST;
 
-    // std::cout << "base_link4ST.transpose()" << std::endl << base_link4ST.E.transpose() << std::endl;
-    // J = EigenUtilities::RotationMatrixToRBDLJoint(base_link4ST.E.transpose(), 
-    //                                   RigidBodyDynamics::JointType::JointTypeRevolute);
+    link3_link4Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link4ST.E.transpose().block<3, 1>(0, 2).transpose());
 
     const Eigen::Vector3d P_base_link4_base = base_link3ST.E.inverse() * link3_link4ST.r;
-    link3_link4Joint = Joint(SpatialVector (0., -1., 0., 0., 0., 0.));
     link3_link4ID = rbdlModel->AddBody(link2_link3ID, 
-      RigidBodyDynamics::Math::Xtrans(P_base_link4_base), link3_link4Joint, link4Body, "link3-link4");
-    std::cout << "-----------------------------------------------" << std::endl;
+      RigidBodyDynamics::Math::Xtrans(P_base_link4_base), link3_link4Joint, 
+                                              link4Body, "link3-link4");
     //--------------------------------------------------------------------//
-    // Eigen::Vector3d link4_link5PA = { 00.000, 01.000, 00.000 };
-    // Eigen::Vector3d link4_link5CA = { 00.000, 00.000, 01.000 };
-    // Eigen::Vector3d link4_link5PP = { -0.002, 00.202, -0.008 };
-    // Eigen::Vector3d link4_link5CP = { 00.000, 00.000, 00.000 };
-    // link4_link5PA.normalize();
-    // link4_link5CA.normalize();
+    Eigen::Vector3d link4_link5PA = { 00.000, 01.000, 00.000 };
+    Eigen::Vector3d link4_link5CA = { 00.000, 00.000, 01.000 };
+    Eigen::Vector3d link4_link5PP = { -0.002, 00.202, -0.008 };
+    Eigen::Vector3d link4_link5CP = { 00.000, 00.000, 00.000 };
+    link4_link5PA.normalize();
+    link4_link5CA.normalize();
 
-    // Eigen::Matrix3d link4_link5Rot = 
-    //       Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link4_link5PA, link4_link5CA));
-    // Eigen::Matrix3d link4_link5_offset = EigenUtilities::rotZ(link5_link6Offset);
+    Eigen::Matrix3d link4_link5Rot = 
+          Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link4_link5PA, link4_link5CA));
+    Eigen::Matrix3d link4_link5_offset = EigenUtilities::rotZ(link5_link6Offset);
 
-    // link4_link5ST.E = link4_link5_offset * link4_link5Rot;
-    // link4_link5ST.r = link4_link5PP - (link4_link5Rot.inverse() * link4_link5CP);
+    link4_link5ST.E = link4_link5_offset * link4_link5Rot;
+    link4_link5ST.r = link4_link5PP - (link4_link5Rot.inverse() * link4_link5CP);
 
-    // const SpatialTransform base_link5ST = base_link4ST * link4_link5ST;
+    const SpatialTransform base_link5ST = base_link4ST * link4_link5ST;
 
-    // std::cout << "base_link5ST" << std::endl << base_link5ST.E << std::endl;
-    // EigenUtilities::RotationMatrixToAxisOfRotation(base_link5ST.E);
+    const Eigen::Vector3d P_base_link5_base = base_link4ST.E.inverse() * link4_link5ST.r;
 
-    // const Eigen::Vector3d P_base_link5_base = base_link4ST.E.inverse() * link4_link5ST.r;
-    // link4_link5Joint = Joint(SpatialVector (0., 0., 1., 0., 0., 0.));
-    // link4_link5ID = rbdlModel->AddBody(link3_link4ID, 
-    //   RigidBodyDynamics::Math::Xtrans(P_base_link5_base), link4_link5Joint, link5Body, "link4-link5");
-    // std::cout << "-----------------------------------------------" << std::endl;
-    // //--------------------------------------------------------------------//
-    // Eigen::Vector3d link5_link6PA = { 00.000, 01.000, 00.000 };
-    // Eigen::Vector3d link5_link6CA = { 00.000, 00.000, 01.000 };
-    // Eigen::Vector3d link5_link6PP = { 00.002, -0.052, 00.204 };
-    // Eigen::Vector3d link5_link6CP = { 00.000, 00.000, 00.000 };
-    // link5_link6PA.normalize();
-    // link5_link6CA.normalize();
-
-    // Eigen::Matrix3d link5_link6Rot = 
-    //       Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link5_link6PA, link5_link6CA));
-    // Eigen::Matrix3d link5_link6_offset = EigenUtilities::rotZ(link5_link6Offset);
-
-    // link5_link6ST.E = link5_link6_offset * link5_link6Rot;
-    // link5_link6ST.r = link5_link6PP - (link5_link6Rot.inverse() * link5_link6CP);
-
-    // const SpatialTransform base_link6ST = base_link5ST * link5_link6ST;
-
-    // std::cout << "base_link6ST" << std::endl << base_link6ST.E << std::endl;
-    // EigenUtilities::RotationMatrixToAxisOfRotation(base_link6ST.E);
-
-    // const Eigen::Vector3d P_base_link6_base = base_link5ST.E.inverse() * link5_link6ST.r;
-    // link5_link6Joint = Joint(SpatialVector (0., 1., 0., 0., 0., 0.));
-    // link5_link6ID = rbdlModel->AddBody(link4_link5ID, 
-    //   RigidBodyDynamics::Math::Xtrans(P_base_link6_base), link5_link6Joint, link6Body, "link5-link6");
-    // //--------------------------------------------------------------------//
-    // Eigen::Vector3d link6_link7PA = { 00.000, -1.000, 00.000 };
-    // Eigen::Vector3d link6_link7CA = { 00.000, 00.000, 01.000 };
-    // Eigen::Vector3d link6_link7PP = { -0.003, -0.050, 00.053 };
-    // Eigen::Vector3d link6_link7CP = { 00.000, 00.000, 00.000 };
-    // link6_link7PA.normalize();
-    // link6_link7CA.normalize();
-
-    // Eigen::Matrix3d link6_link7Rot = 
-    //       Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link6_link7PA, link6_link7CA));
-    // Eigen::Matrix3d link6_link7_offset = EigenUtilities::rotZ(link6_link7Offset);
-
-    // link6_link7ST.E = link6_link7_offset * link6_link7Rot;
-    // link6_link7ST.r = link6_link7PP - (link6_link7Rot.inverse() * link6_link7CP);
-
-    // const SpatialTransform base_link7ST = base_link6ST * link6_link7ST;
-
-    // std::cout << "base_link7ST" << std::endl << base_link7ST.E << std::endl;
-    // EigenUtilities::RotationMatrixToAxisOfRotation(base_link7ST.E);
-
-    // const Eigen::Vector3d P_base_link7_base = base_link6ST.E.inverse() * link6_link7ST.r;
-    // link6_link7Joint = Joint(SpatialVector (0., 0., 1., 0., 0., 0.));
-    // link6_link7ID = rbdlModel->AddBody(link5_link6ID, 
-    //   RigidBodyDynamics::Math::Xtrans(P_base_link7_base), link6_link7Joint, link7Body, "link6-link7");
+    link4_link5Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link5ST.E.transpose().block<3, 1>(0, 2).transpose());
+    link4_link5ID = rbdlModel->AddBody(link3_link4ID, 
+      RigidBodyDynamics::Math::Xtrans(P_base_link5_base), link4_link5Joint, 
+                              link5Body, "link4-link5");
     //--------------------------------------------------------------------//
+    Eigen::Vector3d link5_link6PA = { 00.000, 01.000, 00.000 };
+    Eigen::Vector3d link5_link6CA = { 00.000, 00.000, 01.000 };
+    Eigen::Vector3d link5_link6PP = { 00.002, -0.052, 00.204 };
+    Eigen::Vector3d link5_link6CP = { 00.000, 00.000, 00.000 };
+    link5_link6PA.normalize();
+    link5_link6CA.normalize();
 
+    Eigen::Matrix3d link5_link6Rot = 
+          Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link5_link6PA, link5_link6CA));
+    Eigen::Matrix3d link5_link6_offset = EigenUtilities::rotZ(link5_link6Offset);
+
+    link5_link6ST.E = link5_link6_offset * link5_link6Rot;
+    link5_link6ST.r = link5_link6PP - (link5_link6Rot.inverse() * link5_link6CP);
+
+    const SpatialTransform base_link6ST = base_link5ST * link5_link6ST;
+
+    const Eigen::Vector3d P_base_link6_base = base_link5ST.E.inverse() * link5_link6ST.r;
+
+    link5_link6Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link6ST.E.transpose().block<3, 1>(0, 2).transpose());
+    link5_link6ID = rbdlModel->AddBody(link4_link5ID, 
+      RigidBodyDynamics::Math::Xtrans(P_base_link6_base), link5_link6Joint, 
+                                                            link6Body, "link5-link6");
+    //--------------------------------------------------------------------//
+    Eigen::Vector3d link6_link7PA = { 00.000, -1.000, 00.000 };
+    Eigen::Vector3d link6_link7CA = { 00.000, 00.000, 01.000 };
+    Eigen::Vector3d link6_link7PP = { -0.003, -0.050, 00.053 };
+    Eigen::Vector3d link6_link7CP = { 00.000, 00.000, 00.000 };
+    link6_link7PA.normalize();
+    link6_link7CA.normalize();
+
+    Eigen::Matrix3d link6_link7Rot = 
+          Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link6_link7PA, link6_link7CA));
+    Eigen::Matrix3d link6_link7_offset = EigenUtilities::rotZ(link6_link7Offset);
+
+    link6_link7ST.E = link6_link7_offset * link6_link7Rot;
+    link6_link7ST.r = link6_link7PP - (link6_link7Rot.inverse() * link6_link7CP);
+
+    const SpatialTransform base_link7ST = base_link6ST * link6_link7ST;
+
+    const Eigen::Vector3d P_base_link7_base = base_link6ST.E.inverse() * link6_link7ST.r;
+
+    link6_link7Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link7ST.E.transpose().block<3, 1>(0, 2).transpose());
+
+    link6_link7ID = rbdlModel->AddBody(link5_link6ID, 
+      RigidBodyDynamics::Math::Xtrans(P_base_link7_base), link6_link7Joint, 
+                                                        link7Body, "link6-link7");
+    //--------------------------------------------------------------------//
     Q     = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
     QDot  = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
     QDDot = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
     Tau   = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.); 
-
 
     ClearLogOutput();
   }

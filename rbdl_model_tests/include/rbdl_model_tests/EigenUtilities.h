@@ -10,21 +10,12 @@
 #include <tf/LinearMath/Transform.h>
 #include <algorithm>
 #include <math.h>
-#include <Eigen/Dense>
-#include <Eigen/Eigenvalues>
-#include "rbdl/Model.h"
-#include "rbdl/Joint.h"
-#include "rbdl/rbdl_mathutils.h"
-#include "rbdl/rbdl_eigenmath.h"
-#include "rbdl_model_tests/RBDLTestPrep.h"
 
-using namespace Eigen;
-// TODO: Use Quaternion instead of Matrix
 class EigenUtilities
 {
 public:
     EigenUtilities() {}
-    static float get_angle(Vector3f vec_a, Vector3f vec_b, Vector3f up_vector);
+    static float get_angle(Eigen::Vector3f vec_a, Eigen::Vector3f vec_b, Eigen::Vector3f up_vector);
     static float get_random_between_range(float low, float high);
     static Eigen::Matrix3d rotationMatrixFromVectors(Eigen::Vector3d vec1, Eigen::Vector3d vec2);
     static Eigen::Matrix3d RodriguesRotationFormula(Eigen::Vector3d vec1, Eigen::Vector3d vec2);
@@ -72,8 +63,6 @@ public:
         return Trans;
     }
 
-    static float MatrixRotationAngle(Eigen::Matrix3d R);
-    static void MatrixAxisOfRotation(Eigen::Matrix3d R);
     static const Eigen::Vector3d tfToEigenVector(const tf::Vector3 vec_tf);
     static const Eigen::Quaterniond tfToEigenQuaternion(const tf::Quaternion quat_tf);
 
@@ -88,49 +77,6 @@ public:
             return (str == key);
         }
     };
-
-
-    static RigidBodyDynamics::Joint RotationMatrixToRBDLJoint(const Eigen::Matrix3d R, 
-                                                        RigidBodyDynamics::JointType jointType);
-    /** 
-     * https://stackoverflow.com/questions/15482498/how-to-resize-a-vector-in-eigen3
-     * To be upgraded to c++ 20 to support double template. 
-     * https://stackoverflow.com/questions/2183087/why-cant-i-use-float-value-as-a-template-parameter
-     **/
-    template <bool COND, int A, int B>
-    struct IF
-    {
-    enum { val = A };
-    };
-
-    template <int A, int B>
-    struct IF<false, A, B>
-    {
-    enum { val = B };
-    };
-
-    template <int A, int B>
-    struct MIN : IF<A < B, A, B>
-    {
-    };
-
-    template <typename T,int dim,int newDim>
-    static Eigen::Matrix<T,newDim,1> to(Eigen::Matrix<T,dim,1> p)
-    {
-    Eigen::Matrix<int,newDim,1> newp =
-        // Eigen::Matrix<T,newDim,1>::Zero();
-        Eigen::Matrix<T,newDim,1>::Ones();;
-    newp.template head< MIN<dim,newDim>::val >() =
-        p.template head< MIN<dim,newDim>::val >();
-
-    return newp;
-    }
-
-    // Eigen::Vector2i p_2i(1,2);
-    // Eigen::Vector3i p_3i(3,4,5);
-
-    // std::cout << EigenUtilities::to<int, 2, 3>(p_2i) << std::endl << std::endl;
-    // std::cout << EigenUtilities::to<int, 3, 2>(p_3i) << std::endl << std::endl;
 
 
     ~EigenUtilities(void);
