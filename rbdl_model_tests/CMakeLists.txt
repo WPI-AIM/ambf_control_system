@@ -3,9 +3,6 @@ project(rbdl_model_tests)
 # add_compile_options(-std=c++11)
 list(APPEND CMAKE_PREFIX_PATH "/opt/ros/melodic/")
 
-
-
-
 get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
 set (CMAKE_MODULE_PATH ${PARENT_CMAKE} )
 
@@ -19,8 +16,6 @@ include_directories("~/catkin_ws/src/ambf_control_system/rbdl_model/include/")
 FIND_PACKAGE (rbdl_model REQUIRED)
 include_directories(${RBDL_MODEL})
 include_directories(rbdl_model)
-
-
 
 set (ambf_msgs_DIR ${CMAKE_MODULE_PATH})
 
@@ -62,11 +57,16 @@ catkin_package( INCLUDE_DIRS include
 FIND_PACKAGE (UnitTest++ REQUIRED)
 INCLUDE_DIRECTORIES (${UNITTEST++_INCLUDE_DIR})
 
-include_directories( include ${AMBF_CLIENT_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${Eigen_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR} ${RBDL_INCLUDE_DIR})
+include_directories( include 
+                    ${AMBF_CLIENT_INCLUDE_DIRS} 
+                    ${catkin_INCLUDE_DIRS} 
+                    ${Eigen_INCLUDE_DIRS} 
+                    ${EIGEN3_INCLUDE_DIR} 
+                    ${RBDL_INCLUDE_DIR})
 
 
 #find_package (ambf_client REQUIRED)
-find_package (GLFW REQUIRED)
+# find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 
 ## Specify additional locations of header files
@@ -80,29 +80,7 @@ include_directories (${GLFW_INCLUDE_DIRS}
                      ${PROJECT_NAME}/include
 )
 
-
-# set (HDR_FILES
-#     include/${PROJECT_NAME}/rbdl_model_test.h)
-
-# set(SOURCE_FILES
-#     src/rbdl_model_test.cpp
-#     #src/main.cpp
-#     )
-
-
-# set (RBDL_MODEL_TESTS_HDR_FILES
-# #    include/${PROJECT_NAME}/RBDLBodyTests.h
-#     include/${PROJECT_NAME}/RBDLTestPrep.h
-#     )
-
-# set(RBDL_MODEL_TESTS_SOURCE_FILES
-#     src/RBDLBodyTests.cpp
-#     src/RBDLJointTests.cpp
-#     src/RBDLTestPrep.cpp
-#     src/main.cpp
-#     )
-
-find_package (GLFW REQUIRED)
+# find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 include_directories (${GLFW_INCLUDE_DIRS})
 
@@ -171,23 +149,18 @@ ${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES})
 target_link_libraries (kuka_tests_hc
     ${catkin_LIBRARIES}
     ${AMBF_CLIENT_LIBRARY} 
-    ${RBDL_MODEL_LIBRARY}
-    ${GLFW_LIBRARIES} 
+    ${RBDL_MODEL_LIBRARY} 
     ${Boost_LIBRARIES} 
-    # ${Eigen_LIBRARIES} 
     ${UNITTEST++_LIBRARY}
     ${RBDL_LIBRARY}
     pthread
     )
-################END################
 
-################START################
-set (ECM_RBDL_MODEL_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/ECM.h
-    include/${PROJECT_NAME}/EigenUtilities.h
-    include/${PROJECT_NAME}/rbdl_tests.h
-    include/${PROJECT_NAME}/RBDLTestPrep.h    
+set_target_properties(kuka_tests_hc PROPERTIES
+    CXX_STANDARD 17
+    CXX_EXTENSIONS OFF
     )
+################END################
 
 # Executible ECM_tests
 set(ECM_HC_RBDL_MODEL_TESTS_SOURCE_FILES

@@ -1,13 +1,14 @@
 #include "rbdl_model_tests/EigenUtilities.h"
 
-// EigenUtilities::EigenUtilities() {}
 
-float EigenUtilities::get_angle(Vector3f vec_a, Vector3f vec_b, Vector3f up_vector) {
+
+float EigenUtilities::get_angle(Eigen::Vector3f vec_a, Eigen::Vector3f vec_b, 
+                                                                    Eigen::Vector3f up_vector) {
     float angle = 0.0;
     vec_a.normalize();
     vec_b.normalize();
 
-    Vector3f cross_ab = vec_a.cross(vec_b);
+    Eigen::Vector3f cross_ab = vec_a.cross(vec_b);
     float vdot = vec_a.dot(vec_b);
 
 //    # Check if the vectors are in the same direction
@@ -38,15 +39,16 @@ float EigenUtilities::get_random_between_range(float low, float high) {
     return seed;
 }
 
-Eigen::Matrix3d EigenUtilities::rotationMatrixFromVectors(Eigen::Vector3d vec1, Eigen::Vector3d vec2)
+Eigen::Matrix3d EigenUtilities::rotationMatrixFromVectors(Eigen::Vector3d vec1, 
+                                                                Eigen::Vector3d vec2)
 {
     Eigen::Matrix3d m;
     m = Eigen::Matrix3d::Zero(3,3);
 
-    Vector3d a = vec1 / vec1.norm();
-    Vector3d b = vec2 / vec2.norm();
+    Eigen::Vector3d a = vec1 / vec1.norm();
+    Eigen::Vector3d b = vec2 / vec2.norm();
 
-    Vector3d v = a.cross(b);
+    Eigen::Vector3d v = a.cross(b);
     double c = a.dot(b);
     double s = v.norm();
 
@@ -136,6 +138,28 @@ Eigen::Vector3f EigenUtilities::rpy_from_rotation(Eigen::Matrix3f R) {
     rpy[2] = std::atan2( R(1, 0), R(0, 0));
 
     return rpy;
+}
+
+const Eigen::Vector3d EigenUtilities::tfToEigenVector(const tf::Vector3 vec_tf)
+{
+    Eigen::Vector3d vec_e;
+    vec_e(0) = vec_tf[0];
+    vec_e(1) = vec_tf[1];
+    vec_e(2) = vec_tf[2];
+
+    return vec_e;
+}
+
+const Eigen::Quaterniond EigenUtilities::tfToEigenQuaternion(const tf::Quaternion quat_tf)
+{
+    // Eigen::Quaternion quat_e;
+    Eigen::Quaterniond quat_e;
+    quat_e.x() = quat_tf[0];
+    quat_e.y() = quat_tf[1];
+    quat_e.z() = quat_tf[2];
+    quat_e.w() = quat_tf[3];
+
+    return quat_e;
 }
 
 EigenUtilities::~EigenUtilities(void) {}

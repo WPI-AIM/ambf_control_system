@@ -7,14 +7,15 @@
 #include<Eigen/Core>
 #include<cmath>
 #include <stdlib.h>
+#include <tf/LinearMath/Transform.h>
+#include <algorithm>
+#include <math.h>
 
-using namespace Eigen;
-// TODO: Use Quaternion instead of Matrix
 class EigenUtilities
 {
 public:
     EigenUtilities() {}
-    static float get_angle(Vector3f vec_a, Vector3f vec_b, Vector3f up_vector);
+    static float get_angle(Eigen::Vector3f vec_a, Eigen::Vector3f vec_b, Eigen::Vector3f up_vector);
     static float get_random_between_range(float low, float high);
     static Eigen::Matrix3d rotationMatrixFromVectors(Eigen::Vector3d vec1, Eigen::Vector3d vec2);
     static Eigen::Matrix3d RodriguesRotationFormula(Eigen::Vector3d vec1, Eigen::Vector3d vec2);
@@ -61,6 +62,22 @@ public:
 
         return Trans;
     }
+
+    static const Eigen::Vector3d tfToEigenVector(const tf::Vector3 vec_tf);
+    static const Eigen::Quaterniond tfToEigenQuaternion(const tf::Quaternion quat_tf);
+
+    // https://www.techiedelight.com/check-vector-contains-given-element-cpp/
+    struct compare
+    {
+        std::string key;
+        compare(std::string const &str): key(str){}
+
+        bool operator()(std::string const &str)
+        {
+            return (str == key);
+        }
+    };
+
 
     ~EigenUtilities(void);
 };

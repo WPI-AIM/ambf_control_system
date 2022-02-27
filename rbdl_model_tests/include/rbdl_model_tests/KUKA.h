@@ -9,9 +9,9 @@
 const double TEST_LAX = 1.0e-7;
 struct ActivationJoints
 {
-  std::string joint_name;
-  float joint_lower_limit;
-  float joint_higher_limit;
+  std::string bodyNameAMBF;
+  float jointLowerLimit;
+  float jointHigherLimit;
 };
 
 struct KUKA {
@@ -32,30 +32,34 @@ struct KUKA {
     baseHandler = clientPtr->getRigidBody(base_name, false);
     usleep(1000000);
 
-    // //base is rigid body name, not a joint. This is a hacky way to enable ros topics in the 
-    // //server side during first execution
+    //base is rigid body name, not a joint. This is a hacky way to enable ros topics in the 
+    //server side during first execution
     baseHandler->set_joint_pos(base_name, 0.0f); 
 
-    const tf::Quaternion quat_0_w_tf = baseHandler->get_rot();
-    const tf::Vector3 P_0_w_tf = baseHandler->get_pos();
+    const tf::Quaternion quat_w_0_tf = baseHandler->get_rot();
+    const tf::Vector3 P_w_0_tf = baseHandler->get_pos();
 
-    RigidBodyDynamics::Math::Quaternion quat_0_w;
-    quat_0_w(0) = quat_0_w_tf[0];
-    quat_0_w(1) = quat_0_w_tf[1];
-    quat_0_w(2) = quat_0_w_tf[2];
-    quat_0_w(3) = quat_0_w_tf[3];
+    RigidBodyDynamics::Math::Quaternion quat_w_0;
+    quat_w_0(0) = quat_w_0_tf[0];
+    quat_w_0(1) = quat_w_0_tf[1];
+    quat_w_0(2) = quat_w_0_tf[2];
+    quat_w_0(3) = quat_w_0_tf[3];
 
-    const RigidBodyDynamics::Math::Matrix3d R_0_w = quat_0_w.toMatrix();
+    const RigidBodyDynamics::Math::Matrix3d R_w_0 = quat_w_0.toMatrix();
 
-    RigidBodyDynamics::Math::Vector3d P_0_w;
-    P_0_w.setZero();
+    RigidBodyDynamics::Math::Vector3d P_w_0;
+    P_w_0.setZero();
     
-    P_0_w(0) = P_0_w_tf[0];
-    P_0_w(1) = P_0_w_tf[1];
-    P_0_w(2) = P_0_w_tf[2];
+    P_w_0(0) = P_w_0_tf[0];
+    P_w_0(1) = P_w_0_tf[1];
+    P_w_0(2) = P_w_0_tf[2];
 
-    T_0_w = EigenUtilities::get_frame<Eigen::Matrix3d, Eigen::Vector3d, Eigen::Matrix4d>(R_0_w, P_0_w);
-
+    T_w_0 = EigenUtilities::get_frame<Eigen::Matrix3d, 
+                Eigen::Vector3d, Eigen::Matrix4d>(R_w_0, P_w_0);
+    
+    T_0_w = EigenUtilities::get_frame<Eigen::Matrix3d, 
+                Eigen::Vector3d, Eigen::Matrix4d>(R_w_0.transpose(), -R_w_0.transpose() * P_w_0);
+    
     rbdlModel = new Model;
     rbdlModel->gravity = RigidBodyDynamics::Math::Vector3d(0., 0., -9.81);
 
@@ -68,11 +72,9 @@ struct KUKA {
     link5Body = Body (1., Math::Vector3d (0.0000, -0.017, 0.129), Math::Vector3d (0.0363, 0.0350, 0.0045));
     link6Body = Body (1., Math::Vector3d (0.0000, 00.007, 0.068), Math::Vector3d (0.0114, 0.0116, 0.0037));
     link7Body = Body (1., Math::Vector3d (0.0060, 00.000, 0.015), Math::Vector3d (0.0012, 0.0013, 0.0010));
-    //--------------------------------------------------------------------//
-    ROOT_baseJoint = Joint(JointTypeFixed);
-    ROOT_baseST.E = RigidBodyDynamics::Math::Matrix3dIdentity;
-    ROOT_baseST.r = RigidBodyDynamics::Math::Vector3dZero;
-    base_link1ID = rbdlModel->AddBody(0, ROOT_baseST, ROOT_baseJoint, baseBody, "base");
+
+    Eigen::Matrix3d base;
+    base.setIdentity();
     //--------------------------------------------------------------------//
     Eigen::Vector3d base_link1PA = { 00.000, 00.000, 01.000 };
     Eigen::Vector3d base_link1CA = { 00.000, 00.000, 01.000 };
@@ -88,8 +90,12 @@ struct KUKA {
     base_link1ST.E = base_link1_offset * base_link1Rot;
     base_link1ST.r = base_link1PP - (base_link1Rot.inverse() * base_link1CP);
 
-    base_link1Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    base_link1ID = rbdlModel->AddBody(base_link1ID, base_link1ST, base_link1Joint, link1Body, "link1");
+    base_link1Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link1ST.E.transpose().block<3, 1>(0, 2).transpose());
+    
+    const Eigen::Vector3d P_base_link1_base =  base * base_link1ST.r;
+    base_link1ID = rbdlModel->AddBody(0, 
+      RigidBodyDynamics::Math::Xtrans(P_base_link1_base), base_link1Joint, link1Body, "base-link1");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link1_link2PA = { 00.000, 01.000, 00.000 };
     Eigen::Vector3d link1_link2CA = { 00.000, 00.000, 01.000 };
@@ -104,9 +110,15 @@ struct KUKA {
 
     link1_link2ST.E = link1_link2_offset * link1_link2Rot;
     link1_link2ST.r = link1_link2PP - (link1_link2Rot.inverse() * link1_link2CP);
+    
+    const SpatialTransform base_link2ST = base_link1ST * link1_link2ST;
 
-    link1_link2Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    link1_link2ID = rbdlModel->AddBody(base_link1ID, link1_link2ST, link1_link2Joint, link2Body, "link2");
+    link1_link2Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link2ST.E.transpose().block<3, 1>(0, 2).transpose());
+
+    const Eigen::Vector3d P_base_link2_base = base_link1ST.E.inverse() * link1_link2ST.r;
+    link1_link2ID = rbdlModel->AddBody(base_link1ID, 
+      RigidBodyDynamics::Math::Xtrans(P_base_link2_base), link1_link2Joint, link2Body, "link1-link2");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link2_link3PA = { 00.000, -1.000, 00.000 };
     Eigen::Vector3d link2_link3CA = { 00.000, 00.000, 01.000 };
@@ -120,10 +132,16 @@ struct KUKA {
     Eigen::Matrix3d link2_link3_offset = EigenUtilities::rotZ(link2_link3Offset);
 
     link2_link3ST.E = link2_link3_offset * link2_link3Rot;
-    link2_link3ST.r = link2_link3PP - (link2_link3Rot.inverse() * link2_link3CP);
+    link2_link3ST.r = link2_link3PP - (link2_link3Rot.inverse() * link2_link3CP);   
 
-    link2_link3Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    link2_link3ID = rbdlModel->AddBody(link1_link2ID, link2_link3ST, link2_link3Joint, link3Body, "link3");
+    const SpatialTransform base_link3ST = base_link2ST * link2_link3ST;
+
+    link2_link3Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link3ST.E.transpose().block<3, 1>(0, 2).transpose());
+
+    const Eigen::Vector3d P_base_link3_base = base_link2ST.E.inverse() * link2_link3ST.r;
+    link2_link3ID = rbdlModel->AddBody(link1_link2ID, 
+      RigidBodyDynamics::Math::Xtrans(P_base_link3_base), link2_link3Joint, link3Body, "link2-link3");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link3_link4PA = { 00.000, -1.000, 00.000 };
     Eigen::Vector3d link3_link4CA = { 00.000, 00.000, 01.000 };
@@ -139,8 +157,15 @@ struct KUKA {
     link3_link4ST.E = link3_link4_offset * link3_link4Rot;
     link3_link4ST.r = link3_link4PP - (link3_link4Rot.inverse() * link3_link4CP);
 
-    link3_link4Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    link3_link4ID = rbdlModel->AddBody(link2_link3ID, link3_link4ST, link3_link4Joint, link4Body, "link4");
+    const SpatialTransform base_link4ST = base_link3ST * link3_link4ST;
+
+    link3_link4Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link4ST.E.transpose().block<3, 1>(0, 2).transpose());
+
+    const Eigen::Vector3d P_base_link4_base = base_link3ST.E.inverse() * link3_link4ST.r;
+    link3_link4ID = rbdlModel->AddBody(link2_link3ID, 
+      RigidBodyDynamics::Math::Xtrans(P_base_link4_base), link3_link4Joint, 
+                                              link4Body, "link3-link4");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link4_link5PA = { 00.000, 01.000, 00.000 };
     Eigen::Vector3d link4_link5CA = { 00.000, 00.000, 01.000 };
@@ -156,8 +181,15 @@ struct KUKA {
     link4_link5ST.E = link4_link5_offset * link4_link5Rot;
     link4_link5ST.r = link4_link5PP - (link4_link5Rot.inverse() * link4_link5CP);
 
-    link4_link5Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    link4_link5ID = rbdlModel->AddBody(link3_link4ID, link4_link5ST, link4_link5Joint, link5Body, "link5");
+    const SpatialTransform base_link5ST = base_link4ST * link4_link5ST;
+
+    const Eigen::Vector3d P_base_link5_base = base_link4ST.E.inverse() * link4_link5ST.r;
+
+    link4_link5Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link5ST.E.transpose().block<3, 1>(0, 2).transpose());
+    link4_link5ID = rbdlModel->AddBody(link3_link4ID, 
+      RigidBodyDynamics::Math::Xtrans(P_base_link5_base), link4_link5Joint, 
+                              link5Body, "link4-link5");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link5_link6PA = { 00.000, 01.000, 00.000 };
     Eigen::Vector3d link5_link6CA = { 00.000, 00.000, 01.000 };
@@ -173,8 +205,15 @@ struct KUKA {
     link5_link6ST.E = link5_link6_offset * link5_link6Rot;
     link5_link6ST.r = link5_link6PP - (link5_link6Rot.inverse() * link5_link6CP);
 
-    link5_link6Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    link5_link6ID = rbdlModel->AddBody(link4_link5ID, link5_link6ST, link5_link6Joint, link6Body, "link6");
+    const SpatialTransform base_link6ST = base_link5ST * link5_link6ST;
+
+    const Eigen::Vector3d P_base_link6_base = base_link5ST.E.inverse() * link5_link6ST.r;
+
+    link5_link6Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link6ST.E.transpose().block<3, 1>(0, 2).transpose());
+    link5_link6ID = rbdlModel->AddBody(link4_link5ID, 
+      RigidBodyDynamics::Math::Xtrans(P_base_link6_base), link5_link6Joint, 
+                                                            link6Body, "link5-link6");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link6_link7PA = { 00.000, -1.000, 00.000 };
     Eigen::Vector3d link6_link7CA = { 00.000, 00.000, 01.000 };
@@ -190,8 +229,16 @@ struct KUKA {
     link6_link7ST.E = link6_link7_offset * link6_link7Rot;
     link6_link7ST.r = link6_link7PP - (link6_link7Rot.inverse() * link6_link7CP);
 
-    link6_link7Joint = Joint(JointTypeRevolute, Math::Vector3d(0.0, 0.0, 1.0));
-    link6_link7ID = rbdlModel->AddBody(link5_link6ID, link6_link7ST, link6_link7Joint, link7Body, "link7");
+    const SpatialTransform base_link7ST = base_link6ST * link6_link7ST;
+
+    const Eigen::Vector3d P_base_link7_base = base_link6ST.E.inverse() * link6_link7ST.r;
+
+    link6_link7Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+                                    base_link7ST.E.transpose().block<3, 1>(0, 2).transpose());
+
+    link6_link7ID = rbdlModel->AddBody(link5_link6ID, 
+      RigidBodyDynamics::Math::Xtrans(P_base_link7_base), link6_link7Joint, 
+                                                        link7Body, "link6-link7");
     //--------------------------------------------------------------------//
     Q     = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
     QDot  = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
@@ -208,11 +255,14 @@ struct KUKA {
   }
 
   Model *rbdlModel = nullptr;
+
   AMBFClientPtr clientPtr = nullptr;
   rigidBodyPtr baseHandler = nullptr;
   std::string base_name = "base";
 
+  Eigen::Matrix4d T_w_0;
   Eigen::Matrix4d T_0_w;
+
   // Child : Parent
   std::unordered_map<std::string, std::string> hierachyMap =
   {
@@ -227,60 +277,41 @@ struct KUKA {
     { "link6-link7", "link5-link6" },
   };
 
-  std::unordered_map<std::string, ActivationJoints> jointLimits =
+  // AMBF joint name & RBDL Body Name, AMBF body name, limits. 
+  // TBD limits to be taken from RBDL model  
+  static const inline std::unordered_map<std::string, ActivationJoints> RBDL_AMBF_JOINT_MAP =
   {
     { 
-      "link1", { "link1", -2.094f, 2.094f }
+      "base-link1", { "link1", -2.094f, 2.094f }
     },
     { 
-      "link2", { "link2", -2.094f, 2.094f }
+      "link1-link2", { "link2", -2.094f, 2.094f }
     },
     { 
-      "link3", { "link3", -2.094f, 2.094f }
+      "link2-link3", { "link3", -2.094f, 2.094f }
     },
     { 
-      "link4", { "link4", -2.094f, 2.094f }
+      "link3-link4", { "link4", -2.094f, 2.094f }
     },
     { 
-      "link5", { "link5", -2.094f, 2.094f }
+      "link4-link5", { "link5", -2.094f, 2.094f }
     },
     { 
-      "link6", { "link6", -2.094f, 2.094f }
+      "link5-link6", { "link6", -2.094f, 2.094f }
     },
     { 
-      "link7", { "link7", -3.054f, 3.054f }
+      "link6-link7", { "link7", -3.054f, 3.054f }
     }
   };
 
-  // const std::vector<ActivationJoints> controllableJoints =
-  // {
-  //   { "link1", -2.094f, 2.094f },
-  //   { "link2", -2.094f, 2.094f },
-  //   { "link3", -2.094f, 2.094f },
-  //   { "link4", -2.094f, 2.094f },
-  //   { "link5", -2.094f, 2.094f },
-  //   { "link6", -2.094f, 2.094f },
-  //   { "link7", -3.054f, 3.054f },
-  // };
-
-  // std::unordered_map<std::string, std::vector<std::string>> parentJointsMap =
-  // {
-  //   { 
-  //     "base", 
-  //     {
-  //        "base-link1", "link1-link2", "link2-link3", "link3-link4", 
-  //       "link4-link5", "link5-link6", "link6-link7"
-  //     } 
-  //   }
-  // };
-
-  // std::unordered_map<std::string, std::vector<std::string>>::iterator parentJointsMapItr;
-
-  unsigned int base_link1ID, link1_link2ID, link2_link3ID, link3_link4ID, link4_link5ID, 
-               link5_link6ID, link6_link7ID;
   Body baseBody, link1Body, link2Body, link3Body, link4Body, link5Body, link6Body, link7Body;
-  Joint ROOT_baseJoint, base_link1Joint, link1_link2Joint, link2_link3Joint, link3_link4Joint, 
-        link4_link5Joint, link5_link6Joint, link6_link7Joint;
+
+  unsigned int ROOT_baseID, base_link1ID, link1_link2ID, link2_link3ID, 
+               link3_link4ID, link4_link5ID, link5_link6ID, link6_link7ID;
+
+  Joint ROOT_baseJoint, base_link1Joint, link1_link2Joint, link2_link3Joint, 
+        link3_link4Joint, link4_link5Joint, link5_link6Joint, link6_link7Joint;
+
   SpatialTransform ROOT_baseST, base_link1ST, link1_link2ST, link2_link3ST, link3_link4ST, 
                    link4_link5ST, link5_link6ST, link6_link7ST;
 
