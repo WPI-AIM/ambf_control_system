@@ -67,8 +67,8 @@ set(ambf_msgs_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(ambf_msgs_SOURCE_PREFIX /mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_msgs)
-  set(ambf_msgs_DEVEL_PREFIX /mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel)
+  set(ambf_msgs_SOURCE_PREFIX /home/nathanielgoldfarb//ambf/ambf_ros_modules/ambf_msgs)
+  set(ambf_msgs_DEVEL_PREFIX /home/nathanielgoldfarb//ambf/build/devel)
   set(ambf_msgs_INSTALL_PREFIX "")
   set(ambf_msgs_PREFIX ${ambf_msgs_DEVEL_PREFIX})
 else()
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(ambf_msgs_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/include " STREQUAL " ")
+if(NOT "/home/nathanielgoldfarb//ambf/build/devel/include " STREQUAL " ")
   set(ambf_msgs_INCLUDE_DIRS "")
-  set(_include_dirs "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/include")
+  set(_include_dirs "/home/nathanielgoldfarb//ambf/build/devel/include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -110,7 +110,7 @@ if(NOT "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/inc
         message(FATAL_ERROR "Project 'ambf_msgs' specifies '${idir}' as an include dir, which is not found.  It does not exist in '${include}'.  ${_report}")
       endif()
     else()
-      message(FATAL_ERROR "Project 'ambf_msgs' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_msgs/${idir}'.  ${_report}")
+      message(FATAL_ERROR "Project 'ambf_msgs' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/nathanielgoldfarb//ambf/ambf_ros_modules/ambf_msgs/${idir}'.  ${_report}")
     endif()
     _list_append_unique(ambf_msgs_INCLUDE_DIRS ${include})
   endforeach()
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/lib;/mnt/OneTB/localcodebase/ambf_repos/aimlab/ambf/build/devel/lib;/opt/ros/melodic/lib)
+    foreach(path /home/nathanielgoldfarb//ambf/build/devel/lib;/home/nathanielgoldfarb//ambf/build/devel/lib;/opt/ros/melodic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

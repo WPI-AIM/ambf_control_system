@@ -164,7 +164,7 @@ set_target_properties(kuka_tests_hc PROPERTIES
 
 # Executible ECM_tests
 set(ECM_HC_RBDL_MODEL_TESTS_SOURCE_FILES
-    src/ECMHCKinematicsTests.cc
+    #src/ECMHCKinematicsTests.cc
     # src/ECMBodyTests.cc
     src/EigenUtilities.cpp
     src/RBDLTestPrep.cc
@@ -189,7 +189,7 @@ target_link_libraries (ecm_tests_hc
 
 ################START################
 set (PS_RBDL_MODEL_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/ParallelStructureCL.h
+    #include/${PROJECT_NAME}/ParallelStructureCL.h
     # include/${PROJECT_NAME}/ParallelStructure.h
     include/${PROJECT_NAME}/EigenUtilities.h
     include/${PROJECT_NAME}/rbdl_tests.h
