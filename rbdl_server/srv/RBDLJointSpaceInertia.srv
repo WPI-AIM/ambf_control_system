@@ -1,0 +1,4 @@
+string model_name
+float64[] q
+---
+std_msgs/Float64MultiArray Mjoint

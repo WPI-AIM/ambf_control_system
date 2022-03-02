@@ -47,6 +47,9 @@
 #include "rbdl_server/RBDLKinimatics.h"
 #include "rbdl_server/RBDLInverseKinimatics.h"
 #include "rbdl_server/RBDLModelAlignment.h"
+#include "rbdl_server/RBDLJointSpaceInertia.h"
+#include "rbdl_server/RBDLPointVelocity.h"
+#include "rbdl_server/RBDLNonlinearEffects.h"
 #include <iostream>
 
 #include <algorithm>
@@ -84,21 +87,29 @@ class RBDLServer
     std::unordered_map<std::string, std::unordered_map<std::string, unsigned int>> body_ids;
        
 
-    ros::ServiceServer FD_srv, ID_srv, MD_srv, Jac_srv, Kin_srv, InvKin_srv, JointNames_srv, JointAlign_srv;
+    ros::ServiceServer FD_srv, ID_srv, MD_srv, Jac_srv, Kin_srv, InvKin_srv, JointNames_srv, JointAlign_srv, Mjoint_srv, PtVel_srv, NonlinEff_srv;
     VectorNd VectToEigen(const std::vector<double>&);
     RigidBodyDynamics::Model* getModel(std::string);
     bool CreateModel_srv(rbdl_server::RBDLModelRequest&, rbdl_server::RBDLModelResponse& ); //parses the AMBF model into  rbdl model
-    bool CheckSize(int); //need to implement this to find way of checking the msg field sizes
-    bool ForwardDynamics_srv(rbdl_server::RBDLForwardDynamicsRequest&, rbdl_server::RBDLForwardDynamicsResponse&  );
-    bool InverseDynamics_srv(rbdl_server::RBDLInverseDynamicsRequest&, rbdl_server::RBDLInverseDynamicsResponse&  );
-    bool ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest&, rbdl_server::RBDLKinimaticsResponse&);
-    bool Jacobian_srv(rbdl_server::RBDLJacobianRequest&, rbdl_server::RBDLJacobianResponse&);
     bool GetNames_srv(rbdl_server::RBDLBodyNamesRequest&, rbdl_server::RBDLBodyNamesResponse&);
     void GetNames(const std::string& name, std::vector<std::string>& names);
     bool GetJointNames_srv(rbdl_server::RBDLBodyNamesRequest&, rbdl_server::RBDLBodyNamesResponse&);
-    bool InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest&, rbdl_server::RBDLInverseKinimaticsResponse& );
     bool AMBF2RBDL_srv(rbdl_server::RBDLModelAlignmentRequest& , rbdl_server::RBDLModelAlignmentResponse& );
     bool checkModelExists(std::string);
+
+    bool CheckSize(int); //need to implement this to find way of checking the msg field sizes
+
+    // RBDL function calls    
+    bool ForwardDynamics_srv(rbdl_server::RBDLForwardDynamicsRequest&, rbdl_server::RBDLForwardDynamicsResponse&  );
+    bool InverseDynamics_srv(rbdl_server::RBDLInverseDynamicsRequest&, rbdl_server::RBDLInverseDynamicsResponse&  );
+    bool ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest&, rbdl_server::RBDLKinimaticsResponse&);
+    bool InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest&, rbdl_server::RBDLInverseKinimaticsResponse& );
+    bool Jacobian_srv(rbdl_server::RBDLJacobianRequest&, rbdl_server::RBDLJacobianResponse&);
+
+    bool JointSpaceInertia_srv(rbdl_server::RBDLJointSpaceInertiaRequest&, rbdl_server::RBDLJointSpaceInertiaResponse&);
+    bool PointVelocity_srv(rbdl_server::RBDLPointVelocityRequest&, rbdl_server::RBDLPointVelocityResponse&);
+    bool NonlinearEffects_srv(rbdl_server::RBDLNonlinearEffectsRequest&, rbdl_server::RBDLNonlinearEffectsResponse&);
+    
 	
   public:
     RBDLServer(ros::NodeHandle* nodehandle);

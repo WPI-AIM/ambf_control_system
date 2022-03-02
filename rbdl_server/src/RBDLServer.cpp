@@ -16,6 +16,11 @@ RBDLServer::RBDLServer(ros::NodeHandle* nodehandle):nh_(*nodehandle)
      InvKin_srv = nh_.advertiseService("InverseKinimatics", &RBDLServer::InverseKinimatics_srv, this);
      JointNames_srv = nh_.advertiseService("JointNames", &RBDLServer::GetJointNames_srv, this);
      JointAlign_srv = nh_.advertiseService("AMBF2RBDL", &RBDLServer::AMBF2RBDL_srv, this);
+     Mjoint_srv = nh_.advertiseService("JointSpaceInertia", &RBDLServer::JointSpaceInertia_srv, this);
+     PtVel_srv = nh_.advertiseService("PointVelocity", &RBDLServer::PointVelocity_srv, this);
+     NonlinEff_srv = nh_.advertiseService("NonlinearEffects", &RBDLServer::NonlinearEffects_srv, this);
+
+
      ROS_INFO("RBDL server running");
      ros::spinOnce;
 }
@@ -509,5 +514,204 @@ bool RBDLServer::checkModelExists(std::string key)
 {
    
    return (bool)models.count( key );
+
+}
+
+
+/**
+*	ROS service for the current joint-space inertia matrix of the model
+*	@param req is the request service data to be sent
+*   @param res is the response service data returned
+*	@return if the function executed successfully or not (run on an existing model with a valid number of joints)
+**/
+bool RBDLServer::JointSpaceInertia_srv(rbdl_server::RBDLJointSpaceInertiaRequest& req, rbdl_server::RBDLJointSpaceInertiaResponse& res) {
+    
+    ROS_INFO("Called Joint Space Inertia Server");
+
+    std_msgs::Float64MultiArray msg;												// initializing the service response value (M matrix at given q) 
+    std::string name = req.model_name;												// the name of the model for which calculations will be performed
+    
+
+    // Default to another name if the request has an invalid one, program will seg fault if functions are called on an empty model name
+    if(req.model_name.empty()) {
+
+        name = default_name;
+    }
+
+
+    int numDoF = models[name]->dof_count;											// number of Degrees of Freedom (number of joints) of the model 
+    
+    MatrixNd M (MatrixNd::Zero (numDoF, numDoF));									// initializing M(q) matrix output of CompositeRidgidBodyAlgorithm()
+    VectorNd Q = VectToEigen(req.q);												// and its input q vector of joint states
+
+    // Only execute the RBDL function on a valid model
+    if (checkModelExists(name)) {
+
+
+    	//ROS_INFO("q size: %d", req.q.size());
+
+    	// Only execute on a valid number of model joints
+        if (models[name]->q_size != req.q.size()) {
+
+            ROS_INFO("Joint length (q) not correct size");
+            return false;
+        }
+
+
+        // RBDL function to calculate the model M joint space inertia matrix at the current configuration Q
+    	CompositeRigidBodyAlgorithm(*models[name], Q, M, false);
+
+    	tf::matrixEigenToMsg(M, msg);												// convert the MatrixNd output to a std_msgs
+        res.Mjoint = msg;															// and set it as the response
+
+
+        //ROS_INFO("model name: %s", name.c_str());       // for testing
+        //ROS_INFO("DoF: %d", numDoF);
+
+
+        return true;
+    }
+    else {
+
+        return false;
+    }
+
+
+    
+
+
+    return false;
+    
+}
+
+
+/**
+*	ROS service for calculating the current velocity of a point on the model
+*	@param req is the request service data to be sent
+*   @param res is the response service data returned
+*	@return if the function executed successfully or not (run on an existing model with a valid number of joints)
+**/
+bool RBDLServer::PointVelocity_srv(rbdl_server::RBDLPointVelocityRequest& req, rbdl_server::RBDLPointVelocityResponse& res) {
+
+    ROS_INFO("Called Point Velocity Server");
+
+    std::vector<std::string> names;                                                 // vector of body names to print out if invalid name given in request 
+    int id;                                                                         // body id of interest to use in the input of the RBDL function
+    Vector3d point(req.point.x, req.point.y, req.point.z);                          // point on the body in 3D space to use in the input of the RBDL function
+
+    std::string name = req.model_name;                                              // the name of the model for which calculations will be performed
+
+ 
+    // Default to another name if the request has an invalid one, program will seg fault if functions are called on an empty model name
+    if(req.model_name.empty()) {
+        name = default_name;
+    }
+
+    // Only execute the RBDL function on a valid model
+    if (!checkModelExists(name)) {
+        return false;
+    }
+
+    // Need to add some checks on the size of the inputs to make sure they are correct
+    if(!have_model) {
+        ROS_INFO("Model not set");
+        return false;
+    }
+
+    // Only execute on a valid number of model joints
+    if (models[name]->q_size != req.q.size()) {
+        ROS_INFO("Joint length (q) not correct size");
+        return false;
+    }
+
+    // Only execute on a valid number of model joint velocities
+    if (models[name]->qdot_size != req.qd.size()) {
+        ROS_INFO("Joint velocity length (qd) not correct size");
+        return false;
+    }
+
+    // Find the body id among the current model's list of body names
+    if (body_ids[name].find(req.body_name) != body_ids[name].end()) {
+        id = body_ids[name][req.body_name];
+    } 
+    else {
+        ROS_INFO("That is not a body, the current bodies are");
+        GetNames(name, names);
+
+        for(std::string name: names) {
+            ROS_INFO("%s", name.c_str());
+        }
+
+        return false;
+    }
+
+    VectorNd Q =  VectToEigen(req.q);                                               // initializing input q vector of joint states
+    VectorNd QDot = VectToEigen(req.qd);                                            // and q dot vector or joint velocities
+
+    Math::SpatialVector Vel;                                                        // initializing output 6 DoF velocity vector of the RBDL function
+
+    // RBDL function to calculate the joint veloctiy vector for the specified body of the model at the current configuration Q and QDot
+    Vel = CalcPointVelocity6D(*models[name], Q, QDot, id, point, true);
+    
+    std::vector<double> velocity(&Vel[0], Vel.data()+Vel.cols()*Vel.rows());        // Eigen (RBDL Math::SpatialVector) to std::vector conversion for output
+    res.velocity = velocity;                                                        // and then set it as the response
+
+    return true;
+
+}
+
+
+/**
+*	ROS service for calculating the current joint torques caused by nonlinear effects of the model 
+*	@param req is the request service data to be sent
+*   @param res is the response service data returned
+*	@return if the function executed successfully or not (run on an existing model with a valid number of joints)
+**/
+bool RBDLServer::NonlinearEffects_srv(rbdl_server::RBDLNonlinearEffectsRequest& req, rbdl_server::RBDLNonlinearEffectsResponse& res) {
+
+    ROS_INFO("Called Nonlinear Effects Server");
+
+    std::string name = req.model_name;                                              // the name of the model for which calculations will be performed
+ 
+    // Default to another name if the request has an invalid one, program will seg fault if functions are called on an empty model name
+    if(req.model_name.empty()) {
+        name = default_name;
+    }
+
+    // Only execute the RBDL function on a valid model
+    if (!checkModelExists(name)) {
+        return false;
+    }
+
+    // Need to add some checks on the size of the inputs to make sure they are correct
+    if(!have_model) {
+        ROS_INFO("Model not set");
+        return false;
+    }
+
+    // Only execute on a valid number of model joints
+    if (models[name]->q_size != req.q.size()) {
+        ROS_INFO("Joint length (q) not correct size");
+        return false;
+    }
+
+    // Only execute on a valid number of model joint velocities
+    if (models[name]->qdot_size != req.qd.size()) {
+        ROS_INFO("Joint velocity length (qd) not correct size");
+        return false;
+    }
+
+    VectorNd Q =  VectToEigen(req.q);                                               // initializing input q vector of joint states
+    VectorNd QDot = VectToEigen(req.qd);                                            // and q dot vector or joint velocities
+
+    VectorNd Tau = VectorNd::Zero (models[name]->qdot_size);                        // initializing output Tau vector of joint torques
+
+    // RBDL function to calculate the model nonlinear joint torque vector at the current configuration Q and QDot
+    NonlinearEffects(*models[name], Q, QDot, Tau);
+
+    std::vector<double> tau(&Tau[0], Tau.data()+Tau.cols()*Tau.rows());             // Eigen (VectorNd) to std::vector conversion for output
+    res.tau = tau;                                                                  // and then set it as the response
+
+    return true;
 
 }

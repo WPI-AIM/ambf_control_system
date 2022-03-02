@@ -1,0 +1,7 @@
+string model_name
+string body_name
+float64[] q
+float64[] qd
+geometry_msgs/Point point
+---
+float64[] velocity

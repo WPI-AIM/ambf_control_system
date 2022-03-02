@@ -41,6 +41,9 @@ add_service_files(
   RBDLInverseKinimatics.srv
   RBDLBodyNames.srv
   RBDLModelAlignment.srv
+  RBDLJointSpaceInertia.srv
+  RBDLPointVelocity.srv
+  RBDLNonlinearEffects.srv
   
 )
 
