@@ -20,10 +20,6 @@ public:
     static Eigen::Matrix3d rotationMatrixFromVectors(Eigen::Vector3d vec1, Eigen::Vector3d vec2);
     static Eigen::Matrix3d RodriguesRotationFormula(Eigen::Vector3d vec1, Eigen::Vector3d vec2);
 
-    static Eigen::Matrix3d rotX(float theta);
-    static Eigen::Matrix3d rotY(float theta);
-    static Eigen::Matrix3d rotZ(float theta);
-
     template<typename R>
     static R rotation_from_euler(float roll, float pitch, float yaw) {
         // roll and pitch and yaw in radians

@@ -74,18 +74,23 @@ struct KUKA {
     base_link1CA.normalize();
 
     Eigen::Matrix3d base_link1Rot = 
-          Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(base_link1PA, base_link1CA));
-    Eigen::Matrix3d base_link1_offset = EigenUtilities::rotZ(base_link1Offset);
+      Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(base_link1PA, 
+                                                         base_link1CA));
+    Eigen::Affine3d base_link1_offset(Eigen::AngleAxisd(base_link1Offset, 
+      Eigen::Vector3d::UnitZ()));
+    // Eigen::Matrix3d base_link1_offset = EigenUtilities::rotZ(base_link1Offset);
 
-    base_link1ST.E = base_link1_offset * base_link1Rot;
+    base_link1ST.E = base_link1_offset.rotation() * base_link1Rot;
     base_link1ST.r = base_link1PP - (base_link1Rot.inverse() * base_link1CP);
 
-    base_link1Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-                                    base_link1ST.E.transpose().block<3, 1>(0, 2).transpose());
+    base_link1Joint = 
+      RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+      base_link1ST.E.transpose().block<3, 1>(0, 2).transpose());
     
     const Eigen::Vector3d P_base_link1_base =  base * base_link1ST.r;
     base_link1ID = rbdlModel->AddBody(0, 
-      RigidBodyDynamics::Math::Xtrans(P_base_link1_base), base_link1Joint, link1Body, "base-link1");
+      RigidBodyDynamics::Math::Xtrans(P_base_link1_base), 
+      base_link1Joint, link1Body, "base-link1");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link1_link2PA = { 00.000, 01.000, 00.000 };
     Eigen::Vector3d link1_link2CA = { 00.000, 00.000, 01.000 };
@@ -95,20 +100,28 @@ struct KUKA {
     link1_link2CA.normalize();
 
     Eigen::Matrix3d link1_link2Rot = 
-          Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link1_link2PA, link1_link2CA));
-    Eigen::Matrix3d link1_link2_offset = EigenUtilities::rotZ(link1_link2Offset);
+      Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link1_link2PA, 
+      link1_link2CA));
+    Eigen::Affine3d link1_link2_offset(Eigen::AngleAxisd(link1_link2Offset, 
+      Eigen::Vector3d::UnitZ()));
+    // Eigen::Matrix3d link1_link2_offset = 
+    //   EigenUtilities::rotZ(link1_link2Offset);
 
-    link1_link2ST.E = link1_link2_offset * link1_link2Rot;
-    link1_link2ST.r = link1_link2PP - (link1_link2Rot.inverse() * link1_link2CP);
+    link1_link2ST.E = link1_link2_offset.rotation() * link1_link2Rot;
+    link1_link2ST.r = 
+      link1_link2PP - (link1_link2Rot.inverse() * link1_link2CP);
     
     const SpatialTransform base_link2ST = base_link1ST * link1_link2ST;
 
-    link1_link2Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-                                    base_link2ST.E.transpose().block<3, 1>(0, 2).transpose());
+    link1_link2Joint = 
+      RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+      base_link2ST.E.transpose().block<3, 1>(0, 2).transpose());
 
-    const Eigen::Vector3d P_base_link2_base = base_link1ST.E.inverse() * link1_link2ST.r;
+    const Eigen::Vector3d P_base_link2_base = 
+      base_link1ST.E.inverse() * link1_link2ST.r;
     link1_link2ID = rbdlModel->AddBody(base_link1ID, 
-      RigidBodyDynamics::Math::Xtrans(P_base_link2_base), link1_link2Joint, link2Body, "link1-link2");
+      RigidBodyDynamics::Math::Xtrans(P_base_link2_base), 
+      link1_link2Joint, link2Body, "link1-link2");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link2_link3PA = { 00.000, -1.000, 00.000 };
     Eigen::Vector3d link2_link3CA = { 00.000, 00.000, 01.000 };
@@ -118,20 +131,28 @@ struct KUKA {
     link2_link3CA.normalize();
 
     Eigen::Matrix3d link2_link3Rot = 
-          Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link2_link3PA, link2_link3CA));
-    Eigen::Matrix3d link2_link3_offset = EigenUtilities::rotZ(link2_link3Offset);
+      Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link2_link3PA, 
+                                                          link2_link3CA));
+    Eigen::Affine3d link2_link3_offset(Eigen::AngleAxisd(link2_link3Offset, 
+      Eigen::Vector3d::UnitZ()));
+    // Eigen::Matrix3d link2_link3_offset = 
+    //   EigenUtilities::rotZ(link2_link3Offset);
 
-    link2_link3ST.E = link2_link3_offset * link2_link3Rot;
-    link2_link3ST.r = link2_link3PP - (link2_link3Rot.inverse() * link2_link3CP);   
+    link2_link3ST.E = link2_link3_offset.rotation() * link2_link3Rot;
+    link2_link3ST.r = 
+      link2_link3PP - (link2_link3Rot.inverse() * link2_link3CP);   
 
     const SpatialTransform base_link3ST = base_link2ST * link2_link3ST;
 
-    link2_link3Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-                                    base_link3ST.E.transpose().block<3, 1>(0, 2).transpose());
+    link2_link3Joint = 
+      RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+      base_link3ST.E.transpose().block<3, 1>(0, 2).transpose());
 
-    const Eigen::Vector3d P_base_link3_base = base_link2ST.E.inverse() * link2_link3ST.r;
+    const Eigen::Vector3d P_base_link3_base = 
+      base_link2ST.E.inverse() * link2_link3ST.r;
     link2_link3ID = rbdlModel->AddBody(link1_link2ID, 
-      RigidBodyDynamics::Math::Xtrans(P_base_link3_base), link2_link3Joint, link3Body, "link2-link3");
+      RigidBodyDynamics::Math::Xtrans(P_base_link3_base), 
+      link2_link3Joint, link3Body, "link2-link3");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link3_link4PA = { 00.000, -1.000, 00.000 };
     Eigen::Vector3d link3_link4CA = { 00.000, 00.000, 01.000 };
@@ -141,21 +162,28 @@ struct KUKA {
     link3_link4CA.normalize();
 
     Eigen::Matrix3d link3_link4Rot = 
-          Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link3_link4PA, link3_link4CA));
-    Eigen::Matrix3d link3_link4_offset = EigenUtilities::rotZ(link3_link4Offset);
+      Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link3_link4PA, 
+      link3_link4CA));
+    Eigen::Affine3d link3_link4_offset(Eigen::AngleAxisd(link3_link4Offset, 
+      Eigen::Vector3d::UnitZ()));
+    // Eigen::Matrix3d link3_link4_offset = 
+    //   EigenUtilities::rotZ(link3_link4Offset);
 
-    link3_link4ST.E = link3_link4_offset * link3_link4Rot;
-    link3_link4ST.r = link3_link4PP - (link3_link4Rot.inverse() * link3_link4CP);
+    link3_link4ST.E = link3_link4_offset.rotation() * link3_link4Rot;
+    link3_link4ST.r = 
+      link3_link4PP - (link3_link4Rot.inverse() * link3_link4CP);
 
     const SpatialTransform base_link4ST = base_link3ST * link3_link4ST;
 
-    link3_link4Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-                                    base_link4ST.E.transpose().block<3, 1>(0, 2).transpose());
+    link3_link4Joint = 
+      RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+      base_link4ST.E.transpose().block<3, 1>(0, 2).transpose());
 
-    const Eigen::Vector3d P_base_link4_base = base_link3ST.E.inverse() * link3_link4ST.r;
+    const Eigen::Vector3d P_base_link4_base = 
+      base_link3ST.E.inverse() * link3_link4ST.r;
     link3_link4ID = rbdlModel->AddBody(link2_link3ID, 
       RigidBodyDynamics::Math::Xtrans(P_base_link4_base), link3_link4Joint, 
-                                              link4Body, "link3-link4");
+      link4Body, "link3-link4");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link4_link5PA = { 00.000, 01.000, 00.000 };
     Eigen::Vector3d link4_link5CA = { 00.000, 00.000, 01.000 };
@@ -165,21 +193,29 @@ struct KUKA {
     link4_link5CA.normalize();
 
     Eigen::Matrix3d link4_link5Rot = 
-          Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link4_link5PA, link4_link5CA));
-    Eigen::Matrix3d link4_link5_offset = EigenUtilities::rotZ(link5_link6Offset);
+      Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link4_link5PA, 
+      link4_link5CA));
+    Eigen::Affine3d link4_link5_offset(Eigen::AngleAxisd(link4_link5Offset, 
+      Eigen::Vector3d::UnitZ()));
+    // Eigen::Matrix3d link4_link5_offset = 
+    //   EigenUtilities::rotZ(link5_link6Offset);
 
-    link4_link5ST.E = link4_link5_offset * link4_link5Rot;
-    link4_link5ST.r = link4_link5PP - (link4_link5Rot.inverse() * link4_link5CP);
+    link4_link5ST.E = link4_link5_offset.rotation() * link4_link5Rot;
+    link4_link5ST.r = 
+      link4_link5PP - (link4_link5Rot.inverse() * link4_link5CP);
 
     const SpatialTransform base_link5ST = base_link4ST * link4_link5ST;
 
-    const Eigen::Vector3d P_base_link5_base = base_link4ST.E.inverse() * link4_link5ST.r;
+    const Eigen::Vector3d P_base_link5_base = 
+      base_link4ST.E.inverse() * link4_link5ST.r;
 
-    link4_link5Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-                                    base_link5ST.E.transpose().block<3, 1>(0, 2).transpose());
+    link4_link5Joint = 
+      RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+      base_link5ST.E.transpose().block<3, 1>(0, 2).transpose());
+
     link4_link5ID = rbdlModel->AddBody(link3_link4ID, 
       RigidBodyDynamics::Math::Xtrans(P_base_link5_base), link4_link5Joint, 
-                              link5Body, "link4-link5");
+      link5Body, "link4-link5");
     //--------------------------------------------------------------------//
     Eigen::Vector3d link5_link6PA = { 00.000, 01.000, 00.000 };
     Eigen::Vector3d link5_link6CA = { 00.000, 00.000, 01.000 };
@@ -189,18 +225,25 @@ struct KUKA {
     link5_link6CA.normalize();
 
     Eigen::Matrix3d link5_link6Rot = 
-          Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link5_link6PA, link5_link6CA));
-    Eigen::Matrix3d link5_link6_offset = EigenUtilities::rotZ(link5_link6Offset);
+      Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link5_link6PA, 
+      link5_link6CA));
+    Eigen::Affine3d link5_link6_offset(Eigen::AngleAxisd(link5_link6Offset, 
+      Eigen::Vector3d::UnitZ()));
+    // Eigen::Matrix3d link5_link6_offset = 
+    //   EigenUtilities::rotZ(link5_link6Offset);
 
-    link5_link6ST.E = link5_link6_offset * link5_link6Rot;
-    link5_link6ST.r = link5_link6PP - (link5_link6Rot.inverse() * link5_link6CP);
+    link5_link6ST.E = link5_link6_offset.rotation() * link5_link6Rot;
+    link5_link6ST.r = 
+      link5_link6PP - (link5_link6Rot.inverse() * link5_link6CP);
 
     const SpatialTransform base_link6ST = base_link5ST * link5_link6ST;
 
-    const Eigen::Vector3d P_base_link6_base = base_link5ST.E.inverse() * link5_link6ST.r;
+    const Eigen::Vector3d P_base_link6_base = 
+      base_link5ST.E.inverse() * link5_link6ST.r;
 
-    link5_link6Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-                                    base_link6ST.E.transpose().block<3, 1>(0, 2).transpose());
+    link5_link6Joint = 
+      RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+      base_link6ST.E.transpose().block<3, 1>(0, 2).transpose());
     link5_link6ID = rbdlModel->AddBody(link4_link5ID, 
       RigidBodyDynamics::Math::Xtrans(P_base_link6_base), link5_link6Joint, 
                                                             link6Body, "link5-link6");
@@ -213,22 +256,29 @@ struct KUKA {
     link6_link7CA.normalize();
 
     Eigen::Matrix3d link6_link7Rot = 
-          Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link6_link7PA, link6_link7CA));
-    Eigen::Matrix3d link6_link7_offset = EigenUtilities::rotZ(link6_link7Offset);
+      Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link6_link7PA, 
+      link6_link7CA));
+    Eigen::Affine3d link6_link7_offset(Eigen::AngleAxisd(link6_link7Offset, 
+      Eigen::Vector3d::UnitZ()));
+    // Eigen::Matrix3d link6_link7_offset = 
+    //   EigenUtilities::rotZ(link6_link7Offset);
 
-    link6_link7ST.E = link6_link7_offset * link6_link7Rot;
-    link6_link7ST.r = link6_link7PP - (link6_link7Rot.inverse() * link6_link7CP);
+    link6_link7ST.E = link6_link7_offset.rotation() * link6_link7Rot;
+    link6_link7ST.r = 
+      link6_link7PP - (link6_link7Rot.inverse() * link6_link7CP);
 
     const SpatialTransform base_link7ST = base_link6ST * link6_link7ST;
 
-    const Eigen::Vector3d P_base_link7_base = base_link6ST.E.inverse() * link6_link7ST.r;
+    const Eigen::Vector3d P_base_link7_base = 
+      base_link6ST.E.inverse() * link6_link7ST.r;
 
-    link6_link7Joint = RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-                                    base_link7ST.E.transpose().block<3, 1>(0, 2).transpose());
+    link6_link7Joint = 
+      RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+      base_link7ST.E.transpose().block<3, 1>(0, 2).transpose());
 
     link6_link7ID = rbdlModel->AddBody(link5_link6ID, 
       RigidBodyDynamics::Math::Xtrans(P_base_link7_base), link6_link7Joint, 
-                                                        link7Body, "link6-link7");
+      link7Body, "link6-link7");
     //--------------------------------------------------------------------//
     Q     = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
     QDot  = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);

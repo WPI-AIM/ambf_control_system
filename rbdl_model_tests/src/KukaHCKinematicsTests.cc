@@ -1,6 +1,6 @@
 #include "rbdl_model_tests/KUKA.h"
 
-TEST_CASE_METHOD(KUKA, __FILE__"_TestKUKAPositionNeutral", "") 
+TEST_CASE_METHOD(KUKA, __FILE__"_TestKUKAForwardKinematics", "") 
 {
   // We call ForwardDynamics() as it updates the spatial transformation
   // matrices

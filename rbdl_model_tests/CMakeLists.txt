@@ -83,28 +83,69 @@ include_directories (${GLFW_INCLUDE_DIRS}
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 include_directories (${GLFW_INCLUDE_DIRS})
 
-set (KUKA_RBDL_MODEL_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/KUKA.h
+set (RBDL_MODEL_TESTS_HDR_FILES
     include/${PROJECT_NAME}/EigenUtilities.h
     include/${PROJECT_NAME}/rbdl_tests.h
     include/${PROJECT_NAME}/RBDLTestPrep.h    
     )
 
+# ################START################
+# #Executible kuka_hc_tests
+
+# set (KUKA_RBDL_MODEL_TESTS_HDR_FILES
+#     include/${PROJECT_NAME}/KUKA.h
+#     )
+
+# set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
+#     # src/KukaHCDynamicsTests.cc
+#     src/KukaHCKinematicsTests.cc
+#     # src/KUKABodyTests.cc
+#     src/EigenUtilities.cpp
+#     src/RBDLTestPrep.cc
+#     src/main.cc
+#     )
+
+# add_executable (kuka_tests_hc
+# ${RBDL_MODEL_TESTS_HDR_FILES} 
+# ${KUKA_RBDL_MODEL_TESTS_HDR_FILES} 
+# ${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES})
+# target_link_libraries (kuka_tests_hc
+#     ${catkin_LIBRARIES} 
+#     ${Eigen_LIBRARIES} 
+#     ${AMBF_CLIENT_LIBRARY} 
+#     ${RBDL_MODEL_LIBRARY} 
+#     ${Boost_LIBRARIES} 
+#     ${UNITTEST++_LIBRARY}
+#     ${RBDL_LIBRARY}
+#     pthread
+#     )
+
+# set_target_properties(kuka_tests_hc PROPERTIES
+#     CXX_STANDARD 17
+#     CXX_EXTENSIONS OFF
+#     )
+# ################END################
+
 ################START################
-#Executible kuka_hc_tests
-set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
-    # src/KukaHCDynamicsTests.cc
-    src/KukaHCKinematicsTests.cc
-    # src/KUKABodyTests.cc
+#Executible Parallel Structure_hc_tests
+
+set (PS_RBDL_MODEL_TESTS_HDR_FILES
+    include/${PROJECT_NAME}/ParallelStructure.h
+    )
+
+set(PS_RBDL_MODEL_TESTS_SOURCE_FILES
+    src/PSHCKinematicsTests.cc
+    # src/PSBodyTests.cc
     src/EigenUtilities.cpp
     src/RBDLTestPrep.cc
     src/main.cc
     )
 
-add_executable (kuka_tests_hc
-${KUKA_RBDL_MODEL_TESTS_HDR_FILES} 
-${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES})
-target_link_libraries (kuka_tests_hc
+add_executable (ps_tests_hc
+${RBDL_MODEL_TESTS_HDR_FILES} 
+${PS_RBDL_MODEL_TESTS_HDR_FILES} 
+${PS_RBDL_MODEL_TESTS_SOURCE_FILES})
+target_link_libraries (ps_tests_hc
     ${catkin_LIBRARIES} 
     ${Eigen_LIBRARIES} 
     ${AMBF_CLIENT_LIBRARY} 
@@ -115,7 +156,7 @@ target_link_libraries (kuka_tests_hc
     pthread
     )
 
-set_target_properties(kuka_tests_hc PROPERTIES
+set_target_properties(ps_tests_hc PROPERTIES
     CXX_STANDARD 17
     CXX_EXTENSIONS OFF
     )
