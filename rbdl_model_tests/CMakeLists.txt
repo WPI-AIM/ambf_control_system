@@ -126,26 +126,63 @@ set (RBDL_MODEL_TESTS_HDR_FILES
 #     )
 # ################END################
 
-################START################
-#Executible Parallel Structure_hc_tests
+# ################START################
+# #Executible Parallel Structure_hc_tests
 
-set (PS_RBDL_MODEL_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/ParallelStructure.h
+# set (PS_RBDL_MODEL_TESTS_HDR_FILES
+#     include/${PROJECT_NAME}/ParallelStructure.h
+#     )
+
+# set(PS_RBDL_MODEL_TESTS_SOURCE_FILES
+#     src/PSHCKinematicsTests.cc
+#     # src/PSBodyTests.cc
+#     src/EigenUtilities.cpp
+#     src/RBDLTestPrep.cc
+#     src/main.cc
+#     )
+
+# add_executable (ps_tests_hc
+# ${RBDL_MODEL_TESTS_HDR_FILES} 
+# ${PS_RBDL_MODEL_TESTS_HDR_FILES} 
+# ${PS_RBDL_MODEL_TESTS_SOURCE_FILES})
+# target_link_libraries (ps_tests_hc
+#     ${catkin_LIBRARIES} 
+#     ${Eigen_LIBRARIES} 
+#     ${AMBF_CLIENT_LIBRARY} 
+#     ${RBDL_MODEL_LIBRARY} 
+#     ${Boost_LIBRARIES} 
+#     ${UNITTEST++_LIBRARY}
+#     ${RBDL_LIBRARY}
+#     pthread
+#     )
+
+# set_target_properties(ps_tests_hc PROPERTIES
+#     CXX_STANDARD 17
+#     CXX_EXTENSIONS OFF
+#     )
+# ################END################
+
+################START################
+#Executible ecm_hc_tests
+
+set (ECM_RBDL_MODEL_TESTS_HDR_FILES
+    include/${PROJECT_NAME}/ECM.h
     )
 
-set(PS_RBDL_MODEL_TESTS_SOURCE_FILES
-    src/PSHCKinematicsTests.cc
-    # src/PSBodyTests.cc
+set(ECM_RBDL_MODEL_TESTS_SOURCE_FILES
+    # src/ECMHCDynamicsTests.cc
+    src/ECMHCKinematicsTests.cc
+    # src/ECMBodyTests.cc
     src/EigenUtilities.cpp
     src/RBDLTestPrep.cc
     src/main.cc
     )
 
-add_executable (ps_tests_hc
+add_executable (ecm_tests_hc
 ${RBDL_MODEL_TESTS_HDR_FILES} 
-${PS_RBDL_MODEL_TESTS_HDR_FILES} 
-${PS_RBDL_MODEL_TESTS_SOURCE_FILES})
-target_link_libraries (ps_tests_hc
+${ECM_RBDL_MODEL_TESTS_HDR_FILES} 
+${ECM_RBDL_MODEL_TESTS_SOURCE_FILES})
+target_link_libraries (ecm_tests_hc
     ${catkin_LIBRARIES} 
     ${Eigen_LIBRARIES} 
     ${AMBF_CLIENT_LIBRARY} 
@@ -156,7 +193,7 @@ target_link_libraries (ps_tests_hc
     pthread
     )
 
-set_target_properties(ps_tests_hc PROPERTIES
+set_target_properties(ecm_tests_hc PROPERTIES
     CXX_STANDARD 17
     CXX_EXTENSIONS OFF
     )

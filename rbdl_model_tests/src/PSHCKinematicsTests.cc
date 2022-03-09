@@ -31,8 +31,7 @@ TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSForwardKinematics", "")
   {
     for(int i = 0; i < 5; i++)
     {
-      baseHandler->set_joint_pos<std::string>(activationJointName, 
-        activationJointQdesired);
+      baseHandler->set_joint_pos<std::string>(activationJointName, activationJointQdesired);
       usleep(250000);
 
       for(mBodyNameMapItr = mBodyNameMap.begin(); 

@@ -1,7 +1,7 @@
 #include "rbdl_model_tests/RBDLTestPrep.h"
-#include "rbdl_model_tests/KUKA.h"
+#include "rbdl_model_tests/ECM.h"
 
-TEST_CASE_METHOD(KUKA, __FILE__"_TestKUKAPositionHierarchy", "") 
+TEST_CASE_METHOD(ECM, __FILE__"_TestECMPositionHierarchy", "") 
 {
   std::map< std::string, unsigned int > mBodyNameMap = rbdlModel->mBodyNameMap;
   std::map<std::string, unsigned int>::iterator mBodyNameMapItr;
@@ -25,6 +25,6 @@ TEST_CASE_METHOD(KUKA, __FILE__"_TestKUKAPositionHierarchy", "")
 
   //   // std::cout << hierachyMap[bodyName] << ": " << parentName 
   //   // << ", " << bodyName << bodyId << ", " << std::endl;
-  //   CHECK( parentName == hierachyMap[bodyName]);
+  //   // CHECK( parentName == hierachyMap[bodyName]);
   // }
 }
