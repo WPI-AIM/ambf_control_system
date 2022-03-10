@@ -335,12 +335,12 @@ struct ECM {
     // base is rigid body name, not a joint. This is a hacky way to enable ros topics in the 
     // server side during first execution
 
-    rigidBodyPtr baseHandler = BODY_JOINTS_MAP[baseRigidBodyName].rigidBodyHandler;
+    rigidBodyPtr baseLinkHandler = BODY_JOINTS_MAP[baseRigidBodyName].rigidBodyHandler;
     // baseHandler->set_joint_pos(baseRigidBodyName, 0.0f);
     // baseHandler->set_joint_pos(0, 0.0f);
 
-    const tf::Quaternion quat_w_0_tf = baseHandler->get_rot();
-    const tf::Vector3 P_w_0_tf = baseHandler->get_pos();
+    const tf::Quaternion quat_w_0_tf = baseLinkHandler->get_rot();
+    const tf::Vector3 P_w_0_tf = baseLinkHandler->get_pos();
 
     RigidBodyDynamics::Math::Quaternion quat_w_0;
     quat_w_0(0) = quat_w_0_tf[0];
@@ -449,26 +449,26 @@ struct ECM {
         {}
       }
     },
-    { 
-      "ecm/pitchfrontlink", 
-      {
-        nullptr,
-        { 
-          "pitchfrontlink-pitchbottomlink"
-        },
-        {}
-      }
-    },
-    { 
-      "ecm/pitchtoplink", 
-      {
-        nullptr,
-        { 
-          "pitchtoplink-pitchendlink"
-        },
-        {}
-      }
-    }
+    // { 
+    //   "ecm/pitchfrontlink", 
+    //   {
+    //     nullptr,
+    //     { 
+    //       "pitchfrontlink-pitchbottomlink"
+    //     },
+    //     {}
+    //   }
+    // },
+    // { 
+    //   "ecm/pitchtoplink", 
+    //   {
+    //     nullptr,
+    //     { 
+    //       "pitchtoplink-pitchendlink"
+    //     },
+    //     {}
+    //   }
+    // }
   };
 
   std::unordered_map<std::string, ControllableBodyParams>::const_iterator BODY_JOINTS_MAP_itr;

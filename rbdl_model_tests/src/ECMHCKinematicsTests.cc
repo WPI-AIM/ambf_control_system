@@ -76,20 +76,25 @@ TEST_CASE_METHOD(ECM, __FILE__"_TestECMPositionNeutral", "")
 TEST_CASE_METHOD(ECM, __FILE__"_TestPSForwardKinematics", "") 
 {
   ControllableBodyParams baseLinkControllableBodyParams = BODY_JOINTS_MAP[baseRigidBodyName];
-  rigidBodyPtr baseLinkHandler = baseLinkControllableBodyParams.rigidBodyHandler;
+  // rigidBodyPtr baseLinkHandler = baseLinkControllableBodyParams.rigidBodyHandler;
+  rigidBodyPtr baseLinkHandler = BODY_JOINTS_MAP[baseRigidBodyName].rigidBodyHandler;
+  usleep(1000000);
+
   std::vector<JointParams> controllableJoints = baseLinkControllableBodyParams.controllableJoints;
 
-  usleep(1000000);
 
   useconds_t microsec = 250000;
 
   for(JointParams jointParam : controllableJoints)
   {
+    std::string jointName = jointParam.jointName;
     for(int i = 0; i < 5; i++)
     {
-      baseLinkHandler->set_joint_pos<std::string>( jointParam.jointName, 0.0f);
+      baseLinkHandler->set_joint_pos<std::string>(jointName, 0.0f);
       usleep(microsec);
     }
+    std::cout << "jointName: " << jointName << baseLinkHandler->get_joint_pos<std::string>(jointName) << std::endl;
+    std::cout << "--------------" << std::endl;
   }
 
   //   baseLinkHandler->set_joint_pos<std::string>(         "yawlink-pitchbacklink", 0.0f);
