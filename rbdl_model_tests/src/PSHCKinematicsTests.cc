@@ -78,10 +78,11 @@ TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSForwardKinematics", "")
     const tf::Quaternion quat_w_n_tf_ambf = rigidbodyAMBF->get_rot();
     const tf::Vector3 P_w_n_tf_ambf = rigidbodyAMBF->get_pos();
     
-    const Eigen::Quaterniond quat_w_n_ambf = 
-      EigenUtilities::tfToEigenQuaternion(quat_w_n_tf_ambf);
-    const Eigen::Matrix3d R_w_n_ambf = quat_w_n_ambf.toRotationMatrix();
-    Eigen::VectorXd P_w_n_ambf = EigenUtilities::tfToEigenVector(P_w_n_tf_ambf);
+    const Quaternion quat_w_n_ambf = 
+      EigenUtilities::TFtoEigenQuaternion(quat_w_n_tf_ambf);
+      
+    const Matrix3d R_w_n_ambf = quat_w_n_ambf.toMatrix();
+    Eigen::VectorXd P_w_n_ambf = EigenUtilities::TFtoEigenVector(P_w_n_tf_ambf);
 
     const Eigen::Matrix4d T_w_n_ambf = 
       EigenUtilities::get_frame<Eigen::Matrix3d, 

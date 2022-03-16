@@ -1,12 +1,16 @@
 #include "rbdl_model_tests/RBDLTestPrep.h"
-#include "rbdl_model_tests/EigenUtilities.h"
+// #include "rbdl_model_tests/EigenUtilities.h"
 #include "rbdl_model_tests/ECM.h"
 #include <unordered_map>
 
 //const double TEST_PREC = 1.0e-12;
 // const double TEST_LAX = 1.0e-7;
 
-
+TEST_CASE(__FILE__"_ECMHomePoseTest", "") 
+{
+  ECM* ecm = new ECM();
+  ecm->~ECM();
+}
 
 
 
@@ -71,7 +75,7 @@ TEST_CASE_METHOD(ECM, __FILE__"_TestECMPositionNeutral", "")
     }
   }
 }
-*/
+
 
 TEST_CASE_METHOD(ECM, __FILE__"_TestPSForwardKinematics", "") 
 {
@@ -234,4 +238,4 @@ TEST_CASE_METHOD(ECM, __FILE__"_TestPSForwardKinematics", "")
   // }  
   
 }
-
+*/

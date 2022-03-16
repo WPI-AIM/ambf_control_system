@@ -166,6 +166,7 @@ set (RBDL_MODEL_TESTS_HDR_FILES
 #Executible ecm_hc_tests
 
 set (ECM_RBDL_MODEL_TESTS_HDR_FILES
+    include/${PROJECT_NAME}/AMBFParams.h
     include/${PROJECT_NAME}/ECM.h
     )
 
@@ -173,6 +174,8 @@ set(ECM_RBDL_MODEL_TESTS_SOURCE_FILES
     # src/ECMHCDynamicsTests.cc
     src/ECMHCKinematicsTests.cc
     # src/ECMBodyTests.cc
+    src/AMBFParams.cpp
+    src/ECM.cpp
     src/EigenUtilities.cpp
     src/RBDLTestPrep.cc
     src/main.cc
