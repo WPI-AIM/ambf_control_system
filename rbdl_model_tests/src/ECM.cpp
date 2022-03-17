@@ -7,7 +7,7 @@ ECM::ECM()
 	SetAMBFParams();
 	ExecutePoseInAMBF();
   
-	RotationQuaternionTF();
+	PrintAMBFTransformation();
 }
 
 void ECM::ConnectToAMBF()
@@ -28,8 +28,8 @@ void ECM::SetAMBFParams()
 				ambfClientPtr_->getRigidBody(rigidBodyName.c_str(), true), 
 				std::vector<std::string>{},
 				std::vector<ControllableJointConfig>{},
-				tf::Quaternion(0., 0., 0., 0.),
-				tf::Vector3(0., 0., 0.)
+				Matrix3dZero,
+				Vector3dZero
 		);
 	}
 
@@ -71,35 +71,52 @@ void ECM::ExecutePoseInAMBF()
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
 	{
 		const std::string parentBody = ambfParamMapItr_->first;
-		AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[baselinkName_];
+		AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[parentBody];
 
 		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
-		// const tf::Quaternion quat_w_n_tf_ambf = rigidBodyHandler->get_rot();
-		// const tf::Vector3 P_w_n_tf_ambf = rigidBodyHandler->get_pos();
-		ambfRigidBodyParams->RotationQuaternionTF(rigidBodyHandler->get_rot());
-		ambfRigidBodyParams->TranslationVectorTF(rigidBodyHandler->get_pos());
-	}
-}
 
-
-const Matrix3d ECM::RotationQuaternionTF()
-{
-	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
-	{
-		const std::string parentBody = ambfParamMapItr_->first;
-		AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[baselinkName_];
-
-		tf::Quaternion quat_w_n_tf = ambfRigidBodyParams->RotationQuaternionTF();
+		tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
 		Quaternion quat_w_n = EigenUtilities::TFtoEigenQuaternion(quat_w_n_tf);
 		Matrix3d r_w_n = quat_w_n.toMatrix();
 
-		tf::Vector3 p_w_n_tf = ambfRigidBodyParams->TranslationVectorTF();
+		tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
 		Vector3d p_w_n = EigenUtilities::TFtoEigenVector(p_w_n_tf);
 
-		std::cout << "parentBody: " << parentBody << std::endl;
-		std::cout << "r_w_n" << std::endl << r_w_n << std::endl;
-		std::cout << "p_w_n" << std::endl << p_w_n << std::endl;
+		ambfRigidBodyParams->RotationMatrix(r_w_n);
+		ambfRigidBodyParams->TranslationVector(p_w_n);
+		ambfParamMap_[parentBody] = ambfRigidBodyParams;
+	}
 
+	// Register Word to Base Transform
+	ambfRigidBodyParams = ambfParamMap_[baselinkName_];
+
+	t_w_0_.block<3, 3>(0, 0) = ambfRigidBodyParams->RotationMatrix();
+	t_w_0_.block<3, 1>(0, 3) = ambfRigidBodyParams->TranslationVector();
+
+	std::cout << "t_w_0_" << std::endl << t_w_0_ << std::endl;
+}
+
+const Matrix3d ECM::PrintAMBFTransformation()
+{
+	t_0_w_.block<3, 3>(0, 0) = t_w_0_.block<3, 3>(0, 0).transpose();
+	t_0_w_.block<3, 1>(0, 3) = -t_w_0_.block<3, 3>(0, 0).transpose() * t_w_0_.block<3, 1>(0, 3);
+	std::cout << "t_0_w_" << std::endl << t_0_w_ << std::endl;
+
+	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
+	{
+		const std::string parentBody = ambfParamMapItr_->first;
+		AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[parentBody];
+
+		MatrixNd t_w_n = MatrixNd::Identity(4, 4);
+		t_w_n.block<3, 3>(0, 0) = ambfRigidBodyParams->RotationMatrix();
+		t_w_n.block<3, 1>(0, 3) = ambfRigidBodyParams->TranslationVector();
+		
+		MatrixNd t_0_n = MatrixNd::Identity(4, 4);
+		t_0_n = t_0_w_ * t_w_n;
+
+		std::cout << "parentBody: " << parentBody << std::endl;
+		std::cout << "t_w_n" << std::endl << t_w_n << std::endl;
+		std::cout << "t_0_n" << std::endl << t_0_n << std::endl;
 		std::cout << "---------------------------" << std::endl;
 	}
 
@@ -107,6 +124,8 @@ const Matrix3d ECM::RotationQuaternionTF()
 	return dummy;
 }
 
+
+// const Vector3d TranslationVectorTF();
 
 void ECM::SetBodyParams()
 {
@@ -170,9 +189,44 @@ void ECM::CreateRBDLModel()
 		baseLink_yawLinkJoint_, baseLinkBody_, "baseLink-yawLink");
 }
 
+void ECM::CheckRBDLModel()
+{
+	std::map< std::string, unsigned int > mBodyNameMap = rbdlModel_->mBodyNameMap;
+  std::map<std::string, unsigned int>::iterator mBodyNameMapItr;
 
-// const Vector3d TranslationVectorTF();
+  
+  for(mBodyNameMapItr = mBodyNameMap.begin(); 
+      mBodyNameMapItr != mBodyNameMap.end(); 
+      mBodyNameMapItr++)
+  {
+    std::string jointNameRBDL = mBodyNameMapItr->first;
+    unsigned int jointIDRBDL  = mBodyNameMapItr->second;
+    
+    // Skip ROOT body and fixed joints
+    if(jointNameRBDL == "ROOT" || jointIDRBDL > Q_.size()) continue;
 
+  
+    // const Eigen::Matrix4d T_w_n_ambf = 
+    //   EigenUtilities::get_frame<Eigen::Matrix3d, 
+    //   Eigen::Vector3d, Eigen::Matrix4d>(R_w_n_ambf, P_w_n_ambf);
+    
+    const Vector3d P_0_n_rbdl = 
+      CalcBodyToBaseCoordinates(*rbdlModel_, Q_, jointIDRBDL, Vector3d(0., 0., 0.),true);
+
+    RigidBodyDynamics::Math::Vector4d P_w_n_rbdl_4d;
+    P_w_n_rbdl_4d.setOnes();
+    P_w_n_rbdl_4d(0) = P_0_n_rbdl(0);
+    P_w_n_rbdl_4d(1) = P_0_n_rbdl(1);
+    P_w_n_rbdl_4d(2) = P_0_n_rbdl(2);
+
+    // P_w_n_rbdl_4d = T_0_w * (P_w_n_rbdl_4d);
+    // RigidBodyDynamics::Math::Vector3d P_w_n_rbdl;
+    // P_w_n_rbdl = P_w_n_rbdl_4d.block<3,1>(0,0);
+
+    // CHECK_THAT(P_w_n_rbdl, AllCloseMatrix(P_w_n_ambf, TEST_PREC, TEST_PREC));
+  }  
+  
+}
 void ECM::CleanUp()
 {
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)

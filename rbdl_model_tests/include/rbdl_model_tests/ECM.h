@@ -15,8 +15,8 @@ class ECM {
 public:
   ECM();
   ~ECM();
-  const Matrix3d RotationQuaternionTF();
-  const Vector3d TranslationVectorTF();
+  const Matrix3d PrintAMBFTransformation();
+  // const Vector3d TranslationVectorTF();
 
   inline Model* GetRBDLModel() { return rbdlModel_; }
   void CleanUp();
@@ -25,11 +25,9 @@ private:
   void SetAMBFParams();
   void ExecutePoseInAMBF();
 
-  void FindBaseTransform();
   void SetBodyParams();
   void CreateRBDLModel();
-
-
+  void CheckRBDLModel();
 private:
   AMBFClientPtr ambfClientPtr_ = nullptr;
   std::string baselinkName_ = "ecm/baselink";
@@ -44,6 +42,8 @@ private:
   VectorNd QDot_;
   VectorNd QDDot_;
   VectorNd Tau_;
+  MatrixNd t_w_0_ = MatrixNd::Identity(4, 4);
+  MatrixNd t_0_w_ = MatrixNd::Identity(4, 4);
 
   unsigned int baseLink_yawLinkID_, pitchEndLinkId_, mainInsertionLinkId_, toolLinkId_, 
     yawLinkId_, pitchBackLinkId_, pitchBottomLinkId_, pitchFrontLinkId_, pitchTopLinkId_;
