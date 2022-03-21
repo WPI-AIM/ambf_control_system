@@ -153,8 +153,50 @@ void ECM::SetBodyParams()
 																				Vector3d(00.0636, 00.0099, 00.0726));
 }
 
+void ECM::CreateRBDLJoint(Vector3d& pa, Vector3d& ca, Vector3d& pp, Vector3d& cp, const double offsetQ, 
+	Vector3d axis, unsigned int parentId, JointType jointType, SpatialTransform world_parentST, Body &body, 
+	std::string bodyName, unsigned int& newBodyId, SpatialTransform&	world_bodyST)
+{
+	pa.normalize();
+	ca.normalize();
+
+	Matrix3d bodyRot = Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(pa, ca));
+	Eigen::Affine3d rotOffset(Eigen::AngleAxisd(offsetQ, axis));
+		
+	SpatialTransform bodyST;
+	bodyST.E = rotOffset.rotation() * bodyRot;
+	bodyST.r = pp - (bodyRot.inverse() * cp);
+
+	Joint joint = Joint(jointType, 
+		world_parentST.E.transpose().block<3, 1>(0, 2).transpose());
+
+	const Vector3d p_world_body =  world_parentST.E * bodyST.r;
+	newBodyId = rbdlModel_->AddBody(parentId, Xtrans(p_world_body), joint, body, bodyName);
+	world_bodyST = world_parentST * bodyST;
+}
+
 void ECM::CreateRBDLModel()
 {
+  unsigned int baselink_yawlinkId_, pitchendlinkId_, maininsertionlinkId_, toollinkId_, 
+    yawlinkId_, yawlink_pitchbacklinkId_, pitchbacklink_pitchbottomlinkId_, pitchfrontlinkId_, pitchtoplinkId_;
+
+
+  SpatialTransform world_baselinkST_, world_yawlinkST_, world_pitchbacklinkST_, world_pitchbottomlinkST_;
+
+  const double ROOT_baselinkOffsetQ_                  = 0.0;
+  const double baselink_yawlinkOffsetQ_               = -3.1414;
+  const double yawlink_pitchbacklinkOffsetQ_          = 3.1416;
+  const double pitchbacklink_pitchbottomlinkOffsetQ_  = 0.0;
+  const double baselink_pitchendlinkOffsetQ_          = 1.56304;
+  const double pitchendlink_maininsertionlinkOffsetQ_ = -1.5708;
+  const double maininsertionlink_toollinkOffsetQ_     = -1.5708;
+  const double pitchbottomlink_pitchendlinkOffsetQ_   = 0.0;
+  const double yawlink_pitchfrontlinkOffsetQ_         = 3.1416;
+  const double pitchfrontlink_pitchbottomlinkOffsetQ_ = 0.0;
+  const double pitchfrontlink_pitchtoplinkOffsetQ_    = 0.0;
+  const double pitchtoplink_pitchendlinkOffsetQ_      = 0.0;
+
+
 	SetBodyParams();
 	rbdlModel_ = new Model;
 	rbdlModel_->gravity = Vector3d(0., 0., -9.81);
@@ -170,103 +212,45 @@ void ECM::CreateRBDLModel()
 		Vector3d baselink_yawlinkCA = { 00.0000, 00.0000, -1.0000 };
 		Vector3d baselink_yawlinkPP = { 00.0000, 00.0000, 00.0000 };
 		Vector3d baselink_yawlinkCP = { 00.0001, 00.0000, 00.5369 };
-		baselink_yawlinkPA.normalize();
-		baselink_yawlinkCA.normalize();
 
-		Matrix3d baselink_yawlinkBodyRot = Eigen::Matrix3d(
-			Eigen::Quaterniond::FromTwoVectors(baselink_yawlinkPA, baselink_yawlinkCA));
-		std::cout << "baselink_yawlinkBodyRot" << std::endl << baselink_yawlinkBodyRot << std::endl;
-
-		Eigen::Affine3d baselink_yawlinkRotOffset(Eigen::AngleAxisd(baselink_yawlinkOffsetQ_, Vector3d::UnitZ()));
-		
-		SpatialTransform baselink_yawlinkST;
-		baselink_yawlinkST.E = baselink_yawlinkRotOffset.rotation() * baselink_yawlinkBodyRot;
-		baselink_yawlinkST.r = baselink_yawlinkPP - (baselink_yawlinkBodyRot.inverse() * baselink_yawlinkCP);
-
-		Joint baselink_yawlinkJoint = 
-			RigidBodyDynamics::Joint(JointTypeRevolute, 
-			world_baselinkST_.E.transpose().block<3, 1>(0, 2).transpose());
-
-		const Vector3d p_world_yawlink =  world_baselinkST_.E * baselink_yawlinkST.r;
-		std::cout << "p_world_yawlink" << std::endl << p_world_yawlink << std::endl;
-
-		baselink_yawlinkId_ = rbdlModel_->AddBody(0, Xtrans(p_world_yawlink), baselink_yawlinkJoint, 
-		baselinkBody_, "baselink-yawlink");
-
-		world_yawlinkST_ = world_baselinkST_ * baselink_yawlinkST;
-		std::cout << "world_yawlinkST_" << std::endl << world_yawlinkST_ << std::endl;
-		std::cout << std::endl << "-----------------end of baselink_yawlink-----------------" << std::endl;
+		CreateRBDLJoint(baselink_yawlinkPA, baselink_yawlinkCA, baselink_yawlinkPP, baselink_yawlinkCP, 
+		baselink_yawlinkOffsetQ_, Vector3d::UnitZ(), 0, JointTypeRevolute, world_baselinkST_, baselinkBody_, 
+		"baselink-yawlink", baselink_yawlinkId_, world_yawlinkST_);
 	}
-	//--------------------------------------------------------------------//
 	{
-		Eigen::Vector3d yawlink_pitchbacklinkPA = { 1.0,     0.0,    0.0 };
-		Eigen::Vector3d yawlink_pitchbacklinkCA = { 0.0,     0.0,    1.0 };
-		Eigen::Vector3d yawlink_pitchbacklinkPP = { 0.0, -0.0098, 0.1624 };
-		Eigen::Vector3d yawlink_pitchbacklinkCP = { 0.0,     0.0,    0.0 };
-		yawlink_pitchbacklinkPA.normalize();
-		yawlink_pitchbacklinkCA.normalize();
+		Vector3d yawlink_pitchbacklinkPA = { 1.0,     0.0,    0.0 };
+		Vector3d yawlink_pitchbacklinkCA = { 0.0,     0.0,    1.0 };
+		Vector3d yawlink_pitchbacklinkPP = { 0.0, -0.0098, 0.1624 };
+		Vector3d yawlink_pitchbacklinkCP = { 0.0,     0.0,    0.0 };
 
-		Matrix3d yawlink_pitchbacklinkBodyRot = Eigen::Matrix3d(
-			Eigen::Quaterniond::FromTwoVectors(yawlink_pitchbacklinkPA, yawlink_pitchbacklinkCA));
-		Eigen::Affine3d yawlink_pitchbacklinkRotOffset(Eigen::AngleAxisd(yawlink_pitchbacklinkOffsetQ_, Vector3d::UnitZ()));
-		std::cout << "yawlink_pitchbacklinkBodyRot" << std::endl << yawlink_pitchbacklinkBodyRot << std::endl;
-
-		SpatialTransform yawlink_pitchbacklinkST;
-		yawlink_pitchbacklinkST.E = yawlink_pitchbacklinkRotOffset.rotation() * yawlink_pitchbacklinkBodyRot;
-		yawlink_pitchbacklinkST.r = yawlink_pitchbacklinkPP - 
-			(yawlink_pitchbacklinkBodyRot.inverse() * yawlink_pitchbacklinkCP);
-
-		Joint yawlink_pitchbacklinkJoint = 
-			RigidBodyDynamics::Joint(JointTypeRevolute, 
-			world_yawlinkST_.E.transpose().block<3, 1>(0, 2).transpose());
-
-		const Vector3d p_world_patchbacklink =  world_yawlinkST_.E * yawlink_pitchbacklinkST.r;
-		std::cout << "p_world_patchbacklink" << std::endl << p_world_patchbacklink << std::endl;
-
-		yawlink_pitchbacklinkId_ = rbdlModel_->AddBody(baselink_yawlinkId_, 
-		Xtrans(p_world_patchbacklink), yawlink_pitchbacklinkJoint, 
-		yawlinkBody_, "yawlink-pitchbacklink");
-
-		world_pitchbacklinkST_ = world_yawlinkST_ * yawlink_pitchbacklinkST;
-		std::cout << "world_pitchbacklinkST_" << std::endl << world_pitchbacklinkST_ << std::endl;
-		std::cout << std::endl << "-----------------end of yawlink-pitchbacklink-----------------" << std::endl;
+		CreateRBDLJoint(yawlink_pitchbacklinkPA, yawlink_pitchbacklinkCA, yawlink_pitchbacklinkPP, 
+		yawlink_pitchbacklinkCP, yawlink_pitchbacklinkOffsetQ_, Vector3d::UnitZ(), baselink_yawlinkId_, 
+		JointTypeRevolute, world_yawlinkST_, yawlinkBody_, "yawlink-pitchbacklink", 
+		yawlink_pitchbacklinkId_, world_pitchbacklinkST_);
 	}
-	// --------------------------------------------------------------------//
 	{
-    Eigen::Vector3d pitchbacklink_pitchbottomlinkPA = {     0.0,     0.0,     1.0 };
-    Eigen::Vector3d pitchbacklink_pitchbottomlinkCA = {     0.0,     0.0,     1.0 };
-    Eigen::Vector3d pitchbacklink_pitchbottomlinkPP = { -0.1028, -0.2867,     0.0 };
-    Eigen::Vector3d pitchbacklink_pitchbottomlinkCP = { -0.0364,  0.0098, -0.0005 };
-    pitchbacklink_pitchbottomlinkPA.normalize();
-    pitchbacklink_pitchbottomlinkCA.normalize();
+    Vector3d pitchbacklink_pitchbottomlinkPA = {     0.0,     0.0,     1.0 };
+    Vector3d pitchbacklink_pitchbottomlinkCA = {     0.0,     0.0,     1.0 };
+    Vector3d pitchbacklink_pitchbottomlinkPP = { -0.1028, -0.2867,     0.0 };
+    Vector3d pitchbacklink_pitchbottomlinkCP = { -0.0364,  0.0098, -0.0005 };
 
-		Matrix3d pitchbacklink_pitchbottomlinkBodyRot = Eigen::Matrix3d(
-			Eigen::Quaterniond::FromTwoVectors(pitchbacklink_pitchbottomlinkPA, pitchbacklink_pitchbottomlinkCA));
-		Eigen::Affine3d pitchbacklink_pitchbottomlinkRotOffset(
-			Eigen::AngleAxisd(pitchbacklink_pitchbottomlinkOffsetQ_, Vector3d::UnitZ()));
-		std::cout << "pitchbacklink_pitchbottomlinkBodyRot" << std::endl << pitchbacklink_pitchbottomlinkBodyRot << std::endl;
+		CreateRBDLJoint(pitchbacklink_pitchbottomlinkPA, pitchbacklink_pitchbottomlinkCA, 
+		pitchbacklink_pitchbottomlinkPP, pitchbacklink_pitchbottomlinkCP, pitchbacklink_pitchbottomlinkOffsetQ_, 
+		Vector3d::UnitZ(), yawlink_pitchbacklinkId_, JointTypeRevolute, world_pitchbacklinkST_, 
+		pitchbacklinkBody_, "pitchbacklink-yawlink", 
+		pitchbacklink_pitchbottomlinkId_, world_pitchbottomlinkST_);
+	}
+	{
+    Vector3d pitchbacklink_pitchbottomlinkPA = {     0.0,     0.0,     1.0 };
+    Vector3d pitchbacklink_pitchbottomlinkCA = {     0.0,     0.0,     1.0 };
+    Vector3d pitchbacklink_pitchbottomlinkPP = { -0.1028, -0.2867,     0.0 };
+    Vector3d pitchbacklink_pitchbottomlinkCP = { -0.0364,  0.0098, -0.0005 };
 
-		SpatialTransform pitchbacklink_pitchbottomlinkST;
-		pitchbacklink_pitchbottomlinkST.E = pitchbacklink_pitchbottomlinkRotOffset.rotation() * 
-			pitchbacklink_pitchbottomlinkBodyRot;
-		pitchbacklink_pitchbottomlinkST.r = pitchbacklink_pitchbottomlinkPP - 
-			(pitchbacklink_pitchbottomlinkBodyRot.inverse() * pitchbacklink_pitchbottomlinkCP);
-
-		// world_pitchbottomlinkST_ = world_pitchbacklinkST_ * pitchbacklink_pitchbottomlinkST;
-		Joint pitchbacklink_pitchbottomlinkJoint = 
-			RigidBodyDynamics::Joint(JointTypeRevolute, 
-			world_pitchbacklinkST_.E.transpose().block<3, 1>(0, 2).transpose());
-
-		const Vector3d p_world_patchbottomlink =  world_pitchbacklinkST_.E * 
-			pitchbacklink_pitchbottomlinkST.r;
-		std::cout << "p_world_patchbottomlink" << std::endl << p_world_patchbottomlink << std::endl;
-
-		pitchbacklink_pitchbottomlinkId_ = rbdlModel_->AddBody(yawlink_pitchbacklinkId_, 
-		Xtrans(p_world_patchbottomlink), pitchbacklink_pitchbottomlinkJoint, 
-		pitchbacklinkBody_, "pitchbacklink-pitchbottomlink");
-
-		world_pitchbottomlinkST_ = world_pitchbacklinkST_ * pitchbacklink_pitchbottomlinkST;
-		std::cout << std::endl << "-----------------end of pitchbacklink_pitchbottomlink-----------------" << std::endl;
+		CreateRBDLJoint(pitchbacklink_pitchbottomlinkPA, pitchbacklink_pitchbottomlinkCA, 
+		pitchbacklink_pitchbottomlinkPP, pitchbacklink_pitchbottomlinkCP, pitchbacklink_pitchbottomlinkOffsetQ_, 
+		Vector3d::UnitZ(), yawlink_pitchbacklinkId_, JointTypeRevolute, world_pitchbacklinkST_, 
+		pitchbacklinkBody_, "pitchbacklink-yawlink", 
+		pitchbacklink_pitchbottomlinkId_, world_pitchbottomlinkST_);
 	}
 	//--------------------------------------------------------------------//
 	// std::cout << "---------------------------" << std::endl;
