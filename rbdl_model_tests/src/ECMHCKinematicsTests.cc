@@ -9,7 +9,7 @@
 TEST_CASE(__FILE__"_ECMHomePoseTest", "") 
 {
   ECM* ecm = new ECM();
-  ecm->~ECM();
+  // ecm->~ECM();
 }
 
 

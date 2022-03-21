@@ -45,39 +45,40 @@ private:
   MatrixNd t_w_0_ = MatrixNd::Identity(4, 4);
   MatrixNd t_0_w_ = MatrixNd::Identity(4, 4);
 
-  unsigned int baseLink_yawLinkID_, pitchEndLinkId_, mainInsertionLinkId_, toolLinkId_, 
-    yawLinkId_, pitchBackLinkId_, pitchBottomLinkId_, pitchFrontLinkId_, pitchTopLinkId_;
+  unsigned int baselink_yawlinkId_, pitchendlinkId_, maininsertionlinkId_, toollinkId_, 
+    yawlinkId_, yawlink_pitchbacklinkId_, pitchbacklink_pitchbottomlinkId_, pitchfrontlinkId_, pitchtoplinkId_;
 
-  Body baseLinkBody_, pitchEndLinkBody_, mainInsertionLinkBody_, toolLinkBody_, yawLinkBody_, 
-    pitchBackLinkBody_, pitchBottomLinkBody_, pitchFrontLinkBody_, pitchTopLinkBody_;
+  Body baselinkBody_, pitchendlinkBody_, maininsertionlinkBody_, toollinkBody_, yawlinkBody_, 
+    pitchbacklinkBody_, pitchbottomlinkBody_, pitchfrontlinkBody_, pitchtoplinkBody_;
 
-  double baseLinkMScale_, pitchEndLinkMScale_, mainInsertionLinkMScale_, toolLinkMScale_, 
-    yawLinkMScale_, pitchBackLinkMScale_, pitchBottomLinkMScale_, pitchFrontLinkMScale_, 
-    pitchTopLinkMScale_ = 1.0;
+  double baselinkMScale_, pitchendlinkMScale_, maininsertionlinkMScale_, toollinkMScale_, 
+    yawlinkMScale_, pitchbacklinkMScale_, pitchbottomlinkMScale_, pitchfrontlinkMScale_, 
+    pitchtoplinkMScale_ = 1.0;
 
-  Joint ROOT_baseLinkJoint_, baseLink_pitchEndLinkJoint_, pitchEndLink_mainInsertionLinkJoint_, 
-    mainInsertionLink_toolLinkJoint_, baseLink_yawLinkJoint_, yawLink_pitchBackLinkJoint_,
-    pitchBackLink_pitchBottomLinkJoint_, pitchBottomLink_pitchEndLinkJoint_,
-    yawLink_pitchFrontLinkJoint_, pitchFrontLink_pitchBottomLinkJoint_, 
-    pitchFrontLink_pitchTopLinkJoint_, pitchTopLink_pitchEndLinkJoint_;
+  // Joint baselink_pitchendlinkJoint_, pitchendlink_maininsertionlinkJoint_, 
+  //   maininsertionlink_toollinkJoint_, baselink_yawlinkJoint_, yawlink_pitchbacklinkJoint_,
+  //   pitchbacklink_pitchbottomlinkJoint_, pitchbottomlink_pitchendlinkJoint_,
+  //   yawlink_pitchfrontlinkJoint_, pitchfrontlink_pitchbottomlinkJoint_, 
+  //   pitchfrontlink_pitchtoplinkJoint_, pitchtoplink_pitchendlinkJoint_;
 
-  SpatialTransform ROOT_baseLinkST_, baseLink_pitchEndLinkST_, 
-    pitchEndLink_mainInsertionLinkST_, mainInsertionLink_toolLinkST_, baseLink_yawLinkST_, 
-    yawLink_pitchBackLinkST_, pitchBackLink_pitchBottomLinkST_, 
-    pitchBottomLink_pitchEndLinkST_,yawLink_pitchFrontLinkST_, 
-    pitchFrontLink_pitchBottomLinkST_, pitchFrontLink_pitchTopLinkST_, 
-    pitchTopLink_pitchEndLinkST_;
+  // SpatialTransform pitchendlink_maininsertionlinkST_, maininsertionlink_toollinkST_, 
+  //   baselink_yawlinkST_, yawlink_pitchbacklinkST_, pitchbacklink_pitchbottomlinkST_, 
+  //   pitchbottomlink_pitchendlinkST_, yawlink_pitchfrontlinkST_, pitchfrontlink_pitchbottomlinkST_, 
+  //   pitchfrontlink_pitchtoplinkST_, pitchyoplink_pitchendlinkST_;
 
-  const double ROOT_baseLinkOffset_                  = 0.0;
-  const double baseLink_pitchEndLinkOffset_          = 0.0;
-  const double pitchEndLink_mainInsertionLinkOffset_ = 0.0;
-  const double mainInsertionLink_toolLinkOffset_     = 0.0;
-  const double baseLink_yawLinkOffset_               = 0.0;
-  const double yawLink_pitchBackLinkOffset_          = 0.0;
-  const double pitchBackLink_pitchBottomLinkOffset_  = 0.0;
-  const double pitchBottomLink_pitchEndLinkOffset_   = 0.0;
-  const double yawLink_pitchFrontLinkOffset_         = 0.0;
-  const double pitchFrontLink_pitchBottomLinkOffset_ = 0.0;
-  const double pitchFrontLink_pitchTopLinkOffset_    = 0.0;
-  const double pitchTopLink_pitchEndLinkOffset_      = 0.0;
+  SpatialTransform world_baselinkST_, world_yawlinkST_, world_pitchbacklinkST_, world_pitchbottomlinkST_;
+
+
+  const double ROOT_baselinkOffsetQ_                  = 0.0;
+  const double baselink_yawlinkOffsetQ_               = -3.1414;
+  const double yawlink_pitchbacklinkOffsetQ_          = 3.1416;
+  const double pitchbacklink_pitchbottomlinkOffsetQ_  = 0.0;
+  const double baselink_pitchendlinkOffsetQ_          = 1.56304;
+  const double pitchendlink_maininsertionlinkOffsetQ_ = -1.5708;
+  const double maininsertionlink_toollinkOffsetQ_     = -1.5708;
+  const double pitchbottomlink_pitchendlinkOffsetQ_   = 0.0;
+  const double yawlink_pitchfrontlinkOffsetQ_         = 3.1416;
+  const double pitchfrontlink_pitchbottomlinkOffsetQ_ = 0.0;
+  const double pitchfrontlink_pitchtoplinkOffsetQ_    = 0.0;
+  const double pitchtoplink_pitchendlinkOffsetQ_      = 0.0;
 };
