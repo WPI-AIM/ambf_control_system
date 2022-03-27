@@ -41,6 +41,10 @@ private:
 
   Model* rbdlModel_ = nullptr;
   ConstraintSet cs_;
+  bool bgStab_ = true;
+  SpatialTransform X_p_;
+  SpatialTransform X_s_;
+
   VectorNd Q_;
   VectorNd QDot_;
   VectorNd QDDot_;
@@ -49,5 +53,5 @@ private:
   MatrixNd t_0_w_ = MatrixNd::Identity(4, 4);
 
   Body baselinkBody_, pitchendlinkBody_, maininsertionlinkBody_, toollinkBody_, yawlinkBody_, 
-    pitchbacklinkBody_, pitchbottomlinkBody_, pitchfrontlinkBody_, pitchtoplinkBody_;
+    pitchbacklinkBody_, pitchbottomlinkBody_, pitchfrontlinkBody_, pitchtoplinkBody_, virtualBody_;
 };
