@@ -2,30 +2,36 @@
 
 ECM::ECM() 
 {
-	// ConnectToAMBF();
-	// SetAMBFParams();
-	// ExecutePoseInAMBF();
-  
-	// PrintAMBFTransformation();
-
+	ConnectToAMBF();
+	SetAMBFParams();
+	MapAMBFJointsToParent();
 	SetBodyParams();
 	CreateRBDLModel();
+	ExecutePoseInAMBF();
+  
+	// // PrintAMBFTransformation();
+
+	// SetRBDLPose();
 	CheckRBDLModel();
+	
+	CleanUp();
 }
 
 void ECM::ConnectToAMBF()
 {
 	ambfClientPtr_ = RBDLTestPrep::getInstance()->getAMBFClientInstance();
 	ambfClientPtr_->connect();
-	usleep(20000);
+	usleep(1000000);
 }
 
 void ECM::SetAMBFParams()
 {
 	std::vector<std::string> rigidBodyNames = ambfClientPtr_->getRigidBodyNames();
+	// printf("Registering rigidbody\n");
 	for(std::string rigidBodyName : rigidBodyNames)
 	{
-		std::cout << rigidBodyName << std::endl;
+		// printf("%s\n", rigidBodyName.c_str());
+
 		ambfParamMap_[rigidBodyName] = new AMBFParams(
 				rigidBodyName, 
 				ambfClientPtr_->getRigidBody(rigidBodyName.c_str(), true), 
@@ -34,6 +40,16 @@ void ECM::SetAMBFParams()
 				Matrix3dZero,
 				Vector3dZero
 		);
+	}
+	usleep(2500000);
+	// printf("---------------------------------\n");
+	// Initialize all the handlers
+	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
+	{
+		printf("RigidBodyName: %s\n", ambfParamMapItr_->first.c_str());
+		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
+		rigidBodyHandler->set_joint_pos<int>(0, 0.0f);
+		usleep(microsec);
 	}
 
 	ambfParamMap_[baselinkName_]->ControllableJointConfigs(
@@ -46,88 +62,47 @@ void ECM::SetAMBFParams()
 		}
 	);
 
-	usleep(250000);
 }
 
-void ECM::ExecutePoseInAMBF()
+void ECM::MapJoints(const std::string& parentBody, rigidBodyPtr rigidBodyHandler)
 {
-	const useconds_t microsec = 250000;
-	AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[baselinkName_];
-
-	// const std::string parentBody = ambfRigidBodyParamsPtr->ParentBodyName();
-	rigidBodyPtr ambfRigidBodyHandler = ambfRigidBodyParams->RididBodyHandler();
-	std::vector<std::string> rigidBodyChildren = ambfRigidBodyParams->ChildrenJoints();
-	std::vector<ControllableJointConfig> rigidBodyControllableJointConfigs = 
-		ambfRigidBodyParams->ControllableJointConfigs();
-
-	std::vector<std::string> rigidBodyNames = ambfClientPtr_->getRigidBodyNames();
-
-	for(int i = 0; i < 1; i++)
+	std::vector<std::string> jointNames = rigidBodyHandler->get_joint_names();
+	for(std::string jointName : jointNames)
 	{
-		for(ControllableJointConfig jointConfig : rigidBodyControllableJointConfigs)
-		{
-			ambfRigidBodyHandler->set_joint_pos<std::string>(jointConfig.jointName, 0.0f);
-			usleep(microsec);
-		}
+		// AMBF parent has been identified already so skip updating it again
+		// More than one AMBF rigid body can control the same joint.
+		ambfJointToParentMapItr_ = ambfJointToParentMap_.find(jointName);
+		if(ambfJointToParentMapItr_ != ambfJointToParentMap_.end()) continue;
+		ambfJointToParentMap_[jointName] = parentBody;
 	}
+}
+
+void ECM::MapAMBFJointsToParent()
+{
+	// Iterate through all ambf handles and their joints. Find the ambf rigid body parent for all the 
+	// RBDL joints. If no AMBF parent is found a given RBDL joint, its q desired cannot be found. 
+	
+	// Handle as many joints possible with baselink
+	MapJoints(baselinkName_, ambfParamMap_[baselinkName_]->RididBodyHandler());
 
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
 	{
 		const std::string parentBody = ambfParamMapItr_->first;
 		AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[parentBody];
-
 		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
-
-		tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
-		Quaternion quat_w_n = EigenUtilities::TFtoEigenQuaternion(quat_w_n_tf);
-		Matrix3d r_w_n = quat_w_n.toMatrix();
-
-		tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
-		Vector3d p_w_n = EigenUtilities::TFtoEigenVector(p_w_n_tf);
-
-		ambfRigidBodyParams->RotationMatrix(r_w_n);
-		ambfRigidBodyParams->TranslationVector(p_w_n);
-		ambfParamMap_[parentBody] = ambfRigidBodyParams;
+		MapJoints(parentBody, rigidBodyHandler);
 	}
 
-	// Register Word to Base Transform
-	ambfRigidBodyParams = ambfParamMap_[baselinkName_];
-
-	t_w_0_.block<3, 3>(0, 0) = ambfRigidBodyParams->RotationMatrix();
-	t_w_0_.block<3, 1>(0, 3) = ambfRigidBodyParams->TranslationVector();
-
-	// std::cout << "t_w_0_" << std::endl << t_w_0_ << std::endl;
-}
-
-const Matrix3d ECM::PrintAMBFTransformation()
-{
-	t_0_w_.block<3, 3>(0, 0) = t_w_0_.block<3, 3>(0, 0).transpose();
-	t_0_w_.block<3, 1>(0, 3) = -t_w_0_.block<3, 3>(0, 0).transpose() * t_w_0_.block<3, 1>(0, 3);
-	std::cout << "t_0_w_" << std::endl << t_0_w_ << std::endl;
-
-	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
+	for(ambfJointToParentMapItr_ = ambfJointToParentMap_.begin(); 
+			ambfJointToParentMapItr_ != ambfJointToParentMap_.end();
+			ambfJointToParentMapItr_++)
 	{
-		const std::string parentBody = ambfParamMapItr_->first;
-		AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[parentBody];
+		std::string jointName = ambfJointToParentMapItr_->first;
+		std::string parentName = ambfJointToParentMapItr_->second;
 
-		MatrixNd t_w_n = MatrixNd::Identity(4, 4);
-		t_w_n.block<3, 3>(0, 0) = ambfRigidBodyParams->RotationMatrix();
-		t_w_n.block<3, 1>(0, 3) = ambfRigidBodyParams->TranslationVector();
-		
-		MatrixNd t_0_n = MatrixNd::Identity(4, 4);
-		t_0_n = t_0_w_ * t_w_n;
-
-		std::cout << "parentBody: " << parentBody << std::endl;
-		std::cout << "t_w_n" << std::endl << t_w_n << std::endl;
-		std::cout << "t_0_n" << std::endl << t_0_n << std::endl;
-		std::cout << "---------------------------" << std::endl;
+		printf("joint: %s, parent: %s\n", jointName.c_str(), parentName.c_str());
 	}
-
-	Matrix3d dummy;
-	return dummy;
 }
-
-// const Vector3d TranslationVectorTF();
 
 void ECM::SetBodyParams()
 {
@@ -169,23 +144,13 @@ void ECM::CreateRBDLJoint(Vector3d& pa, Vector3d& ca, Vector3d& pp, Vector3d& cp
 	bodyST.E = rotOffset.rotation() * bodyRot;
 	bodyST.r = pp - (bodyRot.inverse() * cp);
 
-	//Vector3d roationAxis = world_parentST.E.transpose().block<3, 1>(0, 2).transpose();
 	Vector3d roationAxis = world_parentST.E.block<3, 1>(0, 1).transpose();
 	roationAxis.normalize();
-	// Joint joint = Joint(jointType, 
-	// 	world_parentST.E.transpose().block<3, 1>(0, 2).transpose());
-	// std::cout << std::endl << "world_parentST" << std::endl << world_parentST << std::endl;
-	// std::cout << std::endl << "roationAxis" << std::endl << roationAxis << std::endl;
-
-	// Joint joint = Joint(jointType, roationAxis);
-
-	// const Vector3d p_world_body =  world_parentST.E * bodyST.r;
 	p_world_endingbody =  world_parentST.E * bodyST.r;
-	// newBodyId = rbdlModel_->AddBody(parentId, Xtrans(p_world_body), joint, body, bodyName);
 	newBodyId = rbdlModel_->AddBody(parentId, Xtrans(p_world_startingbody), joint, body, bodyName);
 	world_bodyST = world_parentST * bodyST;
 
-	printf("%s\n", bodyName.c_str());
+	// printf("%s\n", bodyName.c_str());
 }
 
 void ECM::CreateRBDLModel()
@@ -220,8 +185,6 @@ void ECM::CreateRBDLModel()
 	// Modify this with World the base transformation
 	world_baselinkST.E.setIdentity();
 	world_baselinkST.r.setZero();
-
-	std::cout << "-----------------------------" << std::endl;
 	//1--------------------------------------------------------------------//
 	Vector3d baselink_yawlinkPA = { -0.0002, -1.0000, 00.0000 };
 	Vector3d baselink_yawlinkCA = { 00.0000, 00.0000, -1.0000 };
@@ -235,7 +198,6 @@ void ECM::CreateRBDLModel()
 	baselink_yawlinkOffsetQ, Vector3d::UnitZ(), 0, p_world_baselink, Joint(SpatialVector (0., 1., 0., 0., 0., 0.)),
 	world_baselinkST, baselinkBody_, "baselink-yawlink", p_world_yawlink, baselink_yawlinkId, 
 	world_yawlinkST);
-	std::cout << "-----------------------------" << std::endl;
 	//2 and 3 --------------------------------------------------------------------//
 	Vector3d yawlink_pitchfrontlinkPA = { 1.0, 0.0,   0.0 };
 	Vector3d yawlink_pitchfrontlinkCA = { 0.0, 0.0,   1.0 };
@@ -248,7 +210,6 @@ void ECM::CreateRBDLModel()
 	yawlink_pitchfrontlinkCP, yawlink_pitchfrontlinkOffsetQ, Vector3d::UnitZ(), baselink_yawlinkId, 
 	p_world_yawlink, Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), world_yawlinkST, yawlinkBody_, 
 	"yawlink-pitchfrontlink", p_world_pitchfrontlink, yawlink_pitchfrontlinkId, world_pitchfrontlinkST);
-	std::cout << "-----------------------------" << std::endl;
 	//3--------------------------------------------------------------------//
 	Vector3d yawlink_pitchbacklinkPA = { 1.0,     0.0,    0.0 };
 	Vector3d yawlink_pitchbacklinkCA = { 0.0,     0.0,    1.0 };
@@ -261,8 +222,8 @@ void ECM::CreateRBDLModel()
 	yawlink_pitchbacklinkCP, yawlink_pitchbacklinkOffsetQ, Vector3d::UnitZ(), baselink_yawlinkId, 
 	p_world_yawlink, Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), world_yawlinkST, yawlinkBody_, 
 	"yawlink-pitchbacklink", p_world_pitchbacklink, yawlink_pitchbacklinkId, world_pitchbacklinkST);
-	std::cout << "-----------------------------" << std::endl;
   //--------------------------------------------------------------------//
+	// Virtual link
 	Vector3d pitchbacklink_pitchbottomlinkPA = {     0.0,     0.0,     1.0 };
 	Vector3d pitchbacklink_pitchbottomlinkCA = {     0.0,     0.0,     1.0 };
 	Vector3d pitchbacklink_pitchbottomlinkPP = { -0.1028, -0.2867,     0.0 };
@@ -274,15 +235,13 @@ void ECM::CreateRBDLModel()
 	pitchbacklink_pitchbottomlinkPP, pitchbacklink_pitchbottomlinkCP, pitchbacklink_pitchbottomlinkOffsetQ, 
 	Vector3d::UnitZ(), yawlink_pitchbacklinkId, p_world_pitchbacklink, 
 	Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), 
-	world_pitchbacklinkST, virtualBody_, "pitchbacklink-pitchbottom-v", 
+	world_pitchbacklinkST, virtualBody_, "pitchbacklink-pitchbottomlink", 
 	p_world_pitchbottomlink, pitchbacklink_pitchbottomlink_v_Id, world_pitchbottomlinkST);
-	std::cout << "-----------------------------" << std::endl;
 	//8--------------------------------------------------------------------//
 	Vector3d pitchbottomlink_pitchendlinkPA = {    0.0,     0.0,     1.0 };
 	Vector3d pitchbottomlink_pitchendlinkCA = {    0.0,     0.0,     1.0 };
 	Vector3d pitchbottomlink_pitchendlinkPP = { 0.3401, -0.0001, -0.0005 };
 	Vector3d pitchbottomlink_pitchendlinkCP = {    0.0,     0.0,  0.0001 };
-
 	Vector3d p_world_pitchendlink	 	 			 	= Vector3d::Zero();
 
 	CreateRBDLJoint(pitchbottomlink_pitchendlinkPA, pitchbottomlink_pitchendlinkCA, 
@@ -291,7 +250,6 @@ void ECM::CreateRBDLModel()
 	Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), 
 	world_pitchbottomlinkST, pitchbottomlinkBody_, "pitchbottomlink-pitchendlink", 
 	p_world_pitchendlink, pitchbottomlink_pitchendlinkId, world_pitchendlinkST);
-	std::cout << "-----------------------------" << std::endl;
 	//9--------------------------------------------------------------------//
 	Vector3d pitchendlink_maininsertionlinkPA = {     0.0,     1.0,    0.0 };
 	Vector3d pitchendlink_maininsertionlinkCA = {     1.0,     0.0,    0.0 };
@@ -305,7 +263,6 @@ void ECM::CreateRBDLModel()
 	Joint(SpatialVector (0., 0., 0., 0., 0., -1.)),
 	world_pitchendlinkST, pitchendlinkBody_, "pitchendlink-maininsertionlink", 
 	p_world_maininsertionlink, pitchendlink_maininsertionlinkId, world_maininsertionlinkST);
-	std::cout << "-----------------------------" << std::endl;
 	//10--------------------------------------------------------------------//
 	Vector3d maininsertionlink_toollinkPA = {     1.0,     0.0,    0.0 };
 	Vector3d maininsertionlink_toollinkCA = {     0.0,     0.0,   -1.0 };
@@ -319,9 +276,6 @@ void ECM::CreateRBDLModel()
 	Joint(SpatialVector (0., 0., 1., 0., 0., 0.)),
 	world_maininsertionlinkST, maininsertionlinkBody_, "maininsertionlink-toollink", 
 	p_world_toollink, maininsertionlink_toollinkId, world_toollinkST);
-	std::cout << "p_world_toollink" << std::endl << p_world_toollink << std::endl;
-	std::cout << "world_toollinkST" << std::endl << world_toollinkST << std::endl;
-	std::cout << "-----------------------------" << std::endl;
 //11--------------------------------------------------------------------//
 	Vector3d toollink_eePA = { 0.0, 0.0, 1.0 };
 	Vector3d toollink_eeCA = { 0.0, 0.0, 1.0 };
@@ -335,7 +289,6 @@ void ECM::CreateRBDLModel()
 	Joint(SpatialVector (0., 0., 0., 0., 0., 0.)),
 	world_toollinkST, toollinkBody_, "toollink_ee", 
 	p_world_ee, toollink_eeId, world_eeST);
-	std::cout << "-----------------------------" << std::endl;
 	//--------------------------------------------------------------------//
 	unsigned int userDefinedId = 7;
 	cs_.AddLoopConstraint(yawlink_pitchfrontlinkId, pitchbacklink_pitchbottomlink_v_Id, X_p_, X_s_, 
@@ -353,30 +306,128 @@ void ECM::CreateRBDLModel()
 	QDot_  = VectorNd::Constant ((size_t) rbdlModel_->dof_count, 0.);
 	QDDot_ = VectorNd::Constant ((size_t) rbdlModel_->dof_count, 0.);
 	Tau_   = VectorNd::Constant ((size_t) rbdlModel_->dof_count, 0.); 
+	rbdlmBodyMap_ = rbdlModel_->mBodyNameMap;
 
 	ClearLogOutput();
 }
 
+void ECM::ExecutePoseInAMBF()
+{
+	
+	AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[baselinkName_];
+
+	// const std::string parentBody = ambfRigidBodyParamsPtr->ParentBodyName();
+	rigidBodyPtr ambfRigidBodyHandler = ambfRigidBodyParams->RididBodyHandler();
+	std::vector<std::string> rigidBodyChildren = ambfRigidBodyParams->ChildrenJoints();
+	std::vector<ControllableJointConfig> rigidBodyControllableJointConfigs = 
+		ambfRigidBodyParams->ControllableJointConfigs();
+
+	std::vector<std::string> rigidBodyNames = ambfClientPtr_->getRigidBodyNames();
+	
+	for(int i = 0; i < 1; i++)
+	{
+		for(ControllableJointConfig jointConfig : rigidBodyControllableJointConfigs)
+		{
+			ambfRigidBodyHandler->set_joint_pos<std::string>(jointConfig.jointName, 0.0f);
+			usleep(microsec);
+		}
+	}
+
+	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
+	{
+		const std::string parentBody = ambfParamMapItr_->first;
+		AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[parentBody];
+
+		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
+
+		tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
+		Quaternion quat_w_n = EigenUtilities::TFtoEigenQuaternion(quat_w_n_tf);
+		Matrix3d r_w_n = quat_w_n.toMatrix();
+
+		tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
+		Vector3d p_w_n = EigenUtilities::TFtoEigenVector(p_w_n_tf);
+
+		ambfRigidBodyParams->RotationMatrix(r_w_n);
+		ambfRigidBodyParams->TranslationVector(p_w_n);
+		ambfParamMap_[parentBody] = ambfRigidBodyParams;
+	}
+
+	// Register Word to Base Transform
+	ambfRigidBodyParams = ambfParamMap_[baselinkName_];
+
+	t_w_0_.block<3, 3>(0, 0) = ambfRigidBodyParams->RotationMatrix();
+	t_w_0_.block<3, 1>(0, 3) = ambfRigidBodyParams->TranslationVector();
+}
+
+const Matrix3d ECM::PrintAMBFTransformation()
+{
+	t_0_w_.block<3, 3>(0, 0) = t_w_0_.block<3, 3>(0, 0).transpose();
+	t_0_w_.block<3, 1>(0, 3) = -t_w_0_.block<3, 3>(0, 0).transpose() * t_w_0_.block<3, 1>(0, 3);
+	// std::cout << "t_0_w_" << std::endl << t_0_w_ << std::endl;
+
+	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
+	{
+		const std::string parentBody = ambfParamMapItr_->first;
+		AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[parentBody];
+
+		MatrixNd t_w_n = MatrixNd::Identity(4, 4);
+		t_w_n.block<3, 3>(0, 0) = ambfRigidBodyParams->RotationMatrix();
+		t_w_n.block<3, 1>(0, 3) = ambfRigidBodyParams->TranslationVector();
+		
+		MatrixNd t_0_n = MatrixNd::Identity(4, 4);
+		t_0_n = t_0_w_ * t_w_n;
+
+		// std::cout << "parentBody: " << parentBody << std::endl;
+		// std::cout << "t_w_n" << std::endl << t_w_n << std::endl;
+		// std::cout << "t_0_n" << std::endl << t_0_n << std::endl;
+		// std::cout << "---------------------------" << std::endl;
+	}
+
+	Matrix3d dummy;
+	return dummy;
+}
+
+void ECM::SetRBDLPose()
+{
+	for(rbdlmBodyMapItr_ = rbdlmBodyMap_.begin(); rbdlmBodyMapItr_ != rbdlmBodyMap_.end(); rbdlmBodyMapItr_++)
+	{
+		std::string rbdlBodyName = rbdlmBodyMapItr_->first;
+		unsigned int rbdlBodyId = rbdlmBodyMapItr_->second;
+
+		printf("RBDL body: %s, RBDL Id: %d\n", rbdlBodyName.c_str(), rbdlBodyId);
+	}
+}
+
 void ECM::CheckRBDLModel()
 {
-	std::map< std::string, unsigned int > mBodyNameMap = rbdlModel_->mBodyNameMap;
-  std::map<std::string, unsigned int>::iterator mBodyNameMapItr;
 
-  
-  for(mBodyNameMapItr = mBodyNameMap.begin(); mBodyNameMapItr != mBodyNameMap.end(); mBodyNameMapItr++)
+	// Iterate through RBDL body map, for each rbdl body, find the AMBF handler. Use the handler and find 
+	// the q_desired in AMBF
+  for(rbdlmBodyMapItr_ = rbdlmBodyMap_.begin(); rbdlmBodyMapItr_ != rbdlmBodyMap_.end(); rbdlmBodyMapItr_++)
   {
-    std::string jointNameRBDL = mBodyNameMapItr->first;
-    unsigned int jointIDRBDL  = mBodyNameMapItr->second;
+    std::string jointNameRBDL = rbdlmBodyMapItr_->first;
+    unsigned int jointIDRBDL  = rbdlmBodyMapItr_->second;
     
-    const Vector3d P_0_n_rbdl = 
-      CalcBodyToBaseCoordinates(*rbdlModel_, Q_, jointIDRBDL, Vector3d(0., 0., 0.), true);
+    // const Vector3d P_0_n_rbdl = 
+    //   CalcBodyToBaseCoordinates(*rbdlModel_, Q_, jointIDRBDL, Vector3d(0., 0., 0.), true);
+		// std::cout << "P_0_n_rbdl: " << std::endl << P_0_n_rbdl << std::endl;
+		// std::cout << "--------------------" << std::endl;
 
-		printf("jointNameRBDL: %s\n", jointNameRBDL.c_str());
-		std::cout << "P_0_n_rbdl: " << std::endl << P_0_n_rbdl << std::endl;
-		std::cout << "--------------------" << std::endl;
+		// Skip the joint for which AMBF handler not found
+		ambfJointToParentMapItr_ = ambfJointToParentMap_.find(jointNameRBDL);
+		if(ambfJointToParentMapItr_ == ambfJointToParentMap_.end()) continue;
+		std::string parentName = ambfJointToParentMap_[jointNameRBDL];
+
+		ambfParamMapItr_ = ambfParamMap_.find(parentName);
+		if(ambfParamMapItr_ == ambfParamMap_.end()) continue;
+		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
+
+		float qDesiredambf = rigidBodyHandler->get_joint_pos<std::string>(jointNameRBDL);
+		printf("jointNameRBDL: %s, qDesiredambf: %f\n", jointNameRBDL.c_str(), qDesiredambf);
   }  
   
 }
+
 void ECM::CleanUp()
 {
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
@@ -399,4 +450,3 @@ ECM::~ECM()
 	ambfClientPtr_->cleanUp();
 	delete rbdlModel_;
 }
-

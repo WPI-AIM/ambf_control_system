@@ -1,4 +1,5 @@
 #include <unordered_map>
+#include <thread>
 
 #include "rbdl_model_tests/RBDLTestPrep.h"
 #include "rbdl_model_tests/EigenUtilities.h"
@@ -10,6 +11,7 @@ typedef AMBFParams* AMBFParamsPtr;
 
 //const double TEST_PREC = 1.0e-12;
 const double TEST_LAX = 1.0e-7;
+const useconds_t microsec = 250000;
 
 class ECM {
 public:
@@ -23,6 +25,8 @@ public:
 private:
   void ConnectToAMBF();
   void SetAMBFParams();
+  void MapJoints(const std::string& parentBody, rigidBodyPtr rigidBodyHandler);
+  void MapAMBFJointsToParent();
   void ExecutePoseInAMBF();
 
   void SetBodyParams();
@@ -30,28 +34,38 @@ private:
 	Vector3d axis, unsigned int parentId, Vector3d& p_world_startingbody, Joint joint, SpatialTransform	world_parentST, Body &body, 
   std::string bodyName, Vector3d& p_world_endingbody, unsigned int& newBodyId, SpatialTransform&	world_bodyST);
   void CreateRBDLModel();
+  void SetRBDLPose();
   void CheckRBDLModel();
+
 private:
   AMBFClientPtr ambfClientPtr_ = nullptr;
   std::string baselinkName_ = "ecm/baselink";
+  MatrixNd t_w_0_ = MatrixNd::Identity(4, 4);
+  MatrixNd t_0_w_ = MatrixNd::Identity(4, 4);
 
   // Format of the map yet to be decided
   std::unordered_map<std::string, AMBFParamsPtr> ambfParamMap_;
   std::unordered_map<std::string, AMBFParamsPtr>::iterator ambfParamMapItr_;
 
+  // RBDL use joint names to define a body. This corresponds to rigidbody in AMBF.
+  // This give a need to map the RBDL joint name with the corresponing AMBF handler that would provied
+  // the corresponding AMBF joint.
+  std::unordered_map<std::string, std::string> ambfJointToParentMap_;
+  std::unordered_map<std::string, std::string>::iterator ambfJointToParentMapItr_;
+  
   Model* rbdlModel_ = nullptr;
   ConstraintSet cs_;
   bool bgStab_ = true;
   SpatialTransform X_p_;
   SpatialTransform X_s_;
+  Body baselinkBody_, pitchendlinkBody_, maininsertionlinkBody_, toollinkBody_, yawlinkBody_, 
+    pitchbacklinkBody_, pitchbottomlinkBody_, pitchfrontlinkBody_, pitchtoplinkBody_, virtualBody_;
 
   VectorNd Q_;
   VectorNd QDot_;
   VectorNd QDDot_;
   VectorNd Tau_;
-  MatrixNd t_w_0_ = MatrixNd::Identity(4, 4);
-  MatrixNd t_0_w_ = MatrixNd::Identity(4, 4);
+  std::map< std::string, unsigned int > rbdlmBodyMap_;
+  std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr_;
 
-  Body baselinkBody_, pitchendlinkBody_, maininsertionlinkBody_, toollinkBody_, yawlinkBody_, 
-    pitchbacklinkBody_, pitchbottomlinkBody_, pitchfrontlinkBody_, pitchtoplinkBody_, virtualBody_;
 };
