@@ -50,6 +50,7 @@
 #include "rbdl_server/RBDLJointSpaceInertia.h"
 #include "rbdl_server/RBDLPointVelocity.h"
 #include "rbdl_server/RBDLNonlinearEffects.h"
+#include "rbdl_server/RBDLTaskSpaceBody.h"
 #include <iostream>
 
 #include <algorithm>
@@ -87,7 +88,8 @@ class RBDLServer
     std::unordered_map<std::string, std::unordered_map<std::string, unsigned int>> body_ids;
        
 
-    ros::ServiceServer FD_srv, ID_srv, MD_srv, Jac_srv, Kin_srv, InvKin_srv, JointNames_srv, JointAlign_srv, Mjoint_srv, PtVel_srv, NonlinEff_srv;
+    ros::ServiceServer FD_srv, ID_srv, MD_srv, Jac_srv, Kin_srv, InvKin_srv, JointNames_srv, JointAlign_srv, Mjoint_srv, PtVel_srv, NonlinEff_srv, 
+      TaskSpBd_srv;
     VectorNd VectToEigen(const std::vector<double>&);
     RigidBodyDynamics::Model* getModel(std::string);
     bool CreateModel_srv(rbdl_server::RBDLModelRequest&, rbdl_server::RBDLModelResponse& ); //parses the AMBF model into  rbdl model
@@ -105,10 +107,11 @@ class RBDLServer
     bool ForwardKinimatics_srv(rbdl_server::RBDLKinimaticsRequest&, rbdl_server::RBDLKinimaticsResponse&);
     bool InverseKinimatics_srv(rbdl_server::RBDLInverseKinimaticsRequest&, rbdl_server::RBDLInverseKinimaticsResponse& );
     bool Jacobian_srv(rbdl_server::RBDLJacobianRequest&, rbdl_server::RBDLJacobianResponse&);
-
     bool JointSpaceInertia_srv(rbdl_server::RBDLJointSpaceInertiaRequest&, rbdl_server::RBDLJointSpaceInertiaResponse&);
     bool PointVelocity_srv(rbdl_server::RBDLPointVelocityRequest&, rbdl_server::RBDLPointVelocityResponse&);
     bool NonlinearEffects_srv(rbdl_server::RBDLNonlinearEffectsRequest&, rbdl_server::RBDLNonlinearEffectsResponse&);
+
+    bool TaskSpaceBody_srv(rbdl_server::RBDLTaskSpaceBodyRequest&, rbdl_server::RBDLTaskSpaceBodyResponse&);
     
 	
   public:

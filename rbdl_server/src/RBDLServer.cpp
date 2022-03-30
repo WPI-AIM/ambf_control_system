@@ -18,7 +18,8 @@ RBDLServer::RBDLServer(ros::NodeHandle* nodehandle):nh_(*nodehandle)
      JointAlign_srv = nh_.advertiseService("AMBF2RBDL", &RBDLServer::AMBF2RBDL_srv, this);
      Mjoint_srv = nh_.advertiseService("JointSpaceInertia", &RBDLServer::JointSpaceInertia_srv, this);
      PtVel_srv = nh_.advertiseService("PointVelocity", &RBDLServer::PointVelocity_srv, this);
-     NonlinEff_srv = nh_.advertiseService("NonlinearEffects", &RBDLServer::NonlinearEffects_srv, this);
+     NonlinEff_srv = nh_.advertiseService("NonlinearEffects", &RBDLServer::NonlinearEffects_srv, this); 
+     TaskSpBd_srv = nh_.advertiseService("TaskSpaceBody", &RBDLServer::TaskSpaceBody_srv, this);
 
 
      ROS_INFO("RBDL server running");
@@ -711,6 +712,104 @@ bool RBDLServer::NonlinearEffects_srv(rbdl_server::RBDLNonlinearEffectsRequest& 
 
     std::vector<double> tau(&Tau[0], Tau.data()+Tau.cols()*Tau.rows());             // Eigen (VectorNd) to std::vector conversion for output
     res.tau = tau;                                                                  // and then set it as the response
+
+    return true;
+
+}
+
+
+/**
+*	ROS service for calculating the current task space position, velocity, and jacobian of the requested model body w.r.t the base body
+*	@param req is the request service data to be sent
+*   @param res is the response service data returned
+*	@return if the function executed successfully or not (run on an existing model with a valid number of joints)
+**/
+bool RBDLServer::TaskSpaceBody_srv(rbdl_server::RBDLTaskSpaceBodyRequest& req, rbdl_server::RBDLTaskSpaceBodyResponse& res) {
+
+    ROS_INFO("Called Task Space Body Server");
+
+    std::string name = req.model_name;                              // the name of the model for which calculations will be performed
+    std::vector<std::string> names;                                 // vector of body names to print out if invalid name given in request
+    int id;                                                         // ID of the requested body in body_ids map
+    Vector3d bodyPoint(0,0,0);                                      // the point on the body used for calculcating RBDL functions, hardcoded to origin
+
+    VectorNd Q =  VectToEigen(req.q);                               // initializing input q vector of joint states
+    VectorNd QDot = VectToEigen(req.qd);                            // and q dot vector or joint velocities
+ 
+
+    // Default to another name if the request has an invalid one, program will seg fault if functions are called on an empty model name
+    if(req.model_name.empty()) {
+        name = default_name;
+    }
+
+    // Only execute the RBDL function on a valid model
+    if (!checkModelExists(name)) {
+        return false;
+    }
+
+    // Need to add some checks on the size of the inputs to make sure they are correct
+    if(!have_model) {
+        ROS_INFO("Model not set");
+        return false;
+    }
+
+    // Only execute on a valid number of model joints
+    if (models[name]->q_size != req.q.size()) {
+        ROS_INFO("Joint length (q) not correct size");
+        return false;
+    }
+
+    // Only execute on a valid number of model joint velocities
+    if (models[name]->qdot_size != req.qd.size()) {
+        ROS_INFO("Joint velocity length (qd) not correct size");
+        return false;
+    }
+
+    // Find the body id among the current model's list of body names
+    if (body_ids[name].find(req.body_name) != body_ids[name].end()) {
+        id = body_ids[name][req.body_name];
+    } 
+    else {
+        ROS_INFO("That is not a body, the current bodies are");
+        GetNames(name, names);
+
+        for(std::string name: names) {
+            ROS_INFO("%s", name.c_str());
+        }
+
+        return false;
+    }
+
+
+    // Forward kinematics
+    Vector3d fk;                                                    // storing the result of CalcBodyToBaseCoordinates RBDL function
+    geometry_msgs::Point endEffectorPoint;
+
+    // RBDL function to calculate the forward kinematics for the specified body of the model at the current configuration Q
+    fk = CalcBodyToBaseCoordinates(*models[name], Q, id, bodyPoint, true);
+    endEffectorPoint.x = fk(0);
+    endEffectorPoint.y = fk(1);
+    endEffectorPoint.z = fk(2);
+    res.point = endEffectorPoint;
+
+    // Point velocity
+    Math::SpatialVector Vel;                                                        // initializing output 6 DoF velocity vector of the RBDL function
+
+    // RBDL function to calculate the joint veloctiy vector for the specified body of the model at the current configuration Q and QDot
+    Vel = CalcPointVelocity6D(*models[name], Q, QDot, id, bodyPoint, true);
+    
+    std::vector<double> velocity(&Vel[0], Vel.data()+Vel.cols()*Vel.rows());        // Eigen (RBDL Math::SpatialVector) to std::vector conversion for output
+    res.velocity = velocity;                                                        // and then set it as the response
+
+    // Jacobian6DoF
+    std_msgs::Float64MultiArray msg;
+    MatrixNd G(MatrixNd::Zero (6, models[name]->dof_count));
+
+    // RBDL function to calculate the Jacobian matrix for the specified body of the model at the current configuration Q
+    CalcPointJacobian6D(*models[name], Q, id, bodyPoint, G, true);
+    tf::matrixEigenToMsg(G, msg);
+    res.jacobian = msg;
+
 
     return true;
 

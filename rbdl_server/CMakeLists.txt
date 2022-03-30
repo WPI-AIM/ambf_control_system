@@ -44,6 +44,7 @@ add_service_files(
   RBDLJointSpaceInertia.srv
   RBDLPointVelocity.srv
   RBDLNonlinearEffects.srv
+  RBDLTaskSpaceBody.srv
   
 )
 
