@@ -1,22 +1,36 @@
 #include "rbdl_model_tests/AMBFParams.h"
+#include "rbdl_model_tests/EigenUtilities.h"
 
-AMBFParams::AMBFParams(const std::string name, rigidBodyPtr handler, const std::vector<std::string>& children, 
-  std::vector<ControllableJointConfig> jConfigs, Matrix3d r, Vector3d p) :
-  parentBodyName_(name), rigidBodyHandler_(handler), childrenJoints_(children), 
-  controllableJointConfigs_(jConfigs), r_w_n_(r),
-  p_w_n_(p) {}
+AMBFParams::AMBFParams(const std::string name, rigidBodyPtr handler) :
+  parentBodyName_(name), rigidBodyHandler_(handler) {}
 
 void AMBFParams::ControllableJointConfigs(const std::vector<ControllableJointConfig>& jointConfig)
 {
   controllableJointConfigs_ = jointConfig;
 }
 
-void AMBFParams::RotationMatrix(const Matrix3d r)
+const Matrix3d AMBFParams::RotationMatrix()
 {
-  r_w_n_ = r;
+  Quaternion quat_w_n = EigenUtilities::TFtoEigenQuaternion(quat_w_n_tf_);
+	return quat_w_n.toMatrix();
 }
 
-void AMBFParams::TranslationVector(const Vector3d p)
+const Vector3d AMBFParams::TranslationVector()
 {
-  p_w_n_ = p;
+  return EigenUtilities::TFtoEigenVector(p_w_n_tf_);
+}
+
+void AMBFParams::QuaternionTF(const tf::Quaternion q)
+{
+  quat_w_n_tf_ = q;
+}
+
+void AMBFParams::TranslationVectorTF(const tf::Vector3 p)
+{
+  p_w_n_tf_ = p;
+}
+
+void AMBFParams::QDesired(float q)
+{
+  qDesired_ = q;
 }

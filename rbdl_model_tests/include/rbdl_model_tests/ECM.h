@@ -2,16 +2,19 @@
 #include <thread>
 
 #include "rbdl_model_tests/RBDLTestPrep.h"
-#include "rbdl_model_tests/EigenUtilities.h"
+// #include "rbdl_model_tests/EigenUtilities.h"
 #include "rbdl_model_tests/AMBFParams.h"
 
 using namespace RigidBodyDynamics;
 using namespace RigidBodyDynamics::Math;
 typedef AMBFParams* AMBFParamsPtr;
+typedef std::unordered_map<std::string, AMBFParamsPtr> AMBFParamMap;
+typedef std::pair<std::string, AMBFParamsPtr> AMBFParamPair;
+
 
 //const double TEST_PREC = 1.0e-12;
-const double TEST_LAX = 1.0e-7;
-const useconds_t microsec = 250000;
+const double TEST_LAX {1.0e-7};
+const useconds_t sleepTime {250000};
 
 class ECM {
 public:
@@ -38,8 +41,8 @@ private:
   void CheckRBDLModel();
 
 private:
-  AMBFClientPtr ambfClientPtr_ = nullptr;
-  std::string baselinkName_ = "ecm/baselink";
+  AMBFClientPtr ambfClientPtr_{nullptr};
+  std::string baselinkName_{"ecm/baselink"};
   MatrixNd t_w_0_ = MatrixNd::Identity(4, 4);
   MatrixNd t_0_w_ = MatrixNd::Identity(4, 4);
 
@@ -52,10 +55,10 @@ private:
   // the corresponding AMBF joint.
   std::unordered_map<std::string, std::string> ambfJointToParentMap_;
   std::unordered_map<std::string, std::string>::iterator ambfJointToParentMapItr_;
-  
-  Model* rbdlModel_ = nullptr;
+
+  Model* rbdlModel_{nullptr};
   ConstraintSet cs_;
-  bool bgStab_ = true;
+  bool bgStab_{true};
   SpatialTransform X_p_;
   SpatialTransform X_s_;
   Body baselinkBody_, pitchendlinkBody_, maininsertionlinkBody_, toollinkBody_, yawlinkBody_, 

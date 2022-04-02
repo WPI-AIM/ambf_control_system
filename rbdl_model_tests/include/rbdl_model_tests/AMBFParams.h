@@ -1,6 +1,7 @@
 #include <iostream>
 #include "ambf_client/ambf_client.h"
 #include "rbdl/rbdl_math.h"
+#include <tf/LinearMath/Transform.h>
 using namespace RigidBodyDynamics;
 using namespace RigidBodyDynamics::Math;
 
@@ -19,20 +20,19 @@ typedef struct ControllableJointConfig
 class AMBFParams
 {
 public:
-  AMBFParams(const std::string name, rigidBodyPtr handler, 
-    const std::vector<std::string>& children, std::vector<ControllableJointConfig> jConfig,
-    Matrix3d r, Vector3d p);
+  AMBFParams(const std::string name, rigidBodyPtr handler);
   
   inline const std::string ParentBodyName() { return parentBodyName_; }
   inline rigidBodyPtr RididBodyHandler() { return rigidBodyHandler_; }
-  inline const std::vector<std::string> ChildrenJoints() { return childrenJoints_; }
   inline const std::vector<ControllableJointConfig> ControllableJointConfigs() { return controllableJointConfigs_; }
-  inline const Matrix3d RotationMatrix() { return r_w_n_; }
-  inline const Vector3d TranslationVector() { return p_w_n_; }
+  const Matrix3d RotationMatrix();
+  const Vector3d TranslationVector();
+  inline const float QDesired() { return qDesired_; }
 
   void ControllableJointConfigs(const std::vector<ControllableJointConfig>& jointConfig);
-  void RotationMatrix(const Matrix3d r);
-  void TranslationVector(const Vector3d p);
+  void QuaternionTF(const tf::Quaternion q);
+  void TranslationVectorTF(const tf::Vector3 p);
+  void QDesired(float q);
   ~AMBFParams();
 
 private:
@@ -40,6 +40,10 @@ private:
   rigidBodyPtr rigidBodyHandler_ = nullptr;
   const std::vector<std::string> childrenJoints_;
   std::vector<ControllableJointConfig> controllableJointConfigs_;
-  Matrix3d r_w_n_;
-  Vector3d p_w_n_;
+  // Matrix3d r_w_n_;
+  // Vector3d p_w_n_;
+  tf::Quaternion quat_w_n_tf_;
+  tf::Vector3 p_w_n_tf_;
+
+  float qDesired_{0.0};
 };

@@ -1,4 +1,5 @@
 #include "rbdl_model_tests/ECM.h"
+#include <thread>
 
 ECM::ECM() 
 {
@@ -9,10 +10,10 @@ ECM::ECM()
 	CreateRBDLModel();
 	ExecutePoseInAMBF();
   
-	// // PrintAMBFTransformation();
+	PrintAMBFTransformation();
 
 	// SetRBDLPose();
-	CheckRBDLModel();
+	// CheckRBDLModel();
 	
 	CleanUp();
 }
@@ -27,29 +28,25 @@ void ECM::ConnectToAMBF()
 void ECM::SetAMBFParams()
 {
 	std::vector<std::string> rigidBodyNames = ambfClientPtr_->getRigidBodyNames();
-	// printf("Registering rigidbody\n");
 	for(std::string rigidBodyName : rigidBodyNames)
 	{
-		// printf("%s\n", rigidBodyName.c_str());
-
 		ambfParamMap_[rigidBodyName] = new AMBFParams(
 				rigidBodyName, 
-				ambfClientPtr_->getRigidBody(rigidBodyName.c_str(), true), 
-				std::vector<std::string>{},
-				std::vector<ControllableJointConfig>{},
-				Matrix3dZero,
-				Vector3dZero
+				ambfClientPtr_->getRigidBody(rigidBodyName.c_str(), true)
 		);
 	}
-	usleep(2500000);
+	usleep(250000);
 	// printf("---------------------------------\n");
 	// Initialize all the handlers
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
 	{
-		printf("RigidBodyName: %s\n", ambfParamMapItr_->first.c_str());
-		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
-		rigidBodyHandler->set_joint_pos<int>(0, 0.0f);
-		usleep(microsec);
+		rigidBodyPtr handler = ambfParamMapItr_->second->RididBodyHandler();
+				
+		// Activate the rigid body if not active
+		if(!handler->is_active())
+		{
+			handler->set_active();
+		}
 	}
 
 	ambfParamMap_[baselinkName_]->ControllableJointConfigs(
@@ -61,12 +58,11 @@ void ECM::SetAMBFParams()
 			{     "maininsertionlink-toollink", -1.553, 1.567 },
 		}
 	);
-
 }
 
-void ECM::MapJoints(const std::string& parentBody, rigidBodyPtr rigidBodyHandler)
+void ECM::MapJoints(const std::string& parentBody, rigidBodyPtr handler)
 {
-	std::vector<std::string> jointNames = rigidBodyHandler->get_joint_names();
+	std::vector<std::string> jointNames = handler->get_joint_names();
 	for(std::string jointName : jointNames)
 	{
 		// AMBF parent has been identified already so skip updating it again
@@ -88,20 +84,20 @@ void ECM::MapAMBFJointsToParent()
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
 	{
 		const std::string parentBody = ambfParamMapItr_->first;
-		AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[parentBody];
+		// AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[parentBody];
 		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
 		MapJoints(parentBody, rigidBodyHandler);
 	}
 
-	for(ambfJointToParentMapItr_ = ambfJointToParentMap_.begin(); 
-			ambfJointToParentMapItr_ != ambfJointToParentMap_.end();
-			ambfJointToParentMapItr_++)
-	{
-		std::string jointName = ambfJointToParentMapItr_->first;
-		std::string parentName = ambfJointToParentMapItr_->second;
+	// for(ambfJointToParentMapItr_ = ambfJointToParentMap_.begin(); 
+	// 		ambfJointToParentMapItr_ != ambfJointToParentMap_.end();
+	// 		ambfJointToParentMapItr_++)
+	// {
+	// 	std::string jointName = ambfJointToParentMapItr_->first;
+	// 	std::string parentName = ambfJointToParentMapItr_->second;
 
-		printf("joint: %s, parent: %s\n", jointName.c_str(), parentName.c_str());
-	}
+	// 	printf("joint: %s, parent: %s\n", jointName.c_str(), parentName.c_str());
+	// }
 }
 
 void ECM::SetBodyParams()
@@ -313,26 +309,64 @@ void ECM::CreateRBDLModel()
 
 void ECM::ExecutePoseInAMBF()
 {
-	
-	AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[baselinkName_];
+	AMBFParamsPtr baselinkParams = ambfParamMap_[baselinkName_];
 
-	// const std::string parentBody = ambfRigidBodyParamsPtr->ParentBodyName();
-	rigidBodyPtr ambfRigidBodyHandler = ambfRigidBodyParams->RididBodyHandler();
-	std::vector<std::string> rigidBodyChildren = ambfRigidBodyParams->ChildrenJoints();
-	std::vector<ControllableJointConfig> rigidBodyControllableJointConfigs = 
-		ambfRigidBodyParams->ControllableJointConfigs();
+	rigidBodyPtr baselinkHandler = baselinkParams->RididBodyHandler();
+	// std::string rigidBodyName = baselinkHandler->get_name();
+	// std::cout << "Suppose to be base, check " << rigidBodyName << std::endl;
 
-	std::vector<std::string> rigidBodyNames = ambfClientPtr_->getRigidBodyNames();
-	
-	for(int i = 0; i < 1; i++)
+	std::vector<ControllableJointConfig> baselinkControllableJointConfigs = 
+		baselinkParams->ControllableJointConfigs();
+
+	int count = 0;
+	float qDesired = 0.0f;
+
+	float sumOfAbsoluteDiff = 0.0f;
+	do
 	{
-		for(ControllableJointConfig jointConfig : rigidBodyControllableJointConfigs)
-		{
-			ambfRigidBodyHandler->set_joint_pos<std::string>(jointConfig.jointName, 0.0f);
-			usleep(microsec);
-		}
-	}
+		/*** Running diff calculates the difference of desired and actual joint angles of all joints.
+		 * Run the do while loop until all joints have reached the desired poses. That is the sume of
+		 * absolute difference between actual and desired is zero for all joints. Absolute is used
+		 * to make sure that positive difference dosent compensate for the negative difference. 
+		 ***/  
+		sumOfAbsoluteDiff = 0.0f;
+		
+		// To avoid infinte looping
+		if(count > 10) return;
 
+		// printf("sumOfAbsoluteDiff: %f\n", sumOfAbsoluteDiff);
+		for(ControllableJointConfig jointConfig : baselinkControllableJointConfigs)
+		{
+			std::string jointName = jointConfig.jointName;
+			// printf("jointName: %s, qDesired: %f\n", jointName.c_str(), qDesired);
+			baselinkHandler->set_joint_pos<std::string>(jointName.c_str(), 0.0f);
+			usleep(sleepTime);
+
+			float qActual = baselinkHandler->get_joint_pos<std::string>(jointName.c_str());
+			sumOfAbsoluteDiff += abs(qDesired - qActual);
+			// printf("jointName: %s, qActual: %f\n", jointName.c_str(), qActual);
+		}
+
+		for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
+		{
+			const std::string parentBody = ambfParamMapItr_->first;
+			AMBFParamsPtr rigidBodyParams = ambfParamMap_[parentBody];
+			rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
+
+			tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
+			tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
+			rigidBodyParams->QuaternionTF(quat_w_n_tf);
+			rigidBodyParams->TranslationVectorTF(p_w_n_tf);
+			ambfParamMap_[parentBody] = rigidBodyParams;
+		}
+		count++;
+	} while (sumOfAbsoluteDiff > 0.002);
+	
+
+/*
+	// Get Joints rotation and pose
+	// This is mearsured after the sleepTime completes. The robot pose could have changed by the
+	// time below code gets executed. TODO: Explore multi theading to implement this. 
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
 	{
 		const std::string parentBody = ambfParamMapItr_->first;
@@ -357,14 +391,34 @@ void ECM::ExecutePoseInAMBF()
 
 	t_w_0_.block<3, 3>(0, 0) = ambfRigidBodyParams->RotationMatrix();
 	t_w_0_.block<3, 1>(0, 3) = ambfRigidBodyParams->TranslationVector();
+*/
 }
 
 const Matrix3d ECM::PrintAMBFTransformation()
 {
-	t_0_w_.block<3, 3>(0, 0) = t_w_0_.block<3, 3>(0, 0).transpose();
-	t_0_w_.block<3, 1>(0, 3) = -t_w_0_.block<3, 3>(0, 0).transpose() * t_w_0_.block<3, 1>(0, 3);
+
+	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
+	{
+		const std::string parentBody = ambfParamMapItr_->first;
+		AMBFParamsPtr rigidBodyParams = ambfParamMap_[parentBody];
+		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
+
+		Matrix3d r_w_n_ambf = ambfParamMapItr_->second->RotationMatrix();
+		Vector3d p_w_n_ambf = ambfParamMapItr_->second->TranslationVector();
+		
+		std::cout << "parentBody: " << parentBody << std::endl;
+		std::cout << "r_w_n_ambf: " << std::endl << r_w_n_ambf << std::endl;
+		std::cout << "p_w_n_ambf: " << std::endl << p_w_n_ambf << std::endl;
+	}
+
+
+
+	// t_0_w_.block<3, 3>(0, 0) = t_w_0_.block<3, 3>(0, 0).transpose();
+	// t_0_w_.block<3, 1>(0, 3) = -t_w_0_.block<3, 3>(0, 0).transpose() * t_w_0_.block<3, 1>(0, 3);
 	// std::cout << "t_0_w_" << std::endl << t_0_w_ << std::endl;
 
+
+/*
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
 	{
 		const std::string parentBody = ambfParamMapItr_->first;
@@ -382,7 +436,7 @@ const Matrix3d ECM::PrintAMBFTransformation()
 		// std::cout << "t_0_n" << std::endl << t_0_n << std::endl;
 		// std::cout << "---------------------------" << std::endl;
 	}
-
+*/
 	Matrix3d dummy;
 	return dummy;
 }
@@ -400,7 +454,6 @@ void ECM::SetRBDLPose()
 
 void ECM::CheckRBDLModel()
 {
-
 	// Iterate through RBDL body map, for each rbdl body, find the AMBF handler. Use the handler and find 
 	// the q_desired in AMBF
   for(rbdlmBodyMapItr_ = rbdlmBodyMap_.begin(); rbdlmBodyMapItr_ != rbdlmBodyMap_.end(); rbdlmBodyMapItr_++)
@@ -434,13 +487,13 @@ void ECM::CleanUp()
 	{
 		const std::string parentBody = ambfParamMapItr_->first;
 		AMBFParamsPtr ambfRigidBodyParamsPtr = ambfParamMapItr_->second;
-		rigidBodyPtr ambfRigidBodyHandler = ambfRigidBodyParamsPtr->RididBodyHandler();
+		rigidBodyPtr rigidBodyHandler = ambfRigidBodyParamsPtr->RididBodyHandler();
 
 		std::cout << "Cleaning up Rigid body pointer for " << parentBody << std::endl;
-		if(ambfRigidBodyHandler == nullptr)
+		if(rigidBodyHandler == nullptr)
 			printf("nullptr for rigidBodyName: %s\n", parentBody.c_str());
 
-		ambfRigidBodyHandler->cleanUp();
+		rigidBodyHandler->cleanUp();
 	}
 }
 
