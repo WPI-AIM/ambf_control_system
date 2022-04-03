@@ -1,5 +1,4 @@
 #include "rbdl_model_tests/ECM.h"
-#include <thread>
 
 ECM::ECM() 
 {
@@ -30,10 +29,10 @@ void ECM::SetAMBFParams()
 	std::vector<std::string> rigidBodyNames = ambfClientPtr_->getRigidBodyNames();
 	for(std::string rigidBodyName : rigidBodyNames)
 	{
-		ambfParamMap_[rigidBodyName] = new AMBFParams(
+		ambfParamMap_.insert(AMBFParamPair(rigidBodyName, new AMBFParams(
 				rigidBodyName, 
-				ambfClientPtr_->getRigidBody(rigidBodyName.c_str(), true)
-		);
+				ambfClientPtr_->getRigidBody(rigidBodyName.c_str(), true)))
+				);
 	}
 	usleep(250000);
 	// printf("---------------------------------\n");
@@ -67,9 +66,9 @@ void ECM::MapJoints(const std::string& parentBody, rigidBodyPtr handler)
 	{
 		// AMBF parent has been identified already so skip updating it again
 		// More than one AMBF rigid body can control the same joint.
-		ambfJointToParentMapItr_ = ambfJointToParentMap_.find(jointName);
-		if(ambfJointToParentMapItr_ != ambfJointToParentMap_.end()) continue;
-		ambfJointToParentMap_[jointName] = parentBody;
+		jointValuesMapItr_ = jointValuesMap_.find(jointName);
+		if(jointValuesMapItr_ != jointValuesMap_.end()) continue;
+		jointValuesMap_.insert(JointValuesPair(jointName, new JointValues{ parentBody, 0.0f }));
 	}
 }
 
@@ -89,12 +88,12 @@ void ECM::MapAMBFJointsToParent()
 		MapJoints(parentBody, rigidBodyHandler);
 	}
 
-	// for(ambfJointToParentMapItr_ = ambfJointToParentMap_.begin(); 
-	// 		ambfJointToParentMapItr_ != ambfJointToParentMap_.end();
-	// 		ambfJointToParentMapItr_++)
+	// for(jointValuesMapItr_ = jointValuesMap_.begin(); 
+	// 		jointValuesMapItr_ != jointValuesMap_.end();
+	// 		jointValuesMapItr_++)
 	// {
-	// 	std::string jointName = ambfJointToParentMapItr_->first;
-	// 	std::string parentName = ambfJointToParentMapItr_->second;
+	// 	std::string jointName = jointValuesMapItr_->first;
+	// 	std::string parentName = jointValuesMapItr_->second->parent;
 
 	// 	printf("joint: %s, parent: %s\n", jointName.c_str(), parentName.c_str());
 	// }
@@ -307,6 +306,48 @@ void ECM::CreateRBDLModel()
 	ClearLogOutput();
 }
 
+void ECM::HelloThread()
+{
+	std::cout << "HelloThread\n";
+}
+
+void ECM::RegisterRigidBodysPose()
+{
+	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
+	{
+		const std::string parentBody = ambfParamMapItr_->first;
+		AMBFParamsPtr rigidBodyParams = ambfParamMap_[parentBody];
+		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
+
+		tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
+		tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
+		rigidBodyParams->QuaternionTF(quat_w_n_tf);
+		rigidBodyParams->TranslationVectorTF(p_w_n_tf);
+		ambfParamMap_[parentBody] = rigidBodyParams;
+	}
+}
+
+void ECM::RegisterJointsAngle()
+{
+	for(jointValuesMapItr_ = jointValuesMap_.begin(); 
+			jointValuesMapItr_ != jointValuesMap_.end(); 
+			jointValuesMapItr_++)
+	{
+		const std::string jointName = jointValuesMapItr_->first;
+		JointValuesPtr jointValuePtr = jointValuesMapItr_->second;
+
+		const std::string parentName = jointValuesMap_[jointName]->parent;
+
+		ambfParamMapItr_ = ambfParamMap_.find(parentName);
+		if(ambfParamMapItr_ == ambfParamMap_.end()) continue;
+
+		rigidBodyPtr handler = ambfParamMap_[parentName]->RididBodyHandler();
+		jointValuePtr->qActual = handler->get_joint_pos<std::string>(jointName);
+
+		jointValuesMap_[jointName] = jointValuePtr;
+	}
+}
+
 void ECM::ExecutePoseInAMBF()
 {
 	AMBFParamsPtr baselinkParams = ambfParamMap_[baselinkName_];
@@ -322,6 +363,7 @@ void ECM::ExecutePoseInAMBF()
 	float qDesired = 0.0f;
 
 	float sumOfAbsoluteDiff = 0.0f;
+
 	do
 	{
 		/*** Running diff calculates the difference of desired and actual joint angles of all joints.
@@ -339,26 +381,15 @@ void ECM::ExecutePoseInAMBF()
 		{
 			std::string jointName = jointConfig.jointName;
 			// printf("jointName: %s, qDesired: %f\n", jointName.c_str(), qDesired);
-			baselinkHandler->set_joint_pos<std::string>(jointName.c_str(), 0.0f);
+			baselinkHandler->set_joint_pos<std::string>(jointName.c_str(), M_PI_4);
 			usleep(sleepTime);
 
 			float qActual = baselinkHandler->get_joint_pos<std::string>(jointName.c_str());
 			sumOfAbsoluteDiff += abs(qDesired - qActual);
 			// printf("jointName: %s, qActual: %f\n", jointName.c_str(), qActual);
 		}
-
-		for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
-		{
-			const std::string parentBody = ambfParamMapItr_->first;
-			AMBFParamsPtr rigidBodyParams = ambfParamMap_[parentBody];
-			rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
-
-			tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
-			tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
-			rigidBodyParams->QuaternionTF(quat_w_n_tf);
-			rigidBodyParams->TranslationVectorTF(p_w_n_tf);
-			ambfParamMap_[parentBody] = rigidBodyParams;
-		}
+		RegisterRigidBodysPose();
+		RegisterJointsAngle();
 		count++;
 	} while (sumOfAbsoluteDiff > 0.002);
 	
@@ -411,7 +442,16 @@ const Matrix3d ECM::PrintAMBFTransformation()
 		std::cout << "p_w_n_ambf: " << std::endl << p_w_n_ambf << std::endl;
 	}
 
+	std::cout << "print q_Acutal from AMBF\n";
+	for(jointValuesMapItr_ = jointValuesMap_.begin(); 
+			jointValuesMapItr_ != jointValuesMap_.end(); 
+			jointValuesMapItr_++)
+	{
+		const std::string jointName = jointValuesMapItr_->first;
+		JointValuesPtr jointValuePtr = jointValuesMapItr_->second;
 
+		printf("JointName: %s, qActualfromAMBF: %f\n", jointName.c_str(), jointValuePtr->qActual);
+	}
 
 	// t_0_w_.block<3, 3>(0, 0) = t_w_0_.block<3, 3>(0, 0).transpose();
 	// t_0_w_.block<3, 1>(0, 3) = -t_w_0_.block<3, 3>(0, 0).transpose() * t_w_0_.block<3, 1>(0, 3);
@@ -467,12 +507,13 @@ void ECM::CheckRBDLModel()
 		// std::cout << "--------------------" << std::endl;
 
 		// Skip the joint for which AMBF handler not found
-		ambfJointToParentMapItr_ = ambfJointToParentMap_.find(jointNameRBDL);
-		if(ambfJointToParentMapItr_ == ambfJointToParentMap_.end()) continue;
-		std::string parentName = ambfJointToParentMap_[jointNameRBDL];
+		jointValuesMapItr_ = jointValuesMap_.find(jointNameRBDL);
+		if(jointValuesMapItr_ == jointValuesMap_.end()) continue;
+		std::string parentName = jointValuesMap_[jointNameRBDL]->parent;
 
 		ambfParamMapItr_ = ambfParamMap_.find(parentName);
 		if(ambfParamMapItr_ == ambfParamMap_.end()) continue;
+
 		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
 
 		float qDesiredambf = rigidBodyHandler->get_joint_pos<std::string>(jointNameRBDL);
