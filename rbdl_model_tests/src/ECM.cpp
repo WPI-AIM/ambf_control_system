@@ -83,20 +83,19 @@ void ECM::MapAMBFJointsToParent()
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
 	{
 		const std::string parentBody = ambfParamMapItr_->first;
-		// AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[parentBody];
 		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
 		MapJoints(parentBody, rigidBodyHandler);
 	}
 
-	// for(jointValuesMapItr_ = jointValuesMap_.begin(); 
-	// 		jointValuesMapItr_ != jointValuesMap_.end();
-	// 		jointValuesMapItr_++)
-	// {
-	// 	std::string jointName = jointValuesMapItr_->first;
-	// 	std::string parentName = jointValuesMapItr_->second->parent;
+	for(jointValuesMapItr_ = jointValuesMap_.begin(); 
+			jointValuesMapItr_ != jointValuesMap_.end();
+			jointValuesMapItr_++)
+	{
+		std::string jointName = jointValuesMapItr_->first;
+		std::string parentName = jointValuesMapItr_->second->parent;
 
-	// 	printf("joint: %s, parent: %s\n", jointName.c_str(), parentName.c_str());
-	// }
+		printf("joint: %s, parent: %s\n", jointName.c_str(), parentName.c_str());
+	}
 }
 
 void ECM::SetBodyParams()
@@ -302,8 +301,17 @@ void ECM::CreateRBDLModel()
 	QDDot_ = VectorNd::Constant ((size_t) rbdlModel_->dof_count, 0.);
 	Tau_   = VectorNd::Constant ((size_t) rbdlModel_->dof_count, 0.); 
 	rbdlmBodyMap_ = rbdlModel_->mBodyNameMap;
-
+  
 	ClearLogOutput();
+
+	for(rbdlmBodyMapItr_ = rbdlmBodyMap_.begin(); rbdlmBodyMapItr_ != rbdlmBodyMap_.end(); rbdlmBodyMapItr_++)
+  {
+    std::string bodyName = rbdlmBodyMapItr_->first;
+    unsigned int bodyId = rbdlmBodyMapItr_->second;
+    std::string parentName = rbdlModel_->GetBodyName(rbdlModel_->GetParentBodyId(bodyId));
+    std::cout << parentName << ", " << bodyName << ", " << bodyId << std::endl;
+  }
+  std::cout << std::endl << "------------------" << std::endl;
 }
 
 void ECM::HelloThread()
@@ -353,6 +361,9 @@ void ECM::ExecutePoseInAMBF()
 	AMBFParamsPtr baselinkParams = ambfParamMap_[baselinkName_];
 
 	rigidBodyPtr baselinkHandler = baselinkParams->RididBodyHandler();
+	// rigidBodyPtr baselinkHandler = ambfClientPtr_->getRigidBody(baselinkName_.c_str(), true);
+	// usleep(250000);
+
 	// std::string rigidBodyName = baselinkHandler->get_name();
 	// std::cout << "Suppose to be base, check " << rigidBodyName << std::endl;
 
@@ -360,10 +371,8 @@ void ECM::ExecutePoseInAMBF()
 		baselinkParams->ControllableJointConfigs();
 
 	int count = 0;
-	float qDesired = 0.0f;
-
+	float qDesired = M_PI_4;
 	float sumOfAbsoluteDiff = 0.0f;
-
 	do
 	{
 		/*** Running diff calculates the difference of desired and actual joint angles of all joints.
@@ -371,24 +380,33 @@ void ECM::ExecutePoseInAMBF()
 		 * absolute difference between actual and desired is zero for all joints. Absolute is used
 		 * to make sure that positive difference dosent compensate for the negative difference. 
 		 ***/  
-		sumOfAbsoluteDiff = 0.0f;
+		sumOfAbsoluteDiff = 1.0f;
 		
 		// To avoid infinte looping
-		if(count > 10) return;
+		if(count > 20) return;
 
 		// printf("sumOfAbsoluteDiff: %f\n", sumOfAbsoluteDiff);
-		for(ControllableJointConfig jointConfig : baselinkControllableJointConfigs)
-		{
-			std::string jointName = jointConfig.jointName;
-			// printf("jointName: %s, qDesired: %f\n", jointName.c_str(), qDesired);
-			baselinkHandler->set_joint_pos<std::string>(jointName.c_str(), M_PI_4);
-			usleep(sleepTime);
+		// for(ControllableJointConfig jointConfig : baselinkControllableJointConfigs)
+		// {
+		// 	baselinkHandler->set_joint_pos<std::string>(jointConfig.jointName.c_str(), qDesired);
+		// }
+		// usleep(sleepTime);
+		baselinkHandler->set_joint_pos<std::string>(              "baselink-yawlink", qDesired);
+		baselinkHandler->set_joint_pos<std::string>(         "yawlink-pitchbacklink", qDesired);
+		baselinkHandler->set_joint_pos<std::string>("pitchendlink-maininsertionlink", 0.10);
+		baselinkHandler->set_joint_pos<std::string>(    "maininsertionlink-toollink", qDesired);
+		usleep(sleepTime);
+		// // float qActual = baselinkHandler->get_joint_pos<std::string>(jointName.c_str());
+		// sumOfAbsoluteDiff += abs(qDesired - qActual);
+		// printf("jointName: %s, qActual: %f\n", jointName.c_str(), qActual);
 
-			float qActual = baselinkHandler->get_joint_pos<std::string>(jointName.c_str());
-			sumOfAbsoluteDiff += abs(qDesired - qActual);
-			// printf("jointName: %s, qActual: %f\n", jointName.c_str(), qActual);
-		}
-		RegisterRigidBodysPose();
+		// float qAcutal1 = baselinkHandler->get_joint_pos<std::string>(              "baselink-yawlink");
+		// float qAcutal2 = baselinkHandler->get_joint_pos<std::string>(         "yawlink-pitchbacklink");
+		// float qAcutal3 = baselinkHandler->get_joint_pos<std::string>("pitchendlink-maininsertionlink");
+		// float qAcutal4 = baselinkHandler->get_joint_pos<std::string>(    "maininsertionlink-toollink");
+		// printf("qActual: %f, %f, %f, %f\n", qAcutal1, qAcutal2, qAcutal3, qAcutal4);
+		// std::cout << sumOfAbsoluteDiff << "------------------" << std::endl;
+		// RegisterRigidBodysPose();
 		RegisterJointsAngle();
 		count++;
 	} while (sumOfAbsoluteDiff > 0.002);
@@ -427,7 +445,15 @@ void ECM::ExecutePoseInAMBF()
 
 const Matrix3d ECM::PrintAMBFTransformation()
 {
-
+	std::cout << "qActual from AMBF\n";
+	for(jointValuesMapItr_ = jointValuesMap_.begin();
+		  jointValuesMapItr_ != jointValuesMap_.end();
+			jointValuesMapItr_++)
+			{
+				printf("%s, %f\n", jointValuesMapItr_->first.c_str(), jointValuesMapItr_->second->qActual);
+			}
+	std::cout << "-----------------\n";
+	/*
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
 	{
 		const std::string parentBody = ambfParamMapItr_->first;
@@ -456,7 +482,7 @@ const Matrix3d ECM::PrintAMBFTransformation()
 	// t_0_w_.block<3, 3>(0, 0) = t_w_0_.block<3, 3>(0, 0).transpose();
 	// t_0_w_.block<3, 1>(0, 3) = -t_w_0_.block<3, 3>(0, 0).transpose() * t_w_0_.block<3, 1>(0, 3);
 	// std::cout << "t_0_w_" << std::endl << t_0_w_ << std::endl;
-
+	*/
 
 /*
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)

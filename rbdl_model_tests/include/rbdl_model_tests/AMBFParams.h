@@ -40,8 +40,6 @@ private:
   rigidBodyPtr rigidBodyHandler_ = nullptr;
   const std::vector<std::string> childrenJoints_;
   std::vector<ControllableJointConfig> controllableJointConfigs_;
-  // Matrix3d r_w_n_;
-  // Vector3d p_w_n_;
   tf::Quaternion quat_w_n_tf_;
   tf::Vector3 p_w_n_tf_;
 
