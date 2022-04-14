@@ -24,7 +24,20 @@ void KUKA::ConnectToAMBF()
 	usleep(1000000);
 
   rbdlModel_ = new Model;
-  rbdlModel_->gravity = RigidBodyDynamics::Math::Vector3d(0., 0., -9.81);
+  rbdlModel_->gravity = Vector3d(0., 0., -9.81);
+}
+
+void KUKA::RegisterBodyToWorldTransformation(const std::string parentBody)
+{
+	// const std::string parentBody = ambfParamMapItr_->first;
+	AMBFParamsPtr rigidBodyParams = ambfParamMap_[parentBody];
+	rigidBodyPtr rigidBodyHandler = rigidBodyParams->RididBodyHandler();
+
+	tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
+	tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
+	rigidBodyParams->QuaternionTF(quat_w_n_tf);
+	rigidBodyParams->TranslationVectorTF(p_w_n_tf);
+	ambfParamMap_[parentBody] = rigidBodyParams;
 }
 
 void KUKA::SetAMBFParams()
@@ -64,6 +77,8 @@ void KUKA::SetAMBFParams()
       { "link7", -1.553, 1.567 },
 		}
 	);
+
+	RegisterBodyToWorldTransformation(baselinkName_);
 }
 
 void KUKA::MapJoints(const std::string& parentBody, rigidBodyPtr handler)
@@ -165,16 +180,18 @@ void KUKA::CreateRBDLModel()
 	
 	rbdlModel_->gravity = Vector3d(0., 0., -9.81);
 
-	// Modify this with World the base transformation
-	world_baseST.E.setIdentity();
+	// Register Word to Base Transform
+	AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[baselinkName_];
+
+	world_baseST.E = ambfRigidBodyParams->RotationMatrix();
 	world_baseST.r.setZero();
+	Vector3d p_world_base  = ambfRigidBodyParams->TranslationVector();
 	//1--------------------------------------------------------------------//
   Vector3d base_link1PA = { 00.000, 00.000, 01.000 };
   Vector3d base_link1CA = { 00.000, 00.000, 01.000 };
   Vector3d base_link1PP = { 00.000, 00.000, 00.103 };
   Vector3d base_link1CP = { 00.000, 00.000, 00.000 };
 
-	Vector3d p_world_base  = Vector3d::Zero();
 	Vector3d p_world_link1 = Vector3d::Zero();
 	
 	CreateRBDLJoint(base_link1PA, base_link1CA, base_link1PP, base_link1CP, 
@@ -310,14 +327,7 @@ void KUKA::RegisterAllRigidBodyPose()
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
 	{
 		const std::string parentBody = ambfParamMapItr_->first;
-		AMBFParamsPtr rigidBodyParams = ambfParamMap_[parentBody];
-		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
-
-		tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
-		tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
-		rigidBodyParams->QuaternionTF(quat_w_n_tf);
-		rigidBodyParams->TranslationVectorTF(p_w_n_tf);
-		ambfParamMap_[parentBody] = rigidBodyParams;
+		RegisterBodyToWorldTransformation(parentBody);
 	}
 }
 

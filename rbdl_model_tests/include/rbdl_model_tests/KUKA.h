@@ -43,10 +43,6 @@ public:
   // const Vector3d TranslationVectorTF();
 
   inline Model* GetRBDLModel() { return rbdlModel_; }
-  // inline VectorNd Q()     { return Q_;     }
-  // inline VectorNd QDot()  { return QDot_;  }
-  // inline VectorNd QDDot() { return QDDot_; }
-  // inline VectorNd Tau()   { return Tau_;   }
 
   void ExecutePose(VectorNd Q);
   t_w_nPtr twnFromModels(std::string jointName);
@@ -54,13 +50,13 @@ public:
   void CleanUp();
 private:
   void ConnectToAMBF();
+  void RegisterBodyToWorldTransformation(const std::string parentBody);
   void SetAMBFParams();
   void MapJoints(const std::string& parentBody, rigidBodyPtr rigidBodyHandler);
   void MapAMBFJointsToParent();
   void HelloThread();
   void RegisterAllRigidBodyPose();
   void ExecutePoseInAMBF();
-  // void ExecutePoseInRBDL(unsigned int rbdlBodyId);
 
   void SetBodyParams();
   void CreateRBDLJoint(Vector3d& PA, Vector3d& CA, Vector3d& PP, Vector3d& CP, const double offsetQ, 

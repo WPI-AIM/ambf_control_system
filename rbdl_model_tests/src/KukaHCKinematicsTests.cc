@@ -15,6 +15,11 @@ TEST_CASE(__FILE__"_KUKAHomePoseTest", "")
   kuka->ExecutePose(Q);
   t_w_nPtr t_w_nptr = kuka->twnFromModels("base-link1");
 
-  std::cout << std::endl << "p_w_n_ambf: " << t_w_nptr->p_w_n_ambf << std::endl;
-  std::cout << std::endl << "p_w_n_rbdl: " << t_w_nptr->p_w_n_rbdl << std::endl;
+  std::cout << std::endl << "r_w_n_ambf: " << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
+  std::cout << std::endl << "r_w_n_rbdl: " << std::endl << t_w_nptr->r_w_n_rbdl << std::endl;
+
+  std::cout << std::endl << "p_w_n_ambf: " << std::endl << t_w_nptr->p_w_n_ambf << std::endl;
+  std::cout << std::endl << "p_w_n_rbdl: " << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
+
+
 }
