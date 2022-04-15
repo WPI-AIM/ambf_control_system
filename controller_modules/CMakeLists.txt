@@ -60,7 +60,7 @@ set(SRC_FILES
    src/PDController.cpp
    src/ModelController.cpp
    src/SMCController.cpp
-   src/GravityCompensationController.cpp)
+   src/GravityCompensationController.cpp
    src/ControllerManager.cpp
    src/TaskSpaceController.cpp)
 
