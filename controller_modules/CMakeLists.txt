@@ -60,6 +60,7 @@ set(SRC_FILES
    src/PDController.cpp
    src/ModelController.cpp
    src/SMCController.cpp
+   src/GravityCompensationController.cpp)
    src/ControllerManager.cpp
    src/TaskSpaceController.cpp)
 
@@ -68,6 +69,7 @@ set (HDR_FILES
    include/${PROJECT_NAME}/PDController.h
    include/${PROJECT_NAME}/SMCController.h
    include/${PROJECT_NAME}/ModelController.h
+   include/${PROJECT_NAME}/GravityCompensationController.h
    include/${PROJECT_NAME}/ControllerManager.h
    include/${Project_NAME}/TaskSpaceController.h)
 

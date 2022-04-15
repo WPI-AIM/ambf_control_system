@@ -67,14 +67,14 @@ set(controller_modules_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(controller_modules_SOURCE_PREFIX /home/nathaniel/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/src/controller_modules)
-  set(controller_modules_DEVEL_PREFIX /home/nathaniel/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/devel)
+  set(controller_modules_SOURCE_PREFIX /home/nathanielgoldfarb/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/src/controller_modules)
+  set(controller_modules_DEVEL_PREFIX /home/nathanielgoldfarb/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/devel)
   set(controller_modules_INSTALL_PREFIX "")
   set(controller_modules_PREFIX ${controller_modules_DEVEL_PREFIX})
 else()
   set(controller_modules_SOURCE_PREFIX "")
   set(controller_modules_DEVEL_PREFIX "")
-  set(controller_modules_INSTALL_PREFIX /home/nathaniel/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/install)
+  set(controller_modules_INSTALL_PREFIX /home/nathanielgoldfarb/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/install)
   set(controller_modules_PREFIX ${controller_modules_INSTALL_PREFIX})
 endif()
 
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(controller_modules_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/home/nathaniel/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/devel/include " STREQUAL " ")
+if(NOT "/home/nathanielgoldfarb/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/devel/include " STREQUAL " ")
   set(controller_modules_INCLUDE_DIRS "")
-  set(_include_dirs "/home/nathaniel/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/devel/include")
+  set(_include_dirs "/home/nathanielgoldfarb/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/devel/include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -110,7 +110,7 @@ if(NOT "/home/nathaniel/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/gl
         message(FATAL_ERROR "Project 'controller_modules' specifies '${idir}' as an include dir, which is not found.  It does not exist in '${include}'.  ${_report}")
       endif()
     else()
-      message(FATAL_ERROR "Project 'controller_modules' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/nathaniel/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/src/controller_modules/${idir}'.  ${_report}")
+      message(FATAL_ERROR "Project 'controller_modules' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/nathanielgoldfarb/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/src/controller_modules/${idir}'.  ${_report}")
     endif()
     _list_append_unique(controller_modules_INCLUDE_DIRS ${include})
   endforeach()
@@ -131,7 +131,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/nathaniel/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/devel/lib;/usr/local/MATLAB/R2021a/sys/ros1/glnxa64/ros1/lib;/usr/local/MATLAB/R2021a/toolbox/ros/mlroscpp/custom_messages/lib)
+    foreach(path /home/nathanielgoldfarb/catkin_ws/src/ambf_control_system/matlab_msg_gen_ros1/glnxa64/devel/lib;/usr/local/MATLAB/R2021a/sys/ros1/glnxa64/ros1/lib;/usr/local/MATLAB/R2021a/toolbox/ros/mlroscpp/custom_messages/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
