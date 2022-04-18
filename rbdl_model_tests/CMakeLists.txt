@@ -128,6 +128,47 @@ set_target_properties(kuka_tests_hc PROPERTIES
     CXX_EXTENSIONS OFF
     )
 ################END################
+################START################
+#Executible kuka_hc_tests_tbd
+
+set (KUKA_RBDL_MODEL_TBD_TESTS_HDR_FILES
+    include/${PROJECT_NAME}/AMBFParams.h
+    include/${PROJECT_NAME}/KUKA.h
+    )
+
+set(KUKA_RBDL_MODEL_TBD_TESTS_SOURCE_FILES
+    # src/ECMHCDynamicsTests.cc
+    src/KukaHCKinematicsTestsTBD.cc
+    # src/KUKABodyTests.cc
+    src/AMBFParams.cpp
+    src/KUKATBD.cpp
+    src/EigenUtilities.cpp
+    src/RBDLTestPrep.cc
+    src/main.cc
+    )
+
+add_executable (kuka_tests_hc_tbd
+${RBDL_MODEL_TESTS_HDR_FILES} 
+${KUKA_RBDL_MODEL_TBD_TESTS_HDR_FILES} 
+${KUKA_RBDL_MODEL_TBD_TESTS_SOURCE_FILES})
+target_link_libraries (kuka_tests_hc_tbd
+    ${catkin_LIBRARIES} 
+    ${Eigen_LIBRARIES} 
+    ${AMBF_CLIENT_LIBRARY} 
+    ${RBDL_MODEL_LIBRARY} 
+    ${Boost_LIBRARIES} 
+    ${UNITTEST++_LIBRARY}
+    ${RBDL_LIBRARY}
+    pthread
+    )
+
+set_target_properties(kuka_tests_hc_tbd PROPERTIES
+    CXX_STANDARD 17
+    CXX_EXTENSIONS OFF
+    )
+################END################
+
+
 
 # ################START################
 # #Executible Parallel Structure_hc_tests

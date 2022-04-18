@@ -60,9 +60,9 @@ private:
 
   void SetBodyParams();
   void CreateRBDLJoint(Vector3d& PA, Vector3d& CA, Vector3d& PP, Vector3d& CP, const double offsetQ, 
-	Vector3d axis, unsigned int parentId, Vector3d& p_world_startingbody, Joint joint,
-  SpatialTransform	world_parentST, Body &body, std::string bodyName, Vector3d& p_world_endingbody, 
-  unsigned int& newBodyId, SpatialTransform&	world_bodyST);
+	Vector3d axis, unsigned int parentId, Vector3d& p_world_parent, Joint joint,
+  SpatialTransform	world_parentST, Body &body, std::string bodyName, Vector3d& p_world_child, 
+  unsigned int& newBodyId, SpatialTransform&	world_childST);
 
   void CreateRBDLModel();
   void PrintRBDLModel();

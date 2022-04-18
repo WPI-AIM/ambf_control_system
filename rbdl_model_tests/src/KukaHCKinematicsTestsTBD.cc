@@ -12,12 +12,12 @@ TEST_CASE(__FILE__"_KUKAHomePoseTest", "")
 	VectorNd Tau   = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
 
   Q.setZero();
-  for(int i = 0; i < Q.size(); i++)
-  {
-    Q[i] = M_PI_4;
-  }
-  // Q[0] = M_PI_4;
-  // Q[1] = M_PI_4;
+  // for(int i = 0; i < Q.size(); i++)
+  // {
+  //   Q[i] = 0.0f;
+  // }
+  Q[0] = M_PI_4;
+  Q[1] = M_PI_4;
   // Q[2] = M_PI_4;
   // Q[3] = M_PI_4;
   // Q[4] = M_PI_4;
@@ -53,3 +53,17 @@ TEST_CASE(__FILE__"_KUKAHomePoseTest", "")
 
   kuka->CleanUp();
 }
+
+// TEST_CASE(__FILE__"_DryTest", "") 
+// {
+//   Matrix3d r_0_2(0.5, 0.5, -0.707107,
+//   -0.707107,    0.707107, 6.50354e-17,
+//         0.5,         0.5,    0.707107
+// );
+  
+//   Vector3d p_2_2(0, 0.013, 0.209);
+
+//   Vector3d p_0_2 = r_0_2.transpose() * p_2_2;
+
+//   std::cout << "p_0_2" << std::endl << p_0_2 << std::endl;
+// }

@@ -7,6 +7,14 @@ KUKA::KUKA()
 	MapAMBFJointsToParent();
 	SetBodyParams();
 	CreateRBDLModel();
+	// ExecutePoseInAMBF();
+  
+	// PrintAMBFTransformation();
+
+	// SetRBDLPose();
+	// CheckRBDLModel();
+	
+	// CleanUp();
 }
 
 void KUKA::ConnectToAMBF()
@@ -147,10 +155,18 @@ void KUKA::CreateRBDLJoint(Vector3d& pa, Vector3d& ca, Vector3d& pp, Vector3d& c
 	bodyST.E = rotOffset.rotation() * bodyRot;
 	bodyST.r = pp - (bodyRot.inverse() * cp);
 
+	// Vector3d roationAxis = world_parentST.E.block<3, 1>(0, 1).transpose();
+	// roationAxis.normalize();
+	// std::cout << "CreateRBDLJoint() " << bodyName << std::endl;
+	// std::cout << "world_parentST" << std::endl << world_parentST << std::endl;
+	// std::cout << "roationAxis" << std::endl << roationAxis << std::endl;
+	// std::cout << "--------------------------\n";
+
 	p_world_child =  world_parentST.E.inverse() * bodyST.r;
 	newBodyId = rbdlModel_->AddBody(parentId, Xtrans(p_world_parent), joint, body, bodyName);
 	
 	world_childST = world_parentST * bodyST;
+	// printf("%s\n", bodyName.c_str());
 }
 
 void KUKA::CreateRBDLModel()
@@ -211,13 +227,14 @@ void KUKA::CreateRBDLModel()
 	Vector3d link7_eePP = Vector3d::Zero();
 	Vector3d link7_eeCP = Vector3d::Zero();
 	
-	Vector3d p_world_link1 = Vector3d::Zero();
-	Vector3d p_world_link2 = Vector3d::Zero();
-	Vector3d p_world_link3 = Vector3d::Zero();
-	Vector3d p_world_link4 = Vector3d::Zero();
-	Vector3d p_world_link5 = Vector3d::Zero();
-	Vector3d p_world_link6 = Vector3d::Zero();
-	Vector3d p_world_link7 = Vector3d::Zero();
+	// Vector3d p_world_link1 = Vector3d::Zero();
+	// Vector3d p_world_link2 = Vector3d::Zero();
+	// Vector3d p_world_link3 = Vector3d::Zero();
+	// Vector3d p_world_link4 = Vector3d::Zero();
+	// Vector3d p_world_link5 = Vector3d::Zero();
+	// Vector3d p_world_link6 = Vector3d::Zero();
+	// Vector3d p_world_link7 = Vector3d::Zero();
+	// Vector3d p_world_ee	 	 = Vector3d::Zero();
 
 	SetBodyParams();
 	
@@ -226,98 +243,124 @@ void KUKA::CreateRBDLModel()
 	// Register Word to Base Transform
 	AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[baselinkName_];
 
-	world_baseST.E = ambfRigidBodyParams->RotationMatrix();
-	world_baseST.r = ambfRigidBodyParams->TranslationVector();
+	// world_baseST.E = ambfRigidBodyParams->RotationMatrix();
+	// world_baseST.r.setIdentity();
+	// Vector3d p_world_base  = ambfRigidBodyParams->TranslationVector();
+	Vector3d p_world_base;
+	p_world_base.setZero();
+	// std::cout << "world_baseST" << std::endl << world_baseST << std::endl;
+	// std::cout << "p_world_base" << std::endl << p_world_base << std::endl;
 
-	Eigen::Matrix3d base;
+	Matrix3d base;
 	base.setIdentity();
 	//1--------------------------------------------------------------------//
-	base_link1PA.normalize();
-	base_link1CA.normalize();
+	// base_link1PA.normalize();
+	// base_link1CA.normalize();
 
-	Matrix3d base_link1Rot = 
-		Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(base_link1PA, 
-																												base_link1CA));
-	Eigen::Affine3d base_link1_offset(Eigen::AngleAxisd(base_link1OffsetQ, 
-		Eigen::Vector3d::UnitZ()));
+	// Matrix3d base_link1Rot = 
+	// 	Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(base_link1PA, 
+	// 																											base_link1CA));
+	// Eigen::Affine3d base_link1_offset(Eigen::AngleAxisd(base_link1OffsetQ, 
+	// 	Eigen::Vector3d::UnitZ()));
+	// // Eigen::Matrix3d base_link1_offset = EigenUtilities::rotZ(base_link1Offset);
 
-	SpatialTransform base_link1ST;
-	base_link1ST.E = base_link1_offset.rotation() * base_link1Rot;
-	base_link1ST.r = base_link1PP - (base_link1Rot.inverse() * base_link1CP);
+	// SpatialTransform base_link1ST;
+	// base_link1ST.E = base_link1_offset.rotation() * base_link1Rot;
+	// base_link1ST.r = base_link1PP - (base_link1Rot.inverse() * base_link1CP);
 
-	// const SpatialTransform 
-	world_link1ST = world_baseST * base_link1ST;
-
-	Joint base_link1Joint = Joint(JointTypeRevolute, world_link1ST.E.transpose().block<3, 1>(0, 2).transpose());
-
-	// const Eigen::Vector3d 
-	p_world_link1 =  world_baseST.E.inverse() * base_link1ST.r;
-	// p_world_link1 = world_link1ST.r;
-	std::cout << "world_baseST" << std::endl << world_baseST << std::endl << std::endl;
-	std::cout << "world_link1ST" << std::endl << world_link1ST << std::endl << std::endl;
-	std::cout << "p_world_link1" << std::endl << p_world_link1 << std::endl << std::endl;
-
-	unsigned int base_link1ID = rbdlModel_->AddBody(0, 
-		RigidBodyDynamics::Math::Xtrans(world_link1ST.r), 
-		base_link1Joint, link1Body_, "base-link1");
-
-	//--------------------------------------------------------------------//
-	link1_link2PA.normalize();
-	link1_link2CA.normalize();
-
-	Eigen::Matrix3d link1_link2Rot = 
-		Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link1_link2PA, 
-		link1_link2CA));
-	Eigen::Affine3d link1_link2_offset(Eigen::AngleAxisd(link1_link2OffsetQ, 
-		Eigen::Vector3d::UnitZ()));
-
-	SpatialTransform link1_link2ST;
-	link1_link2ST.E = link1_link2_offset.rotation() * link1_link2Rot;
-	link1_link2ST.r = 
-		link1_link2PP - (link1_link2Rot.inverse() * link1_link2CP);
+	Joint base_link1Joint = Joint(SpatialVector(0.0, 0.0, 1.0, 0.0, 0.0, 0.0));
+	// RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+	// base_link1ST.E.transpose().block<3, 1>(0, 2).transpose());
 	
-	// const SpatialTransform 
-	world_link2ST = world_link1ST * link1_link2ST;
+	// unsigned int base_link1ID = rbdlModel_->AddBody(0, 
+	// 	RigidBodyDynamics::Math::Xtrans(p_world_base), 
+	// 	base_link1Joint, link1Body_, "base-link1");
 
-	Joint link1_link2Joint = 
-		RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-		world_link2ST.E.transpose().block<3, 1>(0, 2).transpose());
-
-	// const Eigen::Vector3d 
-	p_world_link2 = 
-		world_link1ST.E.inverse() * link1_link2ST.r;
-	unsigned int link1_link2ID = rbdlModel_->AddBody(base_link1ID, 
-		RigidBodyDynamics::Math::Xtrans(p_world_link2), 
-		link1_link2Joint, link2Body_, "link1-link2");
+	// const Eigen::Vector3d P_base_link1_base =  base * base_link1ST.r;
+	unsigned int base_link1ID = 
+    rbdlModel_->AddBody(0, Xtrans(Vector3d(0., 0., 0.)), base_link1Joint, link1Body_, "base-link1");
 	//--------------------------------------------------------------------//
-	link2_link3PA.normalize();
-	link2_link3CA.normalize();
+	// link1_link2PA.normalize();
+	// link1_link2CA.normalize();
 
-	Eigen::Matrix3d link2_link3Rot = 
-		Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link2_link3PA, 
-																												link2_link3CA));
-	Eigen::Affine3d link2_link3_offset(Eigen::AngleAxisd(link2_link3OffsetQ, 
-		Eigen::Vector3d::UnitZ()));
+	// Eigen::Matrix3d link1_link2Rot = 
+	// 	Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link1_link2PA, 
+	// 	link1_link2CA));
+	// Eigen::Affine3d link1_link2_offset(Eigen::AngleAxisd(link1_link2OffsetQ, 
+	// 	Eigen::Vector3d::UnitZ()));
+	// // Eigen::Matrix3d link1_link2_offset = 
+	// //   EigenUtilities::rotZ(link1_link2Offset);
+	// SpatialTransform link1_link2ST;
+	// link1_link2ST.E = link1_link2_offset.rotation() * link1_link2Rot;
+	// link1_link2ST.r = 
+	// 	link1_link2PP - (link1_link2Rot.inverse() * link1_link2CP);
+	
+	// const SpatialTransform base_link2ST = base_link1ST * link1_link2ST;
 
-	SpatialTransform link2_link3ST;
-	link2_link3ST.E = link2_link3_offset.rotation() * link2_link3Rot;
-	link2_link3ST.r = 
-		link2_link3PP - (link2_link3Rot.inverse() * link2_link3CP);   
+	Joint link1_link2Joint = Joint(SpatialVector(0.0, 1.0, 0.0, 0.0, 0.0, 0.0));
+		// RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+		// base_link2ST.E.transpose().block<3, 1>(0, 2).transpose());
 
-	world_link3ST = world_link2ST * link2_link3ST;
+	// unsigned int link1_link2ID = rbdlModel_->AddBody(base_link1ID, 
+	// 	RigidBodyDynamics::Math::Xtrans(P_base_link1_base), 
+	// 	link1_link2Joint, link2Body_, "link1-link2");
+  // Matrix3d r_world_link1( 
+  //   1.0, 0.0, 0.0,
+  //   0.0, 1.0, 0.0,
+  //   0.0, 0.0, 1.0
+  // );
+  Matrix3d r_world_link1( 
+    0.707037,     0.707177, -0.000297534,
+   -0.707177,     0.707037, -1.45781e-05,
+ 0.000200058,  0.000220716,            1
+  );
+	const Vector3d p_world_link1 = r_world_link1 * base_link1PP;
+	unsigned int link1_link2ID = 
+    rbdlModel_->AddBody(base_link1ID, Xtrans(p_world_link1), link1_link2Joint, link2Body_, "link1-link2");
+	//--------------------------------------------------------------------//
+	// link2_link3PA.normalize();
+	// link2_link3CA.normalize();
 
-	Joint link2_link3Joint = 
-		RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-		world_link3ST.E.transpose().block<3, 1>(0, 2).transpose());
+	// Eigen::Matrix3d link2_link3Rot = 
+	// 	Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link2_link3PA, 
+	// 																											link2_link3CA));
+	// Eigen::Affine3d link2_link3_offset(Eigen::AngleAxisd(link2_link3OffsetQ, 
+	// 	Eigen::Vector3d::UnitZ()));
+	// // Eigen::Matrix3d link2_link3_offset = 
+	// //   EigenUtilities::rotZ(link2_link3Offset);
+	// SpatialTransform link2_link3ST;
+	// link2_link3ST.E = link2_link3_offset.rotation() * link2_link3Rot;
+	// link2_link3ST.r = 
+	// 	link2_link3PP - (link2_link3Rot.inverse() * link2_link3CP);   
 
-	// const Eigen::Vector3d 
-	p_world_link3 = 
-		world_link2ST.E.inverse() * link2_link3ST.r;
+	// const SpatialTransform base_link3ST = base_link2ST * link2_link3ST;
 
+	Joint link2_link3Joint = Joint(SpatialVector(0.0, 0.0, 1.0, 0.0, 0.0, 0.0));
+		// RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
+		// base_link3ST.E.transpose().block<3, 1>(0, 2).transpose());
+
+	// unsigned int link2_link3ID = rbdlModel_->AddBody(link1_link2ID, 
+	// 	RigidBodyDynamics::Math::Xtrans(P_base_link2_base), 
+	// 	link2_link3Joint, link3Body_, "link2-link3");
+
+	// const Eigen::Vector3d P_base_link3_base = 
+	// 	base_link2ST.E.inverse() * link2_link3ST.r;
+  // Matrix3d r_world_link2( 
+  //   1.0, 0.0,  0.0,
+  //   0.0, 0.0, -1.0,
+  //   0.0, 1.0,  0.0
+  // );
+  Matrix3d r_world_link2( 
+   0.489667,     0.48996,   -0.721226,
+  -0.509947,    -0.51002,     -0.6927,
+  -0.707234,    0.706979, 0.000114015
+  );
+  const Vector3d p_world_link2 = r_world_link1 * link1_link2PP;
 	unsigned int link2_link3ID = rbdlModel_->AddBody(link1_link2ID, 
-		RigidBodyDynamics::Math::Xtrans(p_world_link3), 
+		RigidBodyDynamics::Math::Xtrans(p_world_link2), 
 		link2_link3Joint, link3Body_, "link2-link3");
 	//--------------------------------------------------------------------//
+  /*
 	link3_link4PA.normalize();
 	link3_link4CA.normalize();
 
@@ -326,111 +369,41 @@ void KUKA::CreateRBDLModel()
 		link3_link4CA));
 	Eigen::Affine3d link3_link4_offset(Eigen::AngleAxisd(link3_link4OffsetQ, 
 		Eigen::Vector3d::UnitZ()));
+	// Eigen::Matrix3d link3_link4_offset = 
+	//   EigenUtilities::rotZ(link3_link4Offset);
 
 	SpatialTransform link3_link4ST;
 	link3_link4ST.E = link3_link4_offset.rotation() * link3_link4Rot;
 	link3_link4ST.r = 
 		link3_link4PP - (link3_link4Rot.inverse() * link3_link4CP);
 
-	// const SpatialTransform 
-	world_link4ST = world_link3ST * link3_link4ST;
+	const SpatialTransform base_link4ST = base_link3ST * link3_link4ST;
 
 	Joint link3_link4Joint = 
 		RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-		world_link4ST.E.transpose().block<3, 1>(0, 2).transpose());
+		base_link4ST.E.transpose().block<3, 1>(0, 2).transpose());
+
+	// unsigned int link3_link4ID = rbdlModel_->AddBody(link2_link3ID, 
+	// 	RigidBodyDynamics::Math::Xtrans(P_base_link3_base), link3_link4Joint, 
+	// 	link4Body_, "link3-link4");
 		
-	// const Eigen::Vector3d 
-	p_world_link4 = 
-		world_link3ST.E.inverse() * link3_link4ST.r;
+	const Eigen::Vector3d P_base_link4_base = 
+		base_link3ST.E.inverse() * link3_link4ST.r;
 	
 	unsigned int link3_link4ID = rbdlModel_->AddBody(link2_link3ID, 
-		RigidBodyDynamics::Math::Xtrans(p_world_link4), link3_link4Joint, 
+		RigidBodyDynamics::Math::Xtrans(P_base_link4_base), link3_link4Joint, 
 		link4Body_, "link3-link4");
 	//--------------------------------------------------------------------//
-	link4_link5PA.normalize();
-	link4_link5CA.normalize();
-
-	Eigen::Matrix3d link4_link5Rot = 
-		Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link4_link5PA, 
-		link4_link5CA));
-	Eigen::Affine3d link4_link5_offset(Eigen::AngleAxisd(link4_link5OffsetQ, 
-		Eigen::Vector3d::UnitZ()));
-
-	SpatialTransform link4_link5ST;
-	link4_link5ST.E = link4_link5_offset.rotation() * link4_link5Rot;
-	link4_link5ST.r = 
-		link4_link5PP - (link4_link5Rot.inverse() * link4_link5CP);
-
-	world_link5ST = world_link4ST * link4_link5ST;
-
-	// const Eigen::Vector3d 
-	p_world_link5 = world_link4ST.E.inverse() * link4_link5ST.r;
-
-	Joint link4_link5Joint = 
-		RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-		world_link5ST.E.transpose().block<3, 1>(0, 2).transpose());
-
-	unsigned int link4_link5ID = rbdlModel_->AddBody(link3_link4ID, 
-		RigidBodyDynamics::Math::Xtrans(p_world_link5), link4_link5Joint, 
-		link5Body_, "link4-link5");
-	//--------------------------------------------------------------------//
-    link5_link6PA.normalize();
-    link5_link6CA.normalize();
-
-    Eigen::Matrix3d link5_link6Rot = 
-      Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link5_link6PA, 
-      link5_link6CA));
-    Eigen::Affine3d link5_link6_offset(Eigen::AngleAxisd(link5_link6OffsetQ, 
-      Eigen::Vector3d::UnitZ()));
-
-		SpatialTransform link5_link6ST;
-    link5_link6ST.E = link5_link6_offset.rotation() * link5_link6Rot;
-    link5_link6ST.r = 
-      link5_link6PP - (link5_link6Rot.inverse() * link5_link6CP);
-
-    world_link6ST = world_link5ST * link5_link6ST;
-
-    // const Eigen::Vector3d 
-		p_world_link6 = world_link5ST.E.inverse() * link5_link6ST.r;
-
-    Joint link5_link6Joint = 
-      RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-      world_link6ST.E.transpose().block<3, 1>(0, 2).transpose());
-    unsigned int link5_link6ID = rbdlModel_->AddBody(link4_link5ID, 
-      RigidBodyDynamics::Math::Xtrans(p_world_link6), link5_link6Joint, 
-                                                            link6Body_, "link5-link6");
-    //--------------------------------------------------------------------//
-    link6_link7PA.normalize();
-    link6_link7CA.normalize();
-
-    Eigen::Matrix3d link6_link7Rot = 
-      Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(link6_link7PA, 
-      link6_link7CA));
-    Eigen::Affine3d link6_link7_offset(Eigen::AngleAxisd(link6_link7OffsetQ, 
-      Eigen::Vector3d::UnitZ()));
-
-		SpatialTransform link6_link7ST;
-    link6_link7ST.E = link6_link7_offset.rotation() * link6_link7Rot;
-    link6_link7ST.r = 
-      link6_link7PP - (link6_link7Rot.inverse() * link6_link7CP);
-
-    world_link7ST = world_link6ST * link6_link7ST;
-
-    // const Eigen::Vector3d 
-		p_world_link7 = 
-		world_link6ST.E.inverse() * link6_link7ST.r;
-
-    Joint link6_link7Joint = 
-      RigidBodyDynamics::Joint(RigidBodyDynamics::JointType::JointTypeRevolute, 
-      world_link7ST.E.transpose().block<3, 1>(0, 2).transpose());
-
-    unsigned int link6_link7ID = rbdlModel_->AddBody(link5_link6ID, 
-      RigidBodyDynamics::Math::Xtrans(p_world_link7), link6_link7Joint, 
-      link7Body_, "link6-link7");
-    //--------------------------------------------------------------------/
-
-
-
+*/
+  // std::cout << "base" << std::endl << base << std::endl;
+  // std::cout << "p_world_base" << std::endl << p_world_base << std::endl;
+  // std::cout << "-------------------------\n";
+  // std::cout << "base_link1ST" << std::endl << base_link1ST << std::endl;
+  // std::cout << "P_base_link1_base" << std::endl << P_base_link1_base << std::endl;
+  // std::cout << "-------------------------\n";
+  // std::cout << "link1_link2ST" << std::endl << link1_link2ST << std::endl;
+  // std::cout << "P_base_link2_base" << std::endl << P_base_link2_base << std::endl;
+  // std::cout << "-------------------------\n";
 
 
 // CreateRBDLJoint(Vector3d& pa, Vector3d& ca, Vector3d& pp, Vector3d& cp, const double offsetQ, 
@@ -469,6 +442,35 @@ void KUKA::CreateRBDLModel()
 	// CreateRBDLJoint(link7_eePA, link7_eeCA, link7_eePP, link7_eeCP, link7_eeOffsetQ, 
 	// Vector3d::UnitZ(), link6_link7Id, p_world_link7, Joint(SpatialVector (0., 0., 0., 0., 0., 0.)), 
 	// world_link7ST, link7Body_, "link7-ee", p_world_ee, link7_eeId, world_eeST);
+
+	// std::cout << "world_baseST" << std::endl << world_baseST << std::endl;
+	// std::cout << "p_world_base" << std::endl << p_world_base << std::endl;
+	// std::cout << "---------------------\n";
+	// std::cout << "world_link1ST" << std::endl << world_link1ST << std::endl;
+	// std::cout << "p_world_link1" << std::endl << p_world_link1 << std::endl;
+	// std::cout << "---------------------\n";
+	// std::cout << "world_link2ST" << std::endl << world_link2ST << std::endl;
+	// std::cout << "p_world_link2" << std::endl << p_world_link2 << std::endl;
+	// std::cout << "---------------------\n";
+	// std::cout << "world_link3ST" << std::endl << world_link3ST << std::endl;
+	// std::cout << "p_world_link3" << std::endl << p_world_link3 << std::endl;
+	// std::cout << "---------------------\n";
+	// std::cout << "world_link4ST" << std::endl << world_link4ST << std::endl;
+	// std::cout << "p_world_link4" << std::endl << p_world_link4 << std::endl;
+	// std::cout << "---------------------\n";
+// //11--------------------------------------------------------------------//
+// 	Vector3d toollink_eePA = { 0.0, 0.0, 1.0 };
+// 	Vector3d toollink_eeCA = { 0.0, 0.0, 1.0 };
+// 	Vector3d toollink_eePP = Vector3d::Zero();
+// 	Vector3d toollink_eeCP = Vector3d::Zero();
+// 	Vector3d p_world_ee	 	 = Vector3d::Zero();
+
+// 	CreateRBDLJoint(toollink_eePA, toollink_eeCA, 
+// 	toollink_eePP, toollink_eeCP, toollink_eeOffsetQ, 
+// 	Vector3d::UnitZ(), maininsertionlink_toollinkId, p_world_toollink, 
+// 	Joint(SpatialVector (0., 0., 0., 0., 0., 0.)),
+// 	world_toollinkST, toollinkBody_, "toollink_ee", 
+// 	p_world_ee, toollink_eeId, world_eeST);
 	//--------------------------------------------------------------------//
 
 	Q_     = VectorNd::Constant ((size_t) rbdlModel_->dof_count, 0.);
@@ -531,7 +533,7 @@ void KUKA::ExecutePoseInAMBF()
 
       // Zero indexed
       float jointAngle = Q_[--jointId];
-			// printf("ExecutePoseInAMBF(): jointName: %s, jointAngle: %f\n", jointName.c_str(), jointAngle);
+			printf("ExecutePoseInAMBF(): jointName: %s, jointAngle: %f\n", jointName.c_str(), jointAngle);
       baselinkHandler->set_joint_pos<std::string>( jointName.c_str(), jointAngle);
     }
     usleep(sleepTime);
@@ -573,8 +575,7 @@ t_w_nPtr KUKA::twnFromModels(std::string jointName)
 	if(npos == -1) return t_w_nptr;
 
 	// const std::string parentName = jointName.substr(0, jointName.find("-", 0));
-	// const std::string parentName = jointName.substr(0, npos);
-	const std::string parentName = jointName.substr(npos + 1, jointName.size());
+	const std::string parentName = jointName.substr(0, npos);
 	// printf("joint_ name: %s, parentName: %s, npos: %ld\n", jointName.c_str(), parentName.c_str(), npos);
 	//-------------------------------------------------------------------------//
 	// std::cout << "ambfParamMap_\n";
@@ -595,18 +596,20 @@ t_w_nPtr KUKA::twnFromModels(std::string jointName)
 	}
 	
 	// Collect AMBF and RBDL Transformation Matrices
-	t_w_nptr->r_w_n_ambf = ambfParamMap_[parentName]->RotationMatrix();
-	t_w_nptr->p_w_n_ambf = ambfParamMap_[parentName]->TranslationVector();
+	// t_w_nptr->r_w_n_ambf = ambfParamMap_[parentName]->RotationMatrix();
+	// t_w_nptr->p_w_n_ambf = ambfParamMap_[parentName]->TranslationVector();
 
-	// // For troubleshooting	
-	// MatrixNd t_w_n_ambf = MatrixNd::Identity(4, 4);
-	// t_w_n_ambf.block<3, 3>(0, 0) = ambfParamMap_[parentName]->RotationMatrix();
-	// t_w_n_ambf.block<3, 1>(0, 3) = ambfParamMap_[parentName]->TranslationVector();
+	// For troubleshooting	
+	MatrixNd t_w_n_ambf = MatrixNd::Identity(4, 4);
+	t_w_n_ambf.block<3, 3>(0, 0) = ambfParamMap_[parentName]->RotationMatrix();
+	t_w_n_ambf.block<3, 1>(0, 3) = ambfParamMap_[parentName]->TranslationVector();
 	
-	// MatrixNd t_0_n_ambf = MatrixNd::Identity(4, 4);
-	// t_0_n_ambf = t_0_w_ * t_w_n_ambf;
-	// t_w_nptr->r_w_n_ambf = t_0_n_ambf.block<3, 3>(0, 0);
-	// t_w_nptr->p_w_n_ambf = t_0_n_ambf.block<3, 1>(0, 3);
+  // Updating pose w.r.t base and not w.r.t world for testing.
+  // This has to chaned w.r.t world.
+	MatrixNd t_0_n_ambf = MatrixNd::Identity(4, 4);
+	t_0_n_ambf = t_0_w_ * t_w_n_ambf;
+	t_w_nptr->r_w_n_ambf = t_0_n_ambf.block<3, 3>(0, 0);
+	t_w_nptr->p_w_n_ambf = t_0_n_ambf.block<3, 1>(0, 3);
 
 	// std::cout << "twnFromModels(): Q_" << std::endl << Q_ << std::endl;
 	ForwardDynamics(*rbdlModel_, Q_, QDot_, Tau_, QDDot_);
