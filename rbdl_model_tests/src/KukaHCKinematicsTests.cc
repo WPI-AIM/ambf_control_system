@@ -16,13 +16,7 @@ TEST_CASE(__FILE__"_KUKAHomePoseTest", "")
   {
     Q[i] = M_PI_4;
   }
-  // Q[0] = M_PI_4;
-  // Q[1] = M_PI_4;
-  // Q[2] = M_PI_4;
-  // Q[3] = M_PI_4;
-  // Q[4] = M_PI_4;
-  // Q[5] = M_PI_4;
-  // Q[6] = M_PI_4;
+
   kuka->ExecutePose(Q);
 
 
@@ -47,9 +41,5 @@ TEST_CASE(__FILE__"_KUKAHomePoseTest", "")
     std::cout << std::endl << "p_w_n_rbdl: " << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
     std::cout << "---------------------------------\n";
   }
-  // t_w_nPtr t_w_nptr = kuka->twnFromModels("base-link1");
-  // t_w_nPtr t_w_nptr = kuka->twnFromModels("link1-link2");
-  // t_w_nPtr t_w_nptr = kuka->twnFromModels("link2-link3");
-
   kuka->CleanUp();
 }

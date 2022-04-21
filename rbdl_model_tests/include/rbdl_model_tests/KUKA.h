@@ -59,10 +59,12 @@ private:
   void ExecutePoseInAMBF();
 
   void SetBodyParams();
-  void CreateRBDLJoint(Vector3d& PA, Vector3d& CA, Vector3d& PP, Vector3d& CP, const double offsetQ, 
-	Vector3d axis, unsigned int parentId, Vector3d& p_world_parent, Joint joint,
-  SpatialTransform	world_parentST, Body &body, std::string bodyName, Vector3d& p_world_child, 
-  unsigned int& newBodyId, SpatialTransform&	world_childST);
+
+  void CreateRBDLJoint(Vector3d& pa, Vector3d& ca, const Vector3d& pp, const Vector3d& cp, 
+  const double offsetQ, 
+	const Vector3d axis, const unsigned int parentId, const Joint joint, const SpatialTransform world_parentST, 
+	const Body &body, const std::string bodyName, unsigned int& childId, SpatialTransform&	world_childST);
+
 
   void CreateRBDLModel();
   void PrintRBDLModel();
