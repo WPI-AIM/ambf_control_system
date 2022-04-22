@@ -14,7 +14,7 @@ ECM::ECM()
 	// SetRBDLPose();
 	// CheckRBDLModel();
 	
-	CleanUp();
+	// CleanUp();
 }
 
 void ECM::ConnectToAMBF()

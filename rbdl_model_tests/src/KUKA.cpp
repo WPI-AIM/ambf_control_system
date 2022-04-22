@@ -238,27 +238,27 @@ void KUKA::CreateRBDLModel()
 	CreateRBDLJoint(link1_link2PA, link1_link2CA, link1_link2PP, link1_link2CP, link1_link2OffsetQ, 
 	Vector3d::UnitZ(), base_link1Id, Joint(SpatialVector (0., 1., 0., 0., 0., 0.)), 
 	world_link1ST, link1Body_, "link1-link2", link1_link2Id, world_link2ST);
-	//--------------------------------------------------------------------//
-	CreateRBDLJoint(link2_link3PA, link2_link3CA, link2_link3PP, link2_link3CP, link2_link3OffsetQ, 
-	Vector3d::UnitZ(), link1_link2Id, Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), 
-	world_link2ST, link2Body_, "link2-link3", link2_link3Id, world_link3ST);
-	//--------------------------------------------------------------------//
-	CreateRBDLJoint(link3_link4PA, link3_link4CA, link3_link4PP, link3_link4CP, link3_link4OffsetQ, 
-	Vector3d::UnitZ(), link2_link3Id, Joint(SpatialVector (0., -1., 0., 0., 0., 0.)), 
-	world_link3ST, link3Body_, "link3-link4", link3_link4Id, world_link4ST);
-	//--------------------------------------------------------------------//
-	CreateRBDLJoint(link4_link5PA, link4_link5CA, link4_link5PP, link4_link5CP, link4_link5OffsetQ, 
-	Vector3d::UnitZ(), link3_link4Id, Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), 
-	world_link4ST, link4Body_, "link4-link5", link4_link5Id, world_link5ST);
-	//--------------------------------------------------------------------//
-	CreateRBDLJoint(link5_link6PA, link5_link6CA, link5_link6PP, link5_link6CP, link5_link6OffsetQ, 
-	Vector3d::UnitZ(), link4_link5Id, Joint(SpatialVector (0., 1., 0., 0., 0., 0.)), 
-	world_link5ST, link5Body_, "link5-link6", link5_link6Id, world_link6ST);
-	//--------------------------------------------------------------------//
-	CreateRBDLJoint(link6_link7PA, link6_link7CA, link6_link7PP, link6_link7CP, link6_link7OffsetQ, 
-	Vector3d::UnitZ(), link5_link6Id, Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), 
-	world_link6ST, link6Body_, "link6-link7", link6_link7Id, world_link7ST);
-	//--------------------------------------------------------------------//
+	// //--------------------------------------------------------------------//
+	// CreateRBDLJoint(link2_link3PA, link2_link3CA, link2_link3PP, link2_link3CP, link2_link3OffsetQ, 
+	// Vector3d::UnitZ(), link1_link2Id, Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), 
+	// world_link2ST, link2Body_, "link2-link3", link2_link3Id, world_link3ST);
+	// //--------------------------------------------------------------------//
+	// CreateRBDLJoint(link3_link4PA, link3_link4CA, link3_link4PP, link3_link4CP, link3_link4OffsetQ, 
+	// Vector3d::UnitZ(), link2_link3Id, Joint(SpatialVector (0., -1., 0., 0., 0., 0.)), 
+	// world_link3ST, link3Body_, "link3-link4", link3_link4Id, world_link4ST);
+	// //--------------------------------------------------------------------//
+	// CreateRBDLJoint(link4_link5PA, link4_link5CA, link4_link5PP, link4_link5CP, link4_link5OffsetQ, 
+	// Vector3d::UnitZ(), link3_link4Id, Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), 
+	// world_link4ST, link4Body_, "link4-link5", link4_link5Id, world_link5ST);
+	// //--------------------------------------------------------------------//
+	// CreateRBDLJoint(link5_link6PA, link5_link6CA, link5_link6PP, link5_link6CP, link5_link6OffsetQ, 
+	// Vector3d::UnitZ(), link4_link5Id, Joint(SpatialVector (0., 1., 0., 0., 0., 0.)), 
+	// world_link5ST, link5Body_, "link5-link6", link5_link6Id, world_link6ST);
+	// //--------------------------------------------------------------------//
+	// CreateRBDLJoint(link6_link7PA, link6_link7CA, link6_link7PP, link6_link7CP, link6_link7OffsetQ, 
+	// Vector3d::UnitZ(), link5_link6Id, Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), 
+	// world_link6ST, link6Body_, "link6-link7", link6_link7Id, world_link7ST);
+	// //--------------------------------------------------------------------//
 
 	Q_     = VectorNd::Constant ((size_t) rbdlModel_->dof_count, 0.);
 	QDot_  = VectorNd::Constant ((size_t) rbdlModel_->dof_count, 0.);
