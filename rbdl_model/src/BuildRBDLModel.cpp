@@ -43,7 +43,6 @@ bool BuildRBDLModel::buildMeshPath() {
 
 }
 
-
 /*
  * Parse YAML file and create instances of Body class for each body of the model
  * @return true after successful parsing

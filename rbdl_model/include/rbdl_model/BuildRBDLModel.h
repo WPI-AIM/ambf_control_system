@@ -68,6 +68,7 @@ private:
     bool buildMeshPath();
 
     std::string blender_namespace_;
+    
     YAML::Node baseNode_;
     std::string actuator_config_file_;
     std::string baseRigidBody_;
@@ -77,6 +78,7 @@ private:
     std::string base_joint_name_;
     Model *RBDLmodel_ = NULL;
     Model *model = NULL;
+
     std::unordered_map<std::string, bodyParamPtr> bodyParamObjectMap_;
 
     //                 <parent,                       <jointname, jointParamPtr>>

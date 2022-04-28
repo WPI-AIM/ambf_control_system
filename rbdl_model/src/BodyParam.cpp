@@ -10,7 +10,7 @@ BodyParam::BodyParam(YAML::Node bodyNode)
     name_ = utilities.trimTrailingSpaces(name);
 
     YAML::Node mesh_name = bodyNode["mesh"];
-    if(!name.IsDefined()) utilities.throwExceptionMessage("mesh name in Body Params");
+    if(!mesh_name.IsDefined()) utilities.throwExceptionMessage("mesh name in Body Params");
     mesh_name_ = utilities.trimTrailingSpaces(mesh_name);
 
     YAML::Node mass = bodyNode["mass"];
@@ -32,8 +32,6 @@ BodyParam::BodyParam(YAML::Node bodyNode)
     YAML::Node inertial_offset_orientation = inertial_offset["orientation"];
     if(!inertial_offset_orientation.IsDefined()) utilities.throwExceptionMessage("inertia offset orientation in Body Params");
     inertial_offset_orientation_ = utilities.toRPY(&inertial_offset_orientation);
-
-
 
 
     YAML::Node location = bodyNode["location"];

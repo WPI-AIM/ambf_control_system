@@ -15,16 +15,17 @@ public:
     ~BodyParam(void);
     inline double Mass() { return mass_; }
     inline std::string MeshName() { return mesh_name_; }
-    inline Vector3d InertialOffsetPosition() { return location_position_; }
-    inline Vector3d InertialOffsetOrientation() { return location_orientation_; }
-    inline Vector3d Position() { return inertial_offset_position_; }
-    inline Vector3d Orientation() { return inertial_offset_orientation_; }
+    inline Vector3d Position() { return location_position_; }
+    inline Vector3d Orientation() { return location_orientation_; }
+    inline Vector3d InertialOffsetPosition() { return inertial_offset_position_; }
+    inline Vector3d InertialOffsetOrientation() { return inertial_offset_orientation_; }
     inline Math::Matrix3d Inertia() { return inertia_; }
 
 private:
 
     std::string name_;
     std::string mesh_name_;
+
     double mass_{0.00000001};
     Math::Matrix3d inertia_;
     Vector3d inertial_offset_position_;
