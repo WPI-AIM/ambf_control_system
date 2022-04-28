@@ -1,5 +1,7 @@
 #include "rbdl_model/BuildRBDLModel.h"
 
+
+
 BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) {
     actuator_config_file_ = actuator_config_file;
 
@@ -18,6 +20,7 @@ BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) {
     if (baseNode_.IsNull()) return;
 
     this->getNamespace();
+    this->buildMeshPath();
     if(!this->getBodies()) return;
     if(!this->getJoints()) return;
     if(!this->findBaseNode()) return;
@@ -31,6 +34,15 @@ void BuildRBDLModel::getNamespace() {
     YAML::Node blender_namespace = baseNode_["namespace"];
     if(blender_namespace.IsDefined())  blender_namespace_ = utilities.trimTrailingSpaces(blender_namespace);
 }
+
+bool BuildRBDLModel::buildMeshPath() {
+    Utilities utilities;
+
+    YAML::Node mesh_path = baseNode_["high resolution path"];
+    if(mesh_path.IsDefined() )mesh_path_  = utilities.trimTrailingSpaces(mesh_path);
+
+}
+
 
 /*
  * Parse YAML file and create instances of Body class for each body of the model

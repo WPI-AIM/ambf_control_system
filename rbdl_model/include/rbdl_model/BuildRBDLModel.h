@@ -13,6 +13,7 @@
 #include <unordered_set>
 #include <vector>
 #include <boost/optional.hpp>
+// #include <boost/filesystem.hpp>
 #include <rbdl_model/RBDLModelErrors.h>
 #include <limits>
 
@@ -31,7 +32,7 @@ class BuildRBDLModel
 {
 public:
     BuildRBDLModel(const std::string actuator_config_file);
-
+    BuildRBDLModel();
     void printBody();
     void printJoint();
     void cleanUp();
@@ -39,7 +40,7 @@ public:
     ~BuildRBDLModel(void);
 
     std::unordered_map<std::string, bodyParamPtr> inline getRBDLBodyToObjectMap() { return bodyParamObjectMap_; }
-
+    std::string inline getMeshPath(){return mesh_path_;}
     std::unordered_map<std::string, unsigned int> inline getRBDLBodyToIDMap() { return rbdlObjectMap_; }
     std::unordered_map<std::string, unsigned int> inline getRBDLJointToIDMap() { return joint_map; }
     Model inline getRBDLModel() { return *RBDLmodel_; }
@@ -57,16 +58,20 @@ private:
     void getNamespace();
     bool getBodies();
     bool getJoints();
+    
+
     bool findBaseNode();
     void addDummyBaseJoint();
 
     bool buildBodyTree();
     bool buildModel();
+    bool buildMeshPath();
 
     std::string blender_namespace_;
     YAML::Node baseNode_;
     std::string actuator_config_file_;
     std::string baseRigidBody_;
+    std::string mesh_path_;
 
     const std::string base_parent_name_ = "world";
     std::string base_joint_name_;
