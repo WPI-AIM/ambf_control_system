@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 typedef BuildRBDLModel* BuildRBDLModelPtr;
 typedef Client* AMBFClientPtr;
+typedef Model* RBDLModelPtr; 
 //------------------------------------------------------------------------------
 
 const double TEST_PREC = 1.0e-2;

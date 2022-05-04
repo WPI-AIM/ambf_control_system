@@ -56,7 +56,6 @@ private:
   void MapAMBFJointsToParent();
   void HelloThread();
   void RegisterAllRigidBodyPose();
-  void ExecutePoseInAMBF();
 
   void SetBodyParams();
 
@@ -70,17 +69,23 @@ private:
   void PrintRBDLModel();
   void SetRBDLPose();
   void CheckRBDLModel();
+  void ExecutePoseInAMBF();
 
 private:
   AMBFClientPtr ambfClientPtr_{nullptr};
   std::string baselinkName_{"base"};
   MatrixNd t_w_0_ = MatrixNd::Identity(4, 4);
   MatrixNd t_0_w_ = MatrixNd::Identity(4, 4);
-
+  Vector3d vector3d_zero_ = Vector3d::Zero();
   // Format of the map yet to be decided
   AMBFParamMap ambfParamMap_;
   AMBFParamMap::iterator ambfParamMapItr_;
-
+  // const double world_base_roll_{-M_PI_2};  // X
+  // const double world_base_pitch_{M_PI_2}; // Y
+  // const double world_base_yaw_{M_PI};   // Z
+  const double world_base_roll_{0.0};  // X
+  const double world_base_pitch_{0.0}; // Y
+  const double world_base_yaw_{0.0};   // Z
   // RBDL use joint names to define a body. This corresponds to rigidbody in AMBF.
   // This give a need to map the RBDL joint name with the corresponing AMBF handler that would provied
   // the corresponding AMBF joint.
@@ -91,7 +96,7 @@ private:
 
   Model* rbdlModel_{nullptr};
 
-  Body baseBody_, link1Body_, link2Body_, link3Body_, link4Body_, link5Body_, link6Body_, link7Body_;
+  Body worldBody_, baseBody_, link1Body_, link2Body_, link3Body_, link4Body_, link5Body_, link6Body_, link7Body_;
   VectorNd Q_;
   VectorNd QDot_;
   VectorNd QDDot_;

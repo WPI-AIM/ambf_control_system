@@ -12,7 +12,7 @@ std::chrono::duration<double> RBDLTestPrep::getTime(){
   return std::chrono::system_clock::now() - begin;
 }
 
-AMBFClientPtr RBDLTestPrep::getAMBFClientInstance(){
+AMBFClientPtr RBDLTestPrep::getAMBFClientInstance() {
   AMBFClientPtr clientPtr = new Client();
   return clientPtr;
 }

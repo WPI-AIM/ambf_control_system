@@ -11,13 +11,13 @@ void AMBFParams::ControllableJointConfigs(const std::vector<ControllableJointCon
 
 const Matrix3d AMBFParams::RotationMatrix()
 {
-  Quaternion quat_w_n = EigenUtilities::TFtoEigenQuaternion(quat_w_n_tf_);
+  Quaternion quat_w_n = EigenUtilities::TFtoRBDLQuaternion(quat_w_n_tf_);
 	return quat_w_n.toMatrix();
 }
 
 const Vector3d AMBFParams::TranslationVector()
 {
-  return EigenUtilities::TFtoEigenVector(p_w_n_tf_);
+  return EigenUtilities::TFtoRBDLVector(p_w_n_tf_);
 }
 
 void AMBFParams::QuaternionTF(const tf::Quaternion q)
