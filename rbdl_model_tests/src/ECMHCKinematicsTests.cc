@@ -32,16 +32,16 @@ TEST_CASE(__FILE__"_Initilize", "")
 
 TEST_CASE(__FILE__"_ECMFKTest", "") 
 {
-  Eigen::Matrix3d m;
-  const double r = 0.5* M_PI;
-  const double p = 0.25* M_PI;
-  const double y = 0.75* M_PI;
-  printf("r: %lf, p: %lf, y: %lf\n", r, p, y);
+  // Eigen::Matrix3d m;
+  // const double r = 0.5* M_PI;
+  // const double p = 0.25* M_PI;
+  // const double y = 0.75* M_PI;
+  // printf("r: %lf, p: %lf, y: %lf\n", r, p, y);
 
-  m = Eigen::AngleAxisd(r, Vector3d::UnitX())
-    * Eigen::AngleAxisd(p, Vector3d::UnitY())
-    * Eigen::AngleAxisd(y, Vector3d::UnitZ());
-  std::cout << m << std::endl << "is unitary: " << m.isUnitary() << std::endl;
+  // m = Eigen::AngleAxisd(r, Vector3d::UnitX())
+  //   * Eigen::AngleAxisd(p, Vector3d::UnitY())
+  //   * Eigen::AngleAxisd(y, Vector3d::UnitZ());
+  // std::cout << m << std::endl << "is unitary: " << m.isUnitary() << std::endl;
 
   if(rbdlModel == nullptr) return;
 	VectorNd Q     = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
@@ -58,13 +58,14 @@ TEST_CASE(__FILE__"_ECMFKTest", "")
   // Q[0] = M_PI_4;
   // Q[1] = 0.0f;
   
-  if(!ecm->ExecutePoseInAMBF(Q)) return;
+  if(!ecm->ExecutePose(Q)) return;
 
 
   std::map< std::string, unsigned int > rbdlmBodyMap = rbdlModel->mBodyNameMap;
   std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr;
 	for(rbdlmBodyMapItr = rbdlmBodyMap.begin(); rbdlmBodyMapItr != rbdlmBodyMap.end(); rbdlmBodyMapItr++)
   {
+    // std::string bodyName = "pitchbacklink-pitchbottomlink";
     std::string bodyName = rbdlmBodyMapItr->first;
     unsigned int bodyId = rbdlmBodyMapItr->second;
     if(bodyId == 0) continue;
@@ -80,12 +81,31 @@ TEST_CASE(__FILE__"_ECMFKTest", "")
 
     std::cout << std::endl << "p_w_n_ambf: " << std::endl << t_w_nptr->p_w_n_ambf << std::endl;
     std::cout << std::endl << "p_w_n_rbdl: " << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
+    
+    CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
     std::cout << "---------------------------------\n";
   }
 }
-
 
 TEST_CASE(__FILE__"_Cleanup", "") 
 {
   ecm->CleanUp();
 }
+
+// TEST_CASE(__FILE__"_TestMatrix", "") 
+// {
+//   Matrix3d r_w_m(0, 0, -1,  0, -1, 0, -1, 0, 0);
+//   Matrix3d r_w_t(0, 1,  0, -1,  0, 0,  0, 0, 1);
+  
+//   Matrix3d rst_m_t = r_w_m.transpose() * r_w_t;
+  
+//   std::cout << "rst_m_t" << std::endl << rst_m_t << std::endl;
+//   Matrix3d r_w_t_check = r_w_m * rst_m_t;
+//   CHECK_THAT (r_w_t, AllCloseMatrix(r_w_t_check, TEST_PREC, TEST_PREC));
+
+//   Matrix3d rRot(0, 0, 1, 0, 1, 0, -1, 0, 0);
+//   Matrix3d rOff;
+//   rOff = rst_m_t * rRot.transpose();
+//   Matrix3d rst_m_t_check = rOff * rRot;
+//   CHECK_THAT (rst_m_t, AllCloseMatrix(rst_m_t_check, TEST_PREC, TEST_PREC));
+// }

@@ -34,7 +34,8 @@ public:
   // const Vector3d TranslationVectorTF();
 
   inline RBDLModelPtr GetRBDLModel() { return rbdlModelPtr_; }
-  bool ExecutePoseInAMBF(VectorNd Q);
+  bool ExecutePose(VectorNd Q);
+  
   t_w_nPtr twnFromModels(std::string jointName);
   void CleanUp();
 private:
@@ -56,7 +57,7 @@ private:
   void CreateRBDLModel();
   void SetRBDLPose();
   void CheckRBDLModel();
-
+  bool ExecutePoseInAMBF();
 private:
   AMBFClientPtr ambfClientPtr_{nullptr};
   std::string baselinkName_{"baselink"};
@@ -69,7 +70,9 @@ private:
   // Format of the map yet to be decided
   AMBFParamMap ambfParamMap_;
   AMBFParamMap::iterator ambfParamMapItr_;
-
+  const double world_base_roll_{0.0};  // X
+  const double world_base_pitch_{0.0}; // Y
+  const double world_base_yaw_{0.0};   // Z
   RBDLModelPtr rbdlModelPtr_{nullptr};
   ConstraintSet cs_;
   bool bgStab_{true};
@@ -84,4 +87,8 @@ private:
   VectorNd Tau_;
   std::map< std::string, unsigned int > rbdlmBodyMap_;
   std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr_;
+
+  SpatialTransform world_baselinkST, world_yawlinkST, world_pitchfrontlinkST, world_pitchbacklinkST, 
+	world_pitchbottomlinkST, world_pitchendlinkST, world_maininsertionlinkST, world_pitchtoplinkST,
+	world_toollinkST, world_eeST;
 };

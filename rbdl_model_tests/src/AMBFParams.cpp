@@ -9,10 +9,22 @@ void AMBFParams::ControllableJointConfigs(const std::vector<ControllableJointCon
   controllableJointConfigs_ = jointConfig;
 }
 
+const Quaternion AMBFParams::GetQuternion()
+{
+  return EigenUtilities::TFtoRBDLQuaternion(quat_w_n_tf_);
+}
+
 const Matrix3d AMBFParams::RotationMatrix()
 {
-  Quaternion quat_w_n = EigenUtilities::TFtoRBDLQuaternion(quat_w_n_tf_);
-	return quat_w_n.toMatrix();
+  // Quaternion quat_w_n = EigenUtilities::TFtoRBDLQuaternion(quat_w_n_tf_);
+	// return quat_w_n.toMatrix();
+  Eigen::Quaterniond quat_w_n;
+  quat_w_n.x() = quat_w_n_tf_.x();
+  quat_w_n.y() = quat_w_n_tf_.y();
+  quat_w_n.z() = quat_w_n_tf_.z();
+  quat_w_n.w() = quat_w_n_tf_.w();
+
+  return quat_w_n.normalized().toRotationMatrix();
 }
 
 const Vector3d AMBFParams::TranslationVector()

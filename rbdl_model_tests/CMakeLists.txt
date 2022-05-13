@@ -165,42 +165,42 @@ set_target_properties(kuka_tests_hc PROPERTIES
 #     )
 # ################END################
 
-# ################START################
-# #Executible ecm_hc_tests
+################START################
+#Executible ecm_hc_tests
 
-# set (ECM_RBDL_MODEL_TESTS_HDR_FILES
-#     include/${PROJECT_NAME}/AMBFParams.h
-#     include/${PROJECT_NAME}/ECM.h
-#     )
+set (ECM_RBDL_MODEL_TESTS_HDR_FILES
+    include/${PROJECT_NAME}/AMBFParams.h
+    include/${PROJECT_NAME}/ECM.h
+    )
 
-# set(ECM_RBDL_MODEL_TESTS_SOURCE_FILES
-#     # src/ECMHCDynamicsTests.cc
-#     src/ECMHCKinematicsTests.cc
-#     # src/ECMBodyTests.cc
-#     src/AMBFParams.cpp
-#     src/ECM.cpp
-#     src/EigenUtilities.cpp
-#     src/RBDLTestPrep.cc
-#     src/main.cc
-#     )
+set(ECM_RBDL_MODEL_TESTS_SOURCE_FILES
+    # src/ECMHCDynamicsTests.cc
+    src/ECMHCKinematicsTests.cc
+    # src/ECMBodyTests.cc
+    src/AMBFParams.cpp
+    src/ECM.cpp
+    src/EigenUtilities.cpp
+    src/RBDLTestPrep.cc
+    src/main.cc
+    )
 
-# add_executable (ecm_tests_hc
-# ${RBDL_MODEL_TESTS_HDR_FILES} 
-# ${ECM_RBDL_MODEL_TESTS_HDR_FILES} 
-# ${ECM_RBDL_MODEL_TESTS_SOURCE_FILES})
-# target_link_libraries (ecm_tests_hc
-#     ${catkin_LIBRARIES} 
-#     ${Eigen_LIBRARIES} 
-#     ${AMBF_CLIENT_LIBRARY} 
-#     ${RBDL_MODEL_LIBRARY} 
-#     ${Boost_LIBRARIES} 
-#     ${UNITTEST++_LIBRARY}
-#     ${RBDL_LIBRARY}
-#     pthread
-#     )
+add_executable (ecm_tests_hc
+${RBDL_MODEL_TESTS_HDR_FILES} 
+${ECM_RBDL_MODEL_TESTS_HDR_FILES} 
+${ECM_RBDL_MODEL_TESTS_SOURCE_FILES})
+target_link_libraries (ecm_tests_hc
+    ${catkin_LIBRARIES} 
+    ${Eigen_LIBRARIES} 
+    ${AMBF_CLIENT_LIBRARY} 
+    ${RBDL_MODEL_LIBRARY} 
+    ${Boost_LIBRARIES} 
+    ${UNITTEST++_LIBRARY}
+    ${RBDL_LIBRARY}
+    pthread
+    )
 
-# set_target_properties(ecm_tests_hc PROPERTIES
-#     CXX_STANDARD 17
-#     CXX_EXTENSIONS OFF
-#     )
-# ################END################
+set_target_properties(ecm_tests_hc PROPERTIES
+    CXX_STANDARD 17
+    CXX_EXTENSIONS OFF
+    )
+################END################

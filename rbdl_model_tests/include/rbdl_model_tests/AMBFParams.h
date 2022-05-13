@@ -4,7 +4,7 @@
 #include <tf/LinearMath/Transform.h>
 using namespace RigidBodyDynamics;
 using namespace RigidBodyDynamics::Math;
-
+#include <Eigen/Geometry>
 
 typedef struct ControllableJointConfig
 {
@@ -25,6 +25,8 @@ public:
   inline const std::string ParentBodyName() { return parentBodyName_; }
   inline rigidBodyPtr RididBodyHandler() { return rigidBodyHandler_; }
   inline const std::vector<ControllableJointConfig> ControllableJointConfigs() { return controllableJointConfigs_; }
+  
+  const Quaternion GetQuternion();
   const Matrix3d RotationMatrix();
   const Vector3d TranslationVector();
   inline const float QDesired() { return qDesired_; }
