@@ -17,6 +17,8 @@ const useconds_t sleepTime {250000};
 
 struct T_W_N
 {
+  std::string bodyName;
+
   Matrix3d r_w_n_ambf;
   Vector3d p_w_n_ambf;
 
@@ -30,12 +32,11 @@ class ECM
 public:
   ECM();
   ~ECM();
-  const Matrix3d PrintAMBFTransformation();
-  // const Vector3d TranslationVectorTF();
 
-  inline RBDLModelPtr GetRBDLModel() { return rbdlModelPtr_; }
-  bool ExecutePose(VectorNd Q);
-  
+  bool SetJointAngleWithName(const std::string jointName, double qDesired);
+  float GetJointAngleWithName(const std::string jointName);
+  bool ExecutePose();
+  std::vector<t_w_nPtr> HomePoseTransformation();
   t_w_nPtr twnFromModels(std::string jointName);
   void CleanUp();
 private:
@@ -46,7 +47,6 @@ private:
   // void MapAMBFJointsToParent();
   void HelloThread();
   void RegisterRigidBodysPose();
-  void SetActualJointsAngleToRBDL();
 
   void SetBodyParams();
   // void CreateRBDLJoint(RBDLModelPtr rbdlModelPtr_, Vector3d& PA, Vector3d& CA, Vector3d& PP, Vector3d& CP, 
@@ -55,8 +55,7 @@ private:
   // unsigned int& newBodyId, SpatialTransform&	world_bodyST);
   
   void CreateRBDLModel();
-  void SetRBDLPose();
-  void CheckRBDLModel();
+  int GetQIndexFromJointName(const std::string jointName);
   bool ExecutePoseInAMBF();
 private:
   AMBFClientPtr ambfClientPtr_{nullptr};

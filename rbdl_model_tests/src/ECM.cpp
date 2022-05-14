@@ -1,9 +1,21 @@
 #include "rbdl_model_tests/ECM.h"
 #include "rbdl_model_tests/EigenUtilities.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+#include <algorithm>
 
 ECM::ECM() 
 {
-	if(!ConnectToAMBF()) return;
+	try
+	{
+		if(!ConnectToAMBF()) throw "AMBF Inactive Exception";
+	}
+	catch(const char* e)
+	{
+		std::exit(EXIT_FAILURE); 		
+	}
+	
 	SetAMBFParams();
 	SetBodyParams();
 	CreateRBDLModel();
@@ -172,18 +184,8 @@ void ECM::CreateRBDLModel()
 	Vector3d maininsertionlink_toollinkPP 	  = { -0.0108,  -0.062,    0.0 };
 	Vector3d maininsertionlink_toollinkCP 	  = { -0.0001, -0.0002, 0.0118 };
 
-	// Vector3d p_world_baselink   				= Vector3d::Zero();
-	// Vector3d p_world_toollink	 		 			= Vector3d::Zero();
-	// Vector3d p_world_maininsertionlink	= Vector3d::Zero();
-	// Vector3d p_world_pitchendlink	 	 		= Vector3d::Zero();
-	// Vector3d p_world_pitchbottomlink	 	= Vector3d::Zero();
-	// Vector3d p_world_pitchbacklink	 		= Vector3d::Zero();
-	// Vector3d p_world_pitchfrontlink	 		= Vector3d::Zero();
-	// Vector3d p_world_yawlink						= Vector3d::Zero();
-
 	rbdlModelPtr_ = new Model;
 	rbdlModelPtr_->gravity = Vector3d(0., 0., -9.81);
-
 
 	// Register Word to Base Transform
 	AMBFParamsPtr ambfRigidBodyParams = ambfParamMap_[baselinkName_];
@@ -192,7 +194,6 @@ void ECM::CreateRBDLModel()
 	world_baselinkST.r = ambfRigidBodyParams->TranslationVector();
 
 	// This is to handle initial World to body rotation.
-
 	//1--------------------------------------------------------------------//
 	baselink_yawlinkPA.normalize();
 	baselink_yawlinkCA.normalize();
@@ -262,7 +263,6 @@ void ECM::CreateRBDLModel()
 	SpatialTransform pitchendlink_maininsertionlinkST;
 	pitchendlink_maininsertionlinkST.E =
 	pitchendlink_maininsertionlinkRot.transpose() * pitchendlink_maininsertionlinkRotOffset.rotation(); 
-	// pitchendlink_maininsertionlinkRotOffset.rotation() * pitchendlink_maininsertionlinkRot.transpose();
 	pitchendlink_maininsertionlinkST.r = 
 		pitchendlink_maininsertionlinkPP - 
 		(pitchendlink_maininsertionlinkRot.transpose() * pitchendlink_maininsertionlinkCP);
@@ -320,72 +320,6 @@ void ECM::CreateRBDLModel()
 		AddBody(pitchendlink_maininsertionlinkId, Xtrans(p_maininsertionlink_toollink_world), 
 		Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody_, "maininsertionlink-toollink");
 	//--------------------------------------------------------------------//
-	std::cout << "baselink_yawlinkRot" << std::endl << baselink_yawlinkRot << std::endl << std::endl;
-	std::cout << "yawlink_pitchbacklinkRot" << std::endl << yawlink_pitchbacklinkRot << std::endl << std::endl;
-	std::cout << "pitchbacklink_pitchbottomlinkRot" << std::endl << pitchbacklink_pitchbottomlinkRot << std::endl << std::endl;
-	std::cout << "pitchbottomlink_pitchendlinkRot" << std::endl << pitchbottomlink_pitchendlinkRot << std::endl << std::endl;
-	std::cout << "pitchendlink_maininsertionlinkRot" << std::endl << pitchendlink_maininsertionlinkRot << std::endl << std::endl;
-	std::cout << "maininsertionlink_toollinkRot" << std::endl << maininsertionlink_toollinkRot << std::endl << std::endl;
-
-	// EigenUtilities::CreateRBDLJoint(rbdlModelPtr_, baselink_yawlinkPA, baselink_yawlinkCA, 
-	// baselink_yawlinkPP, baselink_yawlinkCP, baselink_yawlinkOffsetQ, 
-	// Vector3d::UnitZ(), 0, Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), 
-	// world_baselinkST, baselinkBody_, "baselink-yawlink", baselink_yawlinkId, world_baselinkST);
-
-	// EigenUtilities::CreateRBDLJoint(rbdlModelPtr_, baselink_yawlinkPA, baselink_yawlinkCA, baselink_yawlinkPP, baselink_yawlinkCP, 
-	// baselink_yawlinkOffsetQ, Vector3d::UnitZ(), 0, p_world_baselink, Joint(SpatialVector (0., 1., 0., 0., 0., 0.)),
-	// world_baselinkST, baselinkBody_, "baselink-yawlink", p_world_yawlink, baselink_yawlinkId, 
-	// world_yawlinkST);
-	//2 and 3 --------------------------------------------------------------------//
-	// EigenUtilities::CreateRBDLJoint(rbdlModelPtr_, yawlink_pitchfrontlinkPA, yawlink_pitchfrontlinkCA, 
-	// yawlink_pitchfrontlinkPP, yawlink_pitchfrontlinkCP, yawlink_pitchfrontlinkOffsetQ, 
-	// Vector3d::UnitZ(), 0, Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), 
-	// world_yawlinkST, yawlinkBody_, "yawlink-pitchfrontlink", yawlink_pitchfrontlinkId, world_pitchfrontlinkST);
-// 	CreateRBDLJoint(yawlink_pitchfrontlinkPA, yawlink_pitchfrontlinkCA, yawlink_pitchfrontlinkPP, 
-// 	yawlink_pitchfrontlinkCP, yawlink_pitchfrontlinkOffsetQ, Vector3d::UnitZ(), baselink_yawlinkId, 
-// 	p_world_yawlink, Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), world_yawlinkST, yawlinkBody_, 
-// 	"yawlink-pitchfrontlink", p_world_pitchfrontlink, yawlink_pitchfrontlinkId, world_pitchfrontlinkST);
-// 	//3--------------------------------------------------------------------//
-
-// 	CreateRBDLJoint(yawlink_pitchbacklinkPA, yawlink_pitchbacklinkCA, yawlink_pitchbacklinkPP, 
-// 	yawlink_pitchbacklinkCP, yawlink_pitchbacklinkOffsetQ, Vector3d::UnitZ(), baselink_yawlinkId, 
-// 	p_world_yawlink, Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), world_yawlinkST, yawlinkBody_, 
-// 	"yawlink-pitchbacklink", p_world_pitchbacklink, yawlink_pitchbacklinkId, world_pitchbacklinkST);
-//   //--------------------------------------------------------------------//
-// 	// Virtual link
-
-// 	CreateRBDLJoint(pitchbacklink_pitchbottomlinkPA, pitchbacklink_pitchbottomlinkCA, 
-// 	pitchbacklink_pitchbottomlinkPP, pitchbacklink_pitchbottomlinkCP, pitchbacklink_pitchbottomlinkOffsetQ, 
-// 	Vector3d::UnitZ(), yawlink_pitchbacklinkId, p_world_pitchbacklink, 
-// 	Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), 
-// 	world_pitchbacklinkST, virtualBody_, "pitchbacklink-pitchbottomlink", 
-// 	p_world_pitchbottomlink, pitchbacklink_pitchbottomlink_v_Id, world_pitchbottomlinkST);
-// 	//8--------------------------------------------------------------------//
-
-// 	CreateRBDLJoint(pitchbottomlink_pitchendlinkPA, pitchbottomlink_pitchendlinkCA, 
-// 	pitchbottomlink_pitchendlinkPP, pitchbottomlink_pitchendlinkCP, pitchbottomlink_pitchendlinkOffsetQ, 
-// 	Vector3d::UnitZ(), pitchbacklink_pitchbottomlink_v_Id, p_world_pitchbottomlink, 
-// 	Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), 
-// 	world_pitchbottomlinkST, pitchbottomlinkBody_, "pitchbottomlink-pitchendlink", 
-// 	p_world_pitchendlink, pitchbottomlink_pitchendlinkId, world_pitchendlinkST);
-// 	//9--------------------------------------------------------------------//
-
-// 	CreateRBDLJoint(pitchendlink_maininsertionlinkPA, pitchendlink_maininsertionlinkCA, 
-// 	pitchendlink_maininsertionlinkPP, pitchendlink_maininsertionlinkCP, pitchendlink_maininsertionlinkOffsetQ, 
-// 	-Vector3d::UnitZ(), pitchbottomlink_pitchendlinkId, p_world_pitchendlink, 
-// 	Joint(SpatialVector (0., 0., 0., 0., 0., -1.)),
-// 	world_pitchendlinkST, pitchendlinkBody_, "pitchendlink-maininsertionlink", 
-// 	p_world_maininsertionlink, pitchendlink_maininsertionlinkId, world_maininsertionlinkST);
-// 	//10--------------------------------------------------------------------//
-
-// 	CreateRBDLJoint(maininsertionlink_toollinkPA, maininsertionlink_toollinkCA, 
-// 	maininsertionlink_toollinkPP, maininsertionlink_toollinkCP, maininsertionlink_toollinkOffsetQ, 
-// 	Vector3d::UnitZ(), pitchendlink_maininsertionlinkId, p_world_maininsertionlink, 
-// 	Joint(SpatialVector (0., 0., 1., 0., 0., 0.)),
-// 	world_maininsertionlinkST, maininsertionlinkBody_, "maininsertionlink-toollink", 
-// 	p_world_toollink, maininsertionlink_toollinkId, world_toollinkST);
-// //11--------------------------------------------------------------------//
-
 // 	unsigned int userDefinedId = 7;
 // 	cs_.AddLoopConstraint(yawlink_pitchfrontlinkId, pitchbacklink_pitchbottomlink_v_Id, X_p_, X_s_, 
 // 		SpatialVector(0, 0, 0, 1, 0, 0), bgStab_, 0.1, "LoopXY_Rz", userDefinedId);
@@ -432,8 +366,6 @@ void ECM::RegisterRigidBodysPose()
 
 		tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
 		tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
-		// std::cout << "- RegisterRigidBodysPose() parentBody: " << parentBody << std::endl;
-		// printf("quat_w_n_tf: %lf, %lf, %lf, %lf\n", quat_w_n_tf[0], quat_w_n_tf[1], quat_w_n_tf[2], quat_w_n_tf[3]);
 		
 		rigidBodyParams->QuaternionTF(quat_w_n_tf);
 		rigidBodyParams->TranslationVectorTF(p_w_n_tf);
@@ -441,10 +373,41 @@ void ECM::RegisterRigidBodysPose()
 	}
 }
 
-void ECM::SetActualJointsAngleToRBDL()
+int ECM::GetQIndexFromJointName(const std::string jointName)
 {
+	/***
+	 * Controllable RBDL BodyId starts from body Id 1. 
+	 * Q_ is zero indexed. First three indecies of Q_ are reserved
+	 * for world to base offset. 
+	 * 
+	 * So to world-baselink corresponds to Q_ index 2 which is bodyId(1) + 1.
+	 * Similarly joint index in Q_ for a given joint name corresponds to its 
+	 * bodyId + 1.
+	 ***/ 
+	const int body_id_offset = 1;
+	unsigned int bodyId = rbdlModelPtr_->GetBodyId(jointName.c_str());
+	printf("jointName:%s, bodyId:%d\n", jointName.c_str(), bodyId);
+	// world-base link should not accessable for external control. Handle invalid joint name gracefully. 
+	if(bodyId < 2 || bodyId > rbdlModelPtr_->q_size + body_id_offset)
+	{
+		return -1;
+	}
+
+	return bodyId + body_id_offset;
 
 }
+
+bool ECM::SetJointAngleWithName(const std::string jointName, double qDesired)
+{
+	int qId = GetQIndexFromJointName(jointName);
+	if(qId == -1) return false;
+	Q_[qId] = qDesired;
+
+	std::cout << "SetJointAngleWithName() - Q_" << std::endl << Q_ << std::endl;
+
+	return true;
+}
+
 
 bool ECM::ExecutePoseInAMBF()
 {
@@ -465,60 +428,36 @@ bool ECM::ExecutePoseInAMBF()
     usleep(sleepTime);
 	
     RegisterRigidBodysPose();
-		// std::cout << "-----------------\n";
   }
 
 	// To be deleted
-	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
-  {
-    std::string bodyName = ambfParamMapItr_->first;
+	// for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
+  // {
+  //   std::string bodyName = ambfParamMapItr_->first;
 
-		Matrix3d r_w_n_ambf = ambfParamMap_[bodyName]->RotationMatrix();
-		Vector3d p_w_n_ambf = ambfParamMap_[bodyName]->TranslationVector();
+	// 	Matrix3d r_w_n_ambf = ambfParamMap_[bodyName]->RotationMatrix();
+	// 	Vector3d p_w_n_ambf = ambfParamMap_[bodyName]->TranslationVector();
 
-		std::cout << "bodyName: " << bodyName << std::endl;
-		// std::cout << "q_w_n_ambf: " << std::endl << ambfParamMap_[bodyName]->GetQuternion() << std::endl << std::endl;
-		std::cout << "r_w_n_ambf: " << std::endl << r_w_n_ambf << std::endl << std::endl;
-		std::cout << "p_w_n_ambf: " << std::endl << p_w_n_ambf << std::endl << std::endl;
-  }
-  std::cout << std::endl << "------------------" << std::endl;
+	// 	std::cout << "bodyName: " << bodyName << std::endl;
+	// 	// std::cout << "q_w_n_ambf: " << std::endl << ambfParamMap_[bodyName]->GetQuternion() << std::endl << std::endl;
+	// 	std::cout << "r_w_n_ambf: " << std::endl << r_w_n_ambf << std::endl << std::endl;
+	// 	std::cout << "p_w_n_ambf: " << std::endl << p_w_n_ambf << std::endl << std::endl;
+  // }
+  // std::cout << std::endl << "------------------" << std::endl;
 
-	CHECK_THAT (ambfParamMap_["baselink"]->RotationMatrix(), 
-		AllCloseMatrix(world_baselinkST.E, TEST_PREC, TEST_PREC));
-	CHECK_THAT (ambfParamMap_["yawlink"]->RotationMatrix(), 
-		AllCloseMatrix(world_yawlinkST.E, TEST_PREC, TEST_PREC));
-	CHECK_THAT (ambfParamMap_["pitchbacklink"]->RotationMatrix(), 
-		AllCloseMatrix(world_pitchbacklinkST.E, TEST_PREC, TEST_PREC));
-	CHECK_THAT (ambfParamMap_["pitchbottomlink"]->RotationMatrix(), 
-		AllCloseMatrix(world_pitchbottomlinkST.E, TEST_PREC, TEST_PREC));
-	CHECK_THAT (ambfParamMap_["pitchendlink"]->RotationMatrix(), 
-		AllCloseMatrix(world_pitchendlinkST.E, TEST_PREC, TEST_PREC));
-	CHECK_THAT (ambfParamMap_["maininsertionlink"]->RotationMatrix(), 
-		AllCloseMatrix(world_maininsertionlinkST.E, TEST_PREC, TEST_PREC));
-	CHECK_THAT (ambfParamMap_["toollink"]->RotationMatrix(), 
-		AllCloseMatrix(world_toollinkST.E, TEST_PREC, TEST_PREC));
+
 	return true;
 }
 
-bool ECM::ExecutePose(VectorNd Q)
+bool ECM::ExecutePose()
 {
-	Q_ = Q;
+	// Q_ = Q;
 	Q_[0] = world_base_yaw_; // Z
   Q_[1] = world_base_pitch_; // Y
   Q_[2] = world_base_roll_; // X
-	// Q_[3] = M_PI_2;
+
+
 	return ExecutePoseInAMBF();
-}
-
-void ECM::SetRBDLPose()
-{
-	for(rbdlmBodyMapItr_ = rbdlmBodyMap_.begin(); rbdlmBodyMapItr_ != rbdlmBodyMap_.end(); rbdlmBodyMapItr_++)
-	{
-		std::string rbdlBodyName = rbdlmBodyMapItr_->first;
-		unsigned int rbdlBodyId = rbdlmBodyMapItr_->second;
-
-		printf("RBDL body: %s, RBDL Id: %d\n", rbdlBodyName.c_str(), rbdlBodyId);
-	}
 }
 
 t_w_nPtr ECM::twnFromModels(std::string jointName)
@@ -529,7 +468,7 @@ t_w_nPtr ECM::twnFromModels(std::string jointName)
 	if(npos == -1) return t_w_nptr;
 
 	const std::string parentName = jointName.substr(npos + 1, jointName.size());
-	std::cout << "parentName: " << parentName << std::endl;
+	// std::cout << "parentName: " << parentName << std::endl;
 
 	ambfParamMapItr_ = ambfParamMap_.find(parentName);
 	int rbdlBodyId = rbdlModelPtr_->GetBodyId(jointName.c_str());
@@ -546,7 +485,7 @@ t_w_nPtr ECM::twnFromModels(std::string jointName)
 		return nullptr;
 	}
 	
-
+	t_w_nptr->bodyName = parentName;
 	// Collect AMBF and RBDL Transformation Matrices
 	t_w_nptr->r_w_n_ambf = ambfParamMap_[parentName]->RotationMatrix();
 	t_w_nptr->p_w_n_ambf = ambfParamMap_[parentName]->TranslationVector();
@@ -559,6 +498,75 @@ t_w_nPtr ECM::twnFromModels(std::string jointName)
 	return t_w_nptr;
 }
 
+std::vector<t_w_nPtr> ECM::HomePoseTransformation()
+{
+	Q_.setZero();
+
+	ExecutePose();
+
+	std::vector<t_w_nPtr> transformations;
+	std::vector<t_w_nPtr>::iterator transformationsItr;
+
+	// Skip ROOT which has bodyId = 0
+	for(unsigned int bodyId = 1; bodyId < rbdlModelPtr_->q_size - 1; bodyId++)
+  {
+    std::string jointName = rbdlModelPtr_->GetBodyName(bodyId);
+		transformations.emplace_back(twnFromModels(jointName));
+  }
+
+	// This can be written over a loop if needed. Update RBDL home pose roation to be
+	// the values calcuated.
+	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
+		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "baselink";});
+	if ( transformationsItr != transformations.end() )
+	{
+		(*transformationsItr)->r_w_n_rbdl = world_baselinkST.E;
+	}
+
+	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
+		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "yawlink";});
+	if ( transformationsItr != transformations.end() )
+	{
+		(*transformationsItr)->r_w_n_rbdl = world_yawlinkST.E;
+	}
+
+	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
+		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "pitchbacklink";});
+	if ( transformationsItr != transformations.end() )
+	{
+		(*transformationsItr)->r_w_n_rbdl = world_pitchbacklinkST.E;
+	}
+
+	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
+		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "pitchbottomlink";});
+	if ( transformationsItr != transformations.end() )
+	{
+		(*transformationsItr)->r_w_n_rbdl = world_pitchbottomlinkST.E;
+	}
+
+	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
+		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "pitchendlink";});
+	if ( transformationsItr != transformations.end() )
+	{
+		(*transformationsItr)->r_w_n_rbdl = world_pitchendlinkST.E;
+	}
+
+	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
+		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "maininsertionlink";});
+	if ( transformationsItr != transformations.end() )
+	{
+		(*transformationsItr)->r_w_n_rbdl = world_maininsertionlinkST.E;
+	}
+
+	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
+		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "toollink";});
+	if ( transformationsItr != transformations.end() )
+	{
+		(*transformationsItr)->r_w_n_rbdl = world_toollinkST.E;
+	}
+
+	return transformations;
+}
 void ECM::CleanUp()
 {
 	this->~ECM();
