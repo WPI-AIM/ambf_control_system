@@ -28,15 +28,6 @@ bool ECM::ConnectToAMBF()
 	if(!ambfClientPtr_->connect()) return false;
 	usleep(1000000);
 
-	// baselinkHandler_ = ambfClientPtr_->getRigidBody(baselinkName_.c_str(), true);
-	// usleep(250000);
-
-	// // Initialize handler
-	// baselinkHandler_->set_joint_pos<int>(0, 0.0f);
-
-	// controlableJoints = baselinkHandler_->get_joint_names();
-	// baselinkChildren = baselinkHandler_->get_children_names();
-
 	return true;
 }
 
@@ -279,6 +270,15 @@ void ECM::CreateRBDLModel()
 		maininsertionlink_toollinkPP - 
 		(maininsertionlink_toollinkRot.transpose() * maininsertionlink_toollinkCP);
 	//--------------------------------------------------------------------//
+	// std::cout << "world_baselinkST" 			 					<< std::endl << world_baselinkST 								<< std::endl;
+	// std::cout << "baselink_yawlinkST" 		 					<< std::endl << baselink_yawlinkST 							<< std::endl;
+	// std::cout << "yawlink_pitchbacklinkST" 					<< std::endl << yawlink_pitchbacklinkST 				<< std::endl;
+	// std::cout << "pitchbacklink_pitchbottomlinkST" 	<< std::endl << pitchbacklink_pitchbottomlinkST << std::endl;
+	// std::cout << "pitchbottomlink_pitchendlinkST" 	<< std::endl << pitchbottomlink_pitchendlinkST 	<< std::endl;
+	// std::cout << "pitchendlink_maininsertionlinkST" << std::endl << pitchendlink_maininsertionlinkST << std::endl;
+	// std::cout << "maininsertionlink_toollinkST" 		<< std::endl << maininsertionlink_toollinkST 		<< std::endl;
+
+
 	world_yawlinkST = world_baselinkST * baselink_yawlinkST;
 	world_pitchbacklinkST = world_yawlinkST * yawlink_pitchbacklinkST;
 	world_pitchbottomlinkST = world_pitchbacklinkST * pitchbacklink_pitchbottomlinkST;
@@ -373,7 +373,7 @@ void ECM::RegisterRigidBodysPose()
 	}
 }
 
-int ECM::GetQIndexFromJointName(const std::string jointName)
+int ECM::QIndexFromJointName(const std::string jointName)
 {
 	/***
 	 * Controllable RBDL BodyId starts from body Id 1. 
@@ -386,7 +386,7 @@ int ECM::GetQIndexFromJointName(const std::string jointName)
 	 ***/ 
 	const int body_id_offset = 1;
 	unsigned int bodyId = rbdlModelPtr_->GetBodyId(jointName.c_str());
-	printf("jointName:%s, bodyId:%d\n", jointName.c_str(), bodyId);
+	// printf("jointName:%s, bodyId:%d\n", jointName.c_str(), bodyId);
 	// world-base link should not accessable for external control. Handle invalid joint name gracefully. 
 	if(bodyId < 2 || bodyId > rbdlModelPtr_->q_size + body_id_offset)
 	{
@@ -397,17 +397,24 @@ int ECM::GetQIndexFromJointName(const std::string jointName)
 
 }
 
-bool ECM::SetJointAngleWithName(const std::string jointName, double qDesired)
+std::vector<std::string> ECM::RBDLJointNames()
 {
-	int qId = GetQIndexFromJointName(jointName);
-	if(qId == -1) return false;
-	Q_[qId] = qDesired;
+	std::vector<std::string> jointNames = 
+	{ 
+		"baselink-yawlink", "yawlink-pitchbacklink", 
+		"pitchendlink-maininsertionlink", "maininsertionlink-toollink"
+	};
 
-	std::cout << "SetJointAngleWithName() - Q_" << std::endl << Q_ << std::endl;
-
-	return true;
+	return jointNames;
 }
 
+bool ECM::JointAngleWithName(const std::string jointName, double qDesired)
+{
+	int qId = QIndexFromJointName(jointName);
+	if(qId == -1) return false;
+	Q_[qId] = qDesired;
+	return true;
+}
 
 bool ECM::ExecutePoseInAMBF()
 {
@@ -419,12 +426,26 @@ bool ECM::ExecutePoseInAMBF()
 		return false;
 	}
 
+	std::vector<std::string> jointNames = RBDLJointNames();
   for(int i = 0; i < 10; i++)
   {
-		baselinkHandler_->set_joint_pos<std::string>(               "baselink-yawlink", 0.0f);
-		baselinkHandler_->set_joint_pos<std::string>(     		 "yawlink-pitchbacklink", 0.0f);
-		baselinkHandler_->set_joint_pos<std::string>( "pitchendlink-maininsertionlink", 0.0f);
-		baselinkHandler_->set_joint_pos<std::string>( 		"maininsertionlink-toollink", 0.0f);
+		for(std::string jointName : jointNames)
+		{
+			baselinkHandler_->
+				set_joint_pos<std::string>(jointName, Q_(QIndexFromJointName(jointName)));
+		}
+		// baselinkHandler_->
+		// 	set_joint_pos<std::string>("baselink-yawlink", 
+		// 		Q_(QIndexFromJointName("baselink-yawlink")));
+		// baselinkHandler_->
+		// 	set_joint_pos<std::string>("yawlink-pitchbacklink", 
+		// 		Q_(QIndexFromJointName("yawlink-pitchbacklink")));
+		// baselinkHandler_->
+		// 	set_joint_pos<std::string>("pitchendlink-maininsertionlink", 
+		// 		Q_(QIndexFromJointName("pitchendlink-maininsertionlink")));
+		// baselinkHandler_->
+		// 	set_joint_pos<std::string>("maininsertionlink-toollink", 
+		// 		Q_(QIndexFromJointName("maininsertionlink-toollink")));
     usleep(sleepTime);
 	
     RegisterRigidBodysPose();
@@ -455,7 +476,6 @@ bool ECM::ExecutePose()
 	Q_[0] = world_base_yaw_; // Z
   Q_[1] = world_base_pitch_; // Y
   Q_[2] = world_base_roll_; // X
-
 
 	return ExecutePoseInAMBF();
 }

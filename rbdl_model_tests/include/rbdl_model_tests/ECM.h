@@ -33,8 +33,12 @@ public:
   ECM();
   ~ECM();
 
-  bool SetJointAngleWithName(const std::string jointName, double qDesired);
-  float GetJointAngleWithName(const std::string jointName);
+  // To be deleted. Not to expose the model.
+  inline RBDLModelPtr RbdlModel() { return rbdlModelPtr_; }
+
+  std::vector<std::string> RBDLJointNames();
+  bool JointAngleWithName(const std::string jointName, double qDesired);
+  VectorNd inline TargetJointAngles() { return Q_; }
   bool ExecutePose();
   std::vector<t_w_nPtr> HomePoseTransformation();
   t_w_nPtr twnFromModels(std::string jointName);
@@ -55,7 +59,7 @@ private:
   // unsigned int& newBodyId, SpatialTransform&	world_bodyST);
   
   void CreateRBDLModel();
-  int GetQIndexFromJointName(const std::string jointName);
+  int QIndexFromJointName(const std::string jointName);
   bool ExecutePoseInAMBF();
 private:
   AMBFClientPtr ambfClientPtr_{nullptr};

@@ -11,58 +11,58 @@ TEST_CASE(__FILE__"_Initilize", "")
   rbdlModel = kuka->GetRBDLModel();
 }
 
-TEST_CASE(__FILE__"_KUKAFKTest", "") 
-{
-  // KUKA* kuka = new KUKA();
-  // Model* rbdlModel = kuka->GetRBDLModel();
+// TEST_CASE(__FILE__"_KUKAFKTest", "") 
+// {
+//   // KUKA* kuka = new KUKA();
+//   // Model* rbdlModel = kuka->GetRBDLModel();
 
-	VectorNd Q     = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
-	VectorNd QDot  = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
-	VectorNd QDDot = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
-	VectorNd Tau   = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
+// 	VectorNd Q     = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
+// 	VectorNd QDot  = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
+// 	VectorNd QDDot = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
+// 	VectorNd Tau   = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
 
-  Q.setZero();
-  for(int i = 3; i < Q.size(); i++)
-  {
-    Q[i] = M_PI_2;
-  }
-  // Q[0] = M_PI; // Z
-  // Q[1] = M_PI_2; // Y
-  // Q[2] = -M_PI_2; // X
-  // Q[3] = M_PI_2;
-  // Q[4] = M_PI_2;
-  // Q[4] = M_PI_2;
-  // Q[5] = M_PI_2;
-  std::cout << "Q" << std::endl << Q << std::endl;
+//   Q.setZero();
+//   for(int i = 3; i < Q.size(); i++)
+//   {
+//     Q[i] = M_PI_2;
+//   }
+//   // Q[0] = M_PI; // Z
+//   // Q[1] = M_PI_2; // Y
+//   // Q[2] = -M_PI_2; // X
+//   // Q[3] = M_PI_2;
+//   // Q[4] = M_PI_2;
+//   // Q[4] = M_PI_2;
+//   // Q[5] = M_PI_2;
+//   std::cout << "Q" << std::endl << Q << std::endl;
 
-  kuka->ExecutePose(Q);
+//   kuka->ExecutePose(Q);
 
 
-  std::map< std::string, unsigned int > rbdlmBodyMap = rbdlModel->mBodyNameMap;
-  std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr;
-	for(rbdlmBodyMapItr = rbdlmBodyMap.begin(); rbdlmBodyMapItr != rbdlmBodyMap.end(); rbdlmBodyMapItr++)
-  {
-    std::string bodyName = rbdlmBodyMapItr->first;
-    unsigned int bodyId = rbdlmBodyMapItr->second;
-    if(bodyId == 0) continue;
+//   std::map< std::string, unsigned int > rbdlmBodyMap = rbdlModel->mBodyNameMap;
+//   std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr;
+// 	for(rbdlmBodyMapItr = rbdlmBodyMap.begin(); rbdlmBodyMapItr != rbdlmBodyMap.end(); rbdlmBodyMapItr++)
+//   {
+//     std::string bodyName = rbdlmBodyMapItr->first;
+//     unsigned int bodyId = rbdlmBodyMapItr->second;
+//     if(bodyId == 0) continue;
 
-    printf("bodyName: %s\n", bodyName.c_str());
+//     printf("bodyName: %s\n", bodyName.c_str());
 
-    t_w_nPtr t_w_nptr = kuka->twnFromModels(bodyName);
-    if(t_w_nptr == nullptr) continue;
+//     t_w_nPtr t_w_nptr = kuka->twnFromModels(bodyName);
+//     if(t_w_nptr == nullptr) continue;
     
 
-    std::cout << std::endl << "r_w_n_ambf: " << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
-    std::cout << std::endl << "r_w_n_rbdl: " << std::endl << t_w_nptr->r_w_n_rbdl << std::endl;
+//     std::cout << std::endl << "r_w_n_ambf: " << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
+//     std::cout << std::endl << "r_w_n_rbdl: " << std::endl << t_w_nptr->r_w_n_rbdl << std::endl;
 
-    std::cout << std::endl << "p_w_n_ambf: " << std::endl << t_w_nptr->p_w_n_ambf << std::endl;
-    std::cout << std::endl << "p_w_n_rbdl: " << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
-    std::cout << "---------------------------------\n";
+//     std::cout << std::endl << "p_w_n_ambf: " << std::endl << t_w_nptr->p_w_n_ambf << std::endl;
+//     std::cout << std::endl << "p_w_n_rbdl: " << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
+//     std::cout << "---------------------------------\n";
 
-  // CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));  
-  // CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
-  }
-}
+//   // CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));  
+//   // CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
+//   }
+// }
 // TEST_CASE(__FILE__"_KUKAFKTestMannual", "") 
 // {
 //   Vector3d b_l1PA = { 00.000, 00.000, 01.000 };
@@ -127,7 +127,6 @@ TEST_CASE(__FILE__"_KUKAFKTest", "")
 //   // CHECK_THAT (r_w_l2_ambf, AllCloseMatrix(r_w_l2, TEST_PREC, TEST_PREC));  
 //   // // CHECK_THAT (p_w_l1_ambf, AllCloseVector(p_w_l1, TEST_PREC, TEST_PREC));
 // }
-/*
 TEST_CASE(__FILE__"_KUKAIKTest", "") 
 {
 	VectorNd Q     = VectorNd::Constant ((size_t) rbdlModel->dof_count, 0.);
@@ -235,7 +234,7 @@ TEST_CASE(__FILE__"_KUKAIKTest", "")
 
 
 }
-*/
+
 TEST_CASE(__FILE__"_Cleanup", "") 
 {
   kuka->CleanUp();
