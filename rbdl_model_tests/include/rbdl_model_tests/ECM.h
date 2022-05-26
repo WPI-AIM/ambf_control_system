@@ -34,14 +34,17 @@ public:
   ~ECM();
 
   // To be deleted. Not to expose the model.
-  inline RBDLModelPtr RbdlModel() { return rbdlModelPtr_; }
-
-  std::vector<std::string> RBDLJointNames();
+  // inline RBDLModelPtr RbdlModel() { return rbdlModelPtr_; }
+  inline unsigned int RBDLModelJointSize() { return rbdlModelPtr_->q_size; }
+  inline std::vector<std::string> ControllableJointNames() { return controlableJoints_; }
   bool JointAngleWithName(const std::string jointName, double qDesired);
   VectorNd inline TargetJointAngles() { return Q_; }
   bool ExecutePose();
   std::vector<t_w_nPtr> HomePoseTransformation();
-  t_w_nPtr twnFromModels(std::string jointName);
+
+  template<typename T>
+  t_w_nPtr twnFromModels(T t);
+
   void CleanUp();
 private:
   bool ConnectToAMBF();
@@ -65,8 +68,8 @@ private:
   AMBFClientPtr ambfClientPtr_{nullptr};
   std::string baselinkName_{"baselink"};
   rigidBodyPtr baselinkHandler_{nullptr};
-  std::vector<std::string> controlableJoints;
-  std::vector<std::string> baselinkChildren;
+  std::vector<std::string> controlableJoints_;
+  std::vector<std::string> baselinkChildren_;
   MatrixNd t_w_0_ = MatrixNd::Identity(4, 4);
   MatrixNd t_0_w_ = MatrixNd::Identity(4, 4);
 

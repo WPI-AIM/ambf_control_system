@@ -204,3 +204,26 @@ set_target_properties(ecm_tests_hc PROPERTIES
     CXX_EXTENSIONS OFF
     )
 ################END################
+
+################START################
+set(ECM_SOURCE_FILES
+    src/ECM_.cc
+    src/main.cc
+    )
+
+add_executable (ecm_
+${ECM_SOURCE_FILES})
+target_link_libraries (ecm_
+    ${catkin_LIBRARIES}
+    ${RBDL_MODEL_LIBRARY} 
+    ${Boost_LIBRARIES} 
+    ${UNITTEST++_LIBRARY}
+    ${RBDL_LIBRARY}
+    pthread
+    )
+
+set_target_properties(ecm_ PROPERTIES
+    CXX_STANDARD 17
+    CXX_EXTENSIONS OFF
+    )
+################END################
