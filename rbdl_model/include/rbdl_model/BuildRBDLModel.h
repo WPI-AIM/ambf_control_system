@@ -15,7 +15,7 @@
 #include <boost/optional.hpp>
 #include <rbdl_model/RBDLModelErrors.h>
 #include <limits>
-
+#include "rbdl_model/ModelGraph.h"
 using namespace RigidBodyDynamics;
 using namespace Math;
 using namespace RigidBodyDynamics::Math;

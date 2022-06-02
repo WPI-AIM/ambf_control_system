@@ -64,7 +64,6 @@ private:
     static std::mutex myMutex_;
 
     const std::string actuator_config_file_ = "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/KUKA/kuka.yaml";
-
 };
 
 

@@ -51,19 +51,26 @@ set (RBDL_MODEL_LIBRARIES rbdl_model)
 #add_executable(${EXECUTABLE_NAME})
 
 set (HDR_FILES
-    include/${PROJECT_NAME}/Utilities.h
-    include/${PROJECT_NAME}/BodyParam.h
-    include/${PROJECT_NAME}/JointParam.h
-    include/${PROJECT_NAME}/BuildRBDLModel.h
-    include/${PROJECT_NAME}/RBDLModelErrors.h
+  include/${PROJECT_NAME}/Utilities.h
+  include/${PROJECT_NAME}/BodyParam.h
+  include/${PROJECT_NAME}/JointParam.h
+  include/${PROJECT_NAME}/BuildRBDLModel.h
+  include/${PROJECT_NAME}/ModelGraph.h
+  include/${PROJECT_NAME}/MinHeap.h
+  include/${PROJECT_NAME}/MinHeapStructs.h
+  include/${PROJECT_NAME}/ModelStructs.h
+  include/${PROJECT_NAME}/GraphEdge.h
+  include/${PROJECT_NAME}/RBDLModelErrors.h
 )
 
 set(SOURCE_FILES
-    src/Utilities.cpp
-    src/BodyParam.cpp
-    src/JointParam.cpp
-    src/BuildRBDLModel.cpp
-    src/RBDLModelErrors.cpp
+  src/Utilities.cpp
+  src/BodyParam.cpp
+  src/JointParam.cpp
+  src/BuildRBDLModel.cpp
+  src/ModelGraph.cpp
+  src/MinHeap.cpp
+  src/RBDLModelErrors.cpp
 #    src/main.cpp
     )
 
@@ -76,13 +83,17 @@ add_dependencies(rbdl_model ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 target_link_libraries(rbdl_model 
   ${catkin_LIBRARIES} 
-  # ${GLFW_LIBRARIES} 
   ${Boost_LIBRARIES} 
   ${Eigen_LIBRARIES}
   ${RBDL_LIBRARY} 
   ${YAML_CPP_LIBRARIES} 
   pthread
   )
+
+set_target_properties(rbdl_model PROPERTIES
+ CXX_STANDARD 17
+ CXX_STANDARD_REQUIRED YES
+ )
 
 set (RBDL_MODEL_INCLUDE_DIRS include)
 set (RBDL_MODEL_LIBRARIES rbdl_model)

@@ -89,30 +89,71 @@ set (RBDL_MODEL_TESTS_HDR_FILES
     include/${PROJECT_NAME}/RBDLTestPrep.h    
     )
 
-################START################
-#Executible kuka_hc_tests
+# ################START################
+# #Executible kuka_hc_tests
 
-set (KUKA_RBDL_MODEL_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/AMBFParams.h
-    include/${PROJECT_NAME}/KUKA.h
-    )
+# set (KUKA_RBDL_MODEL_TESTS_HDR_FILES_HC
+#     include/${PROJECT_NAME}/AMBFParams.h
+#     include/${PROJECT_NAME}/KUKA.h
+#     )
+
+# set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES_HC
+#     # src/ECMHCDynamicsTests.cc
+#     src/KukaHCKinematicsTests.cc
+#     # src/KUKABodyTests.cc
+#     src/AMBFParams.cpp
+#     src/KUKA.cpp
+#     src/EigenUtilities.cpp
+#     src/RBDLTestPrep.cc
+#     src/main.cc
+#     )
+
+# add_executable (kuka_tests_hc
+# ${RBDL_MODEL_TESTS_HDR_FILES} 
+# ${KUKA_RBDL_MODEL_TESTS_HDR_FILES_HC} 
+# ${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES_HC})
+# target_link_libraries (kuka_tests_hc
+#     ${catkin_LIBRARIES} 
+#     ${Eigen_LIBRARIES} 
+#     ${AMBF_CLIENT_LIBRARY} 
+#     ${RBDL_MODEL_LIBRARY} 
+#     ${Boost_LIBRARIES} 
+#     ${UNITTEST++_LIBRARY}
+#     ${RBDL_LIBRARY}
+#     pthread
+#     )
+
+# set_target_properties(kuka_tests_hc PROPERTIES
+#     CXX_STANDARD 17
+#     CXX_EXTENSIONS OFF
+#     )
+# ################END################
+
+################START################
+#Executible kuka_tests
+
+# set (KUKA_RBDL_MODEL_TESTS_FILES
+#     include/${PROJECT_NAME}/AMBFParams.h
+#     include/${PROJECT_NAME}/KUKA.h
+#     )
 
 set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
     # src/ECMHCDynamicsTests.cc
-    src/KukaHCKinematicsTests.cc
+    # src/KukaHCKinematicsTests.cc
     # src/KUKABodyTests.cc
-    src/AMBFParams.cpp
-    src/KUKA.cpp
-    src/EigenUtilities.cpp
+    # src/AMBFParams.cpp
+    # src/KUKA.cpp
+    # src/EigenUtilities.cpp
+    src/ModelFromParser/KUKA.cc
     src/RBDLTestPrep.cc
     src/main.cc
     )
 
-add_executable (kuka_tests_hc
+add_executable (kuka_tests
 ${RBDL_MODEL_TESTS_HDR_FILES} 
-${KUKA_RBDL_MODEL_TESTS_HDR_FILES} 
+# ${KUKA_RBDL_MODEL_TESTS_HDR_FILES} 
 ${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES})
-target_link_libraries (kuka_tests_hc
+target_link_libraries (kuka_tests
     ${catkin_LIBRARIES} 
     ${Eigen_LIBRARIES} 
     ${AMBF_CLIENT_LIBRARY} 
@@ -123,7 +164,7 @@ target_link_libraries (kuka_tests_hc
     pthread
     )
 
-set_target_properties(kuka_tests_hc PROPERTIES
+set_target_properties(kuka_tests PROPERTIES
     CXX_STANDARD 17
     CXX_EXTENSIONS OFF
     )
@@ -168,62 +209,62 @@ set_target_properties(kuka_tests_hc PROPERTIES
 ################START################
 #Executible ecm_hc_tests
 
-set (ECM_RBDL_MODEL_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/AMBFParams.h
-    include/${PROJECT_NAME}/ECM.h
-    )
+# set (ECM_RBDL_MODEL_TESTS_HDR_FILES
+#     include/${PROJECT_NAME}/AMBFParams.h
+#     include/${PROJECT_NAME}/ECM.h
+#     )
 
-set(ECM_RBDL_MODEL_TESTS_SOURCE_FILES
-    # src/ECMHCDynamicsTests.cc
-    src/ECMHCKinematicsTests.cc
-    # src/ECMBodyTests.cc
-    src/AMBFParams.cpp
-    src/ECM.cpp
-    src/EigenUtilities.cpp
-    src/RBDLTestPrep.cc
-    src/main.cc
-    )
+# set(ECM_RBDL_MODEL_TESTS_SOURCE_FILES
+#     # src/ECMHCDynamicsTests.cc
+#     src/ECMHCKinematicsTests.cc
+#     # src/ECMBodyTests.cc
+#     src/AMBFParams.cpp
+#     src/ECM.cpp
+#     src/EigenUtilities.cpp
+#     src/RBDLTestPrep.cc
+#     src/main.cc
+#     )
 
-add_executable (ecm_tests_hc
-${RBDL_MODEL_TESTS_HDR_FILES} 
-${ECM_RBDL_MODEL_TESTS_HDR_FILES} 
-${ECM_RBDL_MODEL_TESTS_SOURCE_FILES})
-target_link_libraries (ecm_tests_hc
-    ${catkin_LIBRARIES} 
-    ${Eigen_LIBRARIES} 
-    ${AMBF_CLIENT_LIBRARY} 
-    ${RBDL_MODEL_LIBRARY} 
-    ${Boost_LIBRARIES} 
-    ${UNITTEST++_LIBRARY}
-    ${RBDL_LIBRARY}
-    pthread
-    )
+# add_executable (ecm_tests_hc
+# ${RBDL_MODEL_TESTS_HDR_FILES} 
+# ${ECM_RBDL_MODEL_TESTS_HDR_FILES} 
+# ${ECM_RBDL_MODEL_TESTS_SOURCE_FILES})
+# target_link_libraries (ecm_tests_hc
+#     ${catkin_LIBRARIES} 
+#     ${Eigen_LIBRARIES} 
+#     ${AMBF_CLIENT_LIBRARY} 
+#     ${RBDL_MODEL_LIBRARY} 
+#     ${Boost_LIBRARIES} 
+#     ${UNITTEST++_LIBRARY}
+#     ${RBDL_LIBRARY}
+#     pthread
+#     )
 
-set_target_properties(ecm_tests_hc PROPERTIES
-    CXX_STANDARD 17
-    CXX_EXTENSIONS OFF
-    )
-################END################
+# set_target_properties(ecm_tests_hc PROPERTIES
+#     CXX_STANDARD 17
+#     CXX_EXTENSIONS OFF
+#     )
+# ################END################
 
-################START################
-set(ECM_SOURCE_FILES
-    src/ECM_.cc
-    src/main.cc
-    )
+# ################START################
+# set(ECM_SOURCE_FILES
+#     src/ECM_.cc
+#     src/main.cc
+#     )
 
-add_executable (ecm_
-${ECM_SOURCE_FILES})
-target_link_libraries (ecm_
-    ${catkin_LIBRARIES}
-    ${RBDL_MODEL_LIBRARY} 
-    ${Boost_LIBRARIES} 
-    ${UNITTEST++_LIBRARY}
-    ${RBDL_LIBRARY}
-    pthread
-    )
+# add_executable (ecm_
+# ${ECM_SOURCE_FILES})
+# target_link_libraries (ecm_
+#     ${catkin_LIBRARIES}
+#     ${RBDL_MODEL_LIBRARY} 
+#     ${Boost_LIBRARIES} 
+#     ${UNITTEST++_LIBRARY}
+#     ${RBDL_LIBRARY}
+#     pthread
+#     )
 
-set_target_properties(ecm_ PROPERTIES
-    CXX_STANDARD 17
-    CXX_EXTENSIONS OFF
-    )
-################END################
+# set_target_properties(ecm_ PROPERTIES
+#     CXX_STANDARD 17
+#     CXX_EXTENSIONS OFF
+#     )
+# ################END################

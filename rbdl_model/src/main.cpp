@@ -8,10 +8,10 @@
 
 int main(int argc, char* argv[])
 {
-    const std::string actuator_config_file = "/home/shreyas/ambf/ambf_models/descriptions/multi-bodies/robots/blender-psm.yaml";
+   const std::string actuator_config_file = "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/KUKA/kuka.yaml";
+    // const std::string actuator_config_file = "/home/shreyas/ambf/ambf_models/descriptions/multi-bodies/robots/blender-psm.yaml";
 //    const std::string actuator_config_file = "/home/shreyas/ambf/ambf_models/descriptions/multi-bodies/robots/blender-ecm.yaml";
 //    const std::string actuator_config_file = "/home/shreyas/ambf/ambf_models/descriptions/multi-bodies/robots/blender-mtm.yaml";
-//    const std::string actuator_config_file = "/home/shreyas/ambf/ambf_models/descriptions/multi-bodies/robots/blender-kuka.yaml";
 //    const std::string actuator_config_file = "/home/shreyas/Downloads/simulator/exohuman.yaml";
 
     BuildRBDLModel buildRBDLModel(actuator_config_file);
