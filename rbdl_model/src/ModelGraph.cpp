@@ -53,11 +53,61 @@ void ModelGraph::AddEdge(struct GraphEdge* edge)
 
   // Since graph is undirected, 
   // add an edge from dest to src also
-  newNode = NewAdjListNode(edge->src, edge->weight);
-  newNode->next = graph_->array[edge->dest].head;
-  graph_->array[edge->dest].head = newNode;
+  // newNode = NewAdjListNode(edge->src, edge->weight);
+  // newNode->next = graph_->array[edge->dest].head;
+  // graph_->array[edge->dest].head = newNode;
 }
 
+void ModelGraph::PrintAdjacencyMatrix()
+{
+  for(int v = 0; v < V_; v++)
+  {
+    struct AdjList array = graph_->array[v];
+    printf("parent: %d------->", v);
+    while(array.head != nullptr)
+    {
+      printf("%d, ", array.head->dest);
+      struct AdjListNode *tempNode = array.head;
+      array.head = array.head->next;
+    }
+    printf("\n");
+  }
+}
+
+const int ModelGraph::BaseNode()
+{
+  std::set<int> indices;
+  for (int i = 0; i < V_; ++i)
+  {
+    indices.insert(indices.end(), i);
+  }
+
+  for(int v = 0; v < V_; v++)
+  {
+    struct AdjList array = graph_->array[v];
+    while(array.head != nullptr)
+    {
+      indices.erase(array.head->dest);
+      array.head = array.head->next;
+    }
+  }
+
+  return (indices.size() == 1 ? *(indices.begin()) : -1);
+}
+
+std::vector<int> ModelGraph::EndEffectorNodes()
+{
+  std::vector<int> endEffectorNodes;
+
+  for(int v = 0; v < V_; v++)
+  {
+    struct AdjList array = graph_->array[v];
+    // Endeffector do not have child. Few models like PSM has multiple End effectors.
+    if(array.head == nullptr) endEffectorNodes.emplace_back(v);
+  }
+
+  return endEffectorNodes;
+}
 
 // A utility function used to print the solution
 void ModelGraph::PrintArr(int dist[], int n)
@@ -66,11 +116,11 @@ void ModelGraph::PrintArr(int dist[], int n)
   for (int i = 0; i < n; ++i)
     printf("%d \t\t %d\n", i, dist[i]);
 }
-  
+
 // The main function that calculates 
 // distances of shortest paths from src to all
 // vertices. It is a O(ELogV) function
-void ModelGraph::Dijkstra(int src)
+void ModelGraph::Dijkstra(int src, int dist[])
 { 
   MinHeap minHeap;
   // Get the number of vertices in graph
@@ -78,7 +128,7 @@ void ModelGraph::Dijkstra(int src)
   
   // dist values used to pick
   // minimum weight edge in cut
-  int dist[V];     
+  // int dist[V];     
 
   // minHeap represents set E
   struct MinHeapStruct* minHeapStruct = minHeap.CreateMinHeap(V);
@@ -144,7 +194,7 @@ void ModelGraph::Dijkstra(int src)
   }
   minHeap.~MinHeap();
   // print the calculated shortest distances
-  PrintArr(dist, V);
+  // PrintArr(dist, V);
 }
 
 ModelGraph::~ModelGraph()
@@ -152,7 +202,7 @@ ModelGraph::~ModelGraph()
   for(int v = 0; v < V_; v++)
   {
     struct AdjList array = graph_->array[v];
-    // printf("array.head->dest %d\n", array.head->dest);
+    // printf("parent: %d\n", v);
     while(array.head != nullptr)
     {
       // printf("%d, ", array.head->dest);
@@ -165,5 +215,5 @@ ModelGraph::~ModelGraph()
   }
 
   free(graph_->array);
-  printf("Cleanded ModelGraph Memory\n");
+  // printf("Cleanded ModelGraph Memory\n");
 }

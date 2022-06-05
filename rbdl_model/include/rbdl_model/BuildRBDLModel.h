@@ -13,6 +13,7 @@
 #include <unordered_set>
 #include <vector>
 #include <boost/optional.hpp>
+#include <boost/bimap.hpp>
 #include <rbdl_model/RBDLModelErrors.h>
 #include <limits>
 #include "rbdl_model/ModelGraph.h"
@@ -25,6 +26,9 @@ typedef JointParam* jointParamPtr;
 typedef RigidBodyDynamics::Body rbdlBody;
 typedef RigidBodyDynamics::Joint rbdlJoint;
 typedef RigidBodyDynamics::JointType rbdlJointType;
+typedef boost::bimap<std::string, int> bmStrInt;
+typedef bmStrInt::left_map::const_iterator bmLeftConstItr;
+typedef bmStrInt::right_map::const_iterator bmRightConstItr;
 //------------------------------------------------------------------------------
 
 class BuildRBDLModel
@@ -43,7 +47,7 @@ public:
     std::unordered_map<std::string, unsigned int> inline getRBDLBodyToIDMap() { return rbdlObjectMap_; }
     std::unordered_map<std::string, unsigned int> inline getRBDLJointToIDMap() { return joint_map; }
 
-    Model* getRBDLModel();
+    inline Model* getRBDLModel() { return RBDLmodel_; }
 
     std::string inline getBaseRigidBody() { return baseRigidBody_; }
 
@@ -56,8 +60,13 @@ public:
 
 private:
     void getNamespace();
+    
+    template< class MapType >
+    void PrintMap(const MapType & map, const std::string & separator, std::ostream & os);
+
     bool getBodies();
     bool getJoints();
+    bool buildModelSequence();
     bool findBaseNode();
     void addDummyBaseJoint();
 
@@ -74,8 +83,11 @@ private:
     Model *RBDLmodel_ = NULL;
     std::unordered_map<std::string, bodyParamPtr> bodyParamObjectMap_;
 
-    //                 <parent,                       <jointname, jointParamPtr>>
-    std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr>> jointParamObjectMap_;
+    // //                 <parent,                       <jointname, jointParamPtr>>
+    // std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr>> jointParamObjectMap_;
+                     // <jointname, jointParamPtr>>
+    std::unordered_map<std::string, jointParamPtr> jointParamObjectMap_;
+    std::unordered_map<std::string, jointParamPtr>::iterator jointParamObjectMapItr_;
 
     std::unordered_map<std::string, unsigned int> rbdlObjectMap_;
     std::unordered_map<std::string, unsigned int> joint_map;
@@ -86,7 +98,9 @@ private:
     unsigned int addBodyToRBDL(std::string parent_name, unsigned int parent_id, std::string joint_name, std::string child_name);
 
     // Below Maps are used for Getters only. They dont play a role in model creation.
-    std::unordered_map<std::string, boost::optional<rbdlBody>> rbdlBodyMap_;
+    // strSizetBm rbdlBodyMap_;
+    
+    bmStrInt bodyNameHash_;
 };
 
 #endif // PARSE_YAML_H

@@ -8,6 +8,8 @@
 #include "rbdl_model/GraphEdge.h"
 #include "rbdl_model/MinHeapStructs.h"
 #include "rbdl_model/MinHeap.h"
+#include <set>
+#include <vector>
 
 class ModelGraph
 {
@@ -16,8 +18,12 @@ class ModelGraph
   ModelGraph(GraphEdge edges[], int V, int n);
   ~ModelGraph();
   void CreateGraph();
-  void Dijkstra(int src);
- 
+  void PrintAdjacencyMatrix();
+  const int BaseNode();
+  std::vector<int> EndEffectorNodes();
+
+  void Dijkstra(int src, int dist[]);
+
   private:
   struct AdjListNode* NewAdjListNode(int dest, int weight);
   void AddEdge(struct GraphEdge* edge);
