@@ -86,7 +86,7 @@ bool BuildRBDLModel::getBodies()
     }
   }
 
-  PrintMap( bodyNameHash_.right, ") ", std::cout );
+  // PrintMap( bodyNameHash_.right, ") ", std::cout );
   // PrintMap( bodyNameHash_.left, " ends in position ", std::cout );
   return true;
 }
@@ -137,37 +137,37 @@ bool BuildRBDLModel::getJoints()
 
 bool BuildRBDLModel::buildModelSequence()
 {
-  int V = bodyParamObjectMap_.size();  // Number of vertices in the graph
-  int n = jointParamObjectMap_.size(); // Number of edges in the graph
-  GraphEdge edges[n];
-  bmLeftConstItr bmLeftItr;
-  bmRightConstItr bmRightItr;
+  // int V = bodyParamObjectMap_.size();  // Number of vertices in the graph
+  // int n = jointParamObjectMap_.size(); // Number of edges in the graph
+  // GraphEdge edges[n];
+  // bmLeftConstItr bmLeftItr;
+  // bmRightConstItr bmRightItr;
 
-  int edgeIndex = 0;
-  for(jointParamObjectMapItr_ = jointParamObjectMap_.begin(); 
-    jointParamObjectMapItr_ != jointParamObjectMap_.end();
-    jointParamObjectMapItr_++)
-  {
-    std::string jointName = jointParamObjectMapItr_->first;
-    jointParamPtr ptr = jointParamObjectMapItr_->second;
+  // int edgeIndex = 0;
+  // for(jointParamObjectMapItr_ = jointParamObjectMap_.begin(); 
+  //   jointParamObjectMapItr_ != jointParamObjectMap_.end();
+  //   jointParamObjectMapItr_++)
+  // {
+  //   std::string jointName = jointParamObjectMapItr_->first;
+  //   jointParamPtr ptr = jointParamObjectMapItr_->second;
 
-    std::string parentName = ptr->Parent().c_str();
-    bmLeftItr = bodyNameHash_.left.find(parentName);
-    assert(parentName == bmLeftItr->first);
-    int parentId = bmLeftItr->second;
+  //   std::string parentName = ptr->Parent().c_str();
+  //   bmLeftItr = bodyNameHash_.left.find(parentName);
+  //   assert(parentName == bmLeftItr->first);
+  //   int parentId = bmLeftItr->second;
 
-    std::string childName = ptr->Child().c_str();
-    bmLeftItr = bodyNameHash_.left.find(childName);
-    assert(childName == bmLeftItr->first);
-    int childId = bmLeftItr->second;
+  //   std::string childName = ptr->Child().c_str();
+  //   bmLeftItr = bodyNameHash_.left.find(childName);
+  //   assert(childName == bmLeftItr->first);
+  //   int childId = bmLeftItr->second;
 
-    int weight = ptr->Weight();
-    // printf("%s,\t\t %s, %d,\t %s, %d,\t %d\n", 
-    //   jointName.c_str(), parentName.c_str(), parentId, childName.c_str(), childId, weight);
+  //   int weight = ptr->Weight();
+  //   // printf("%s,\t\t %s, %d,\t %s, %d,\t %d\n", 
+  //   //   jointName.c_str(), parentName.c_str(), parentId, childName.c_str(), childId, weight);
 
-    edges[edgeIndex] = { parentId, childId, weight };
-    edgeIndex++;
-  }
+  //   edges[edgeIndex] = { parentId, childId, weight };
+  //   edgeIndex++;
+  // }
 
   // printf("V: %d, n: %d\n", V, n);
   // assert(sizeof(edges)/sizeof(edges[0]) == n);
@@ -177,56 +177,91 @@ bool BuildRBDLModel::buildModelSequence()
   //   GraphEdge graphEdge = edges[idx];
   //   printf("{ %d, %d, %d }\n", graphEdge.src, graphEdge.dest, graphEdge.weight);
   // }
+
+
   // graph edges array.
   // GraphEdge edges[] = {
   //   {0, 1, 4}, {0, 7, 8}, {1, 2, 8}, {1, 7, 11}, {2, 3, 7}, {2, 8, 2}, {2, 5, 4}, 
   //   {3, 4, 9}, {3, 5, 14},{4, 5, 10}, {5, 6, 2}, {6, 7, 1}, {6, 8, 6}, {7, 8, 7},
   // };
+  GraphEdge edges[] = {
+    {0, 1, 4}, {0, 7, 100}, {1, 2, 8}, {1, 7, 100}, {2, 3, 7}, {2, 8, 100}, {2, 5, 100}, 
+    {3, 4, 9}, {3, 5, 100},{4, 5, 10}, {5, 6, 2}, {6, 7, 1}, {6, 8, 6}, {7, 8, 7},
+  };
+  int V = 9;
+
+  // GraphEdge edges[] = {
+  //   {0, 1, 2}, {0, 2, 4}, {1, 2, 1}, {1, 3, 5}, {2, 3, 10}
+  // };
+  // int V = 4;
+
   // calculate number of edges
-  // int n = sizeof(edges)/sizeof(edges[0]);
+  int E = sizeof(edges)/sizeof(edges[0]);
   // construct graph
   Utilities utilities;
-  ModelGraph modelGraph(edges, V, n);
-  // modelGraph.PrintAdjacencyMatrix();
-  int baseNodeId = modelGraph.BaseNode();
-  if(baseNodeId == -1) utilities.throwBaseNotFoundException();
-
-  bmRightItr = bodyNameHash_.right.find(baseNodeId);
-  // assert(modelGraph.BaseNode() == bmRightItr->first);
-  std::string baseName = bmRightItr->second;
-  printf("baseName: %s\n", baseName.c_str());
+  ModelGraph modelGraph(edges, V, E);
   
-  bmLeftItr = bodyNameHash_.left.find(baseName);
-  // assert(baseName == bmLeftItr->first);
-  int baseId = bmLeftItr->second;
-
+  std::cout << "Source to destination AdjacencyMatrix\n";
+  modelGraph.PrintAdjacencyMatrix();
+  int baseNodeId = modelGraph.BaseNode();
   std::vector<int> endEffectorNodesId = modelGraph.EndEffectorNodes();
-  std::vector<std::string> endEffectorNodesName;
-
-  for(int endEffectorNodeId : endEffectorNodesId)
-  {
-    bmRightItr = bodyNameHash_.right.find(endEffectorNodeId);
-    // assert(modelGraph.BaseNode() == bmRightItr->first);
-    endEffectorNodesName.emplace_back(bmRightItr->second);
-  }
-
-  for(std::string endEffectorNodeName: endEffectorNodesName)
-  {
-    printf("endEffectorNodeName: %s\n", endEffectorNodeName.c_str());
-  }
 
   int dist[V];
-  modelGraph.Dijkstra(baseId, dist);
+  modelGraph.Dijkstra(baseNodeId, dist);
 
-  for(int v = 0; v < V; v++)
-  {
-    bmRightItr = bodyNameHash_.right.find(v);
-    assert(v == bmRightItr->first);
-    std::string bodyName = bmRightItr->second;
+  std::cout << "Distance from source\n";
+  for(int v = 0; v < V; v++) 
+    printf("%d, %d\n", v, dist[v]);
 
-    printf("%d, %s, \t%d\n", v, bodyName.c_str(), dist[v]);
-  }
+  std::vector<int> path = modelGraph.ShortestPath(baseNodeId, endEffectorNodesId.at(0));
 
+  std::cout << "Path\n";
+  for(int id : path) 
+    printf("%d-->", id);
+  printf("\n");
+
+  // std::vector<int> path = modelGraph.ShortestPath(baseId, endEffectorNodesId.at(0));
+
+  // int baseNodeId = modelGraph.BaseNode();
+  // if(baseNodeId == -1) utilities.throwBaseNotFoundException();
+
+  // bmRightItr = bodyNameHash_.right.find(baseNodeId);
+  // // assert(modelGraph.BaseNode() == bmRightItr->first);
+  // std::string baseName = bmRightItr->second;
+  // printf("baseName: %s\n", baseName.c_str());
+  
+  // bmLeftItr = bodyNameHash_.left.find(baseName);
+  // // assert(baseName == bmLeftItr->first);
+  // int baseId = bmLeftItr->second;
+
+  // std::vector<int> endEffectorNodesId = modelGraph.EndEffectorNodes();
+  // std::vector<std::string> endEffectorNodesName;
+
+  // for(int endEffectorNodeId : endEffectorNodesId)
+  // {
+  //   bmRightItr = bodyNameHash_.right.find(endEffectorNodeId);
+  //   // assert(modelGraph.BaseNode() == bmRightItr->first);
+  //   endEffectorNodesName.emplace_back(bmRightItr->second);
+  // }
+
+  // for(std::string endEffectorNodeName: endEffectorNodesName)
+  // {
+  //   printf("endEffectorNodeName: %s\n", endEffectorNodeName.c_str());
+  // }
+
+  // int dist[V];
+  // modelGraph.Dijkstra(baseId, dist);
+
+
+
+  // std::vector<int> path = modelGraph.ShortestPath(baseId, endEffectorNodesId.at(0));
+  // for(int id : path)
+  // {
+  //   bmRightItr = bodyNameHash_.right.find(id);
+  //   // printf("%d, ", id);
+  //   printf("%s->", bmRightItr->second.c_str());
+  // }
+  // printf("\n");
   return true;
 }
 /*

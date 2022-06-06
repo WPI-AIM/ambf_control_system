@@ -1,30 +1,32 @@
 #include "rbdl_model/ModelGraph.h"
 //Ref: https://www.geeksforgeeks.org/dijkstras-algorithm-for-adjacency-list-representation-greedy-algo-8/
-ModelGraph::ModelGraph(GraphEdge edges[], int V, int n)
+ModelGraph::ModelGraph(GraphEdge edges[], int V, int E)
 {
   this->V_ = V;
+  this->E_ = E;
+  CreateGraph(&graph_);
 
-  CreateGraph();
+  for (int i = 0; i < E; ++i)
+    AddEdge(&graph_, &edges[i]);
 
-  for (int i = 0; i < n; ++i)
-    AddEdge(&edges[i]);
+  
 }
 
 // A utility function that creates 
 // a graph of V vertices
-void ModelGraph::CreateGraph()
+void ModelGraph::CreateGraph(struct Graph** graph)
 {
-  graph_ = (struct Graph*) malloc(sizeof(struct Graph));
-  graph_->V = V_;
+  *graph = (struct Graph*) malloc(sizeof(struct Graph));
+  (*graph)->V = V_;
 
   // Create an array of adjacency lists.  
   // Size of array will be V
-  graph_->array = (struct AdjList*) malloc(V_ * sizeof(struct AdjList));
+  (*graph)->array = (struct AdjList*) malloc(V_ * sizeof(struct AdjList));
 
   // Initialize each adjacency list 
   // as empty by making head as NULL
   for (int i = 0; i < V_; ++i)
-    graph_->array[i].head = NULL;
+    (*graph)->array[i].head = NULL;
 }
 
 
@@ -41,15 +43,15 @@ struct AdjListNode* ModelGraph::NewAdjListNode(int dest, int weight)
 }
 
 // Adds an edge to an undirected graph
-void ModelGraph::AddEdge(struct GraphEdge* edge)
+void ModelGraph::AddEdge(struct Graph** graph, struct GraphEdge* edge)
 {
   // Add an edge from src to dest.  
   // A new node is added to the adjacency
   // list of src.  The node is 
   // added at the beginning
   struct AdjListNode* newNode = NewAdjListNode(edge->dest, edge->weight);
-  newNode->next = graph_->array[edge->src].head;
-  graph_->array[edge->src].head = newNode;
+  newNode->next = (*graph)->array[edge->src].head;
+  (*graph)->array[edge->src].head = newNode;
 
   // Since graph is undirected, 
   // add an edge from dest to src also
@@ -196,6 +198,153 @@ void ModelGraph::Dijkstra(int src, int dist[])
   // print the calculated shortest distances
   // PrintArr(dist, V);
 }
+
+std::vector<int> ModelGraph::ShortestPath(int src, int dest)
+{
+  int distFromSrc[V_];
+  int pathSequence[V_];
+  this->Dijkstra(src, distFromSrc);
+  
+  GraphEdge destToSrcEdges[E_];
+
+  int e = 0;
+  for(int v = 0; v < V_; v++)
+  {
+    struct AdjList array = graph_->array[v];
+    // printf("parent: %d------->", v);
+    while(array.head != nullptr)
+    {
+      // printf("%d, ", array.head->dest);
+      destToSrcEdges[e] = { array.head->dest, v, array.head->weight };
+      array.head = array.head->next;
+      e++;
+    }
+  }
+  struct Graph* destToSrcGraph;
+  CreateGraph(&destToSrcGraph);
+  for (int i = 0; i < E_; ++i)
+    AddEdge(&destToSrcGraph, &destToSrcEdges[i]);
+  
+  std::vector<int> path;
+
+  for(int e = 0; e < E_; e++)
+  {
+    printf("{ %d, %d, %d }\n", destToSrcEdges[e].src, destToSrcEdges[e].dest, destToSrcEdges[e].weight);
+  }
+
+  MinHeap minHeap;
+  // minHeap represents set E
+  struct MinHeapStruct* minHeapStruct = minHeap.CreateMinHeap(V_);
+
+  // Get the number of vertices in graph
+  int V = graph_->V;
+  
+  // dist values used to pick
+  // minimum weight edge in cut
+  int distFromDest[V];     
+
+
+  // Initialize min heap with all 
+  // vertices. dist value of all vertices 
+  for (int v = 0; v < V; ++v)
+  {
+      distFromDest[v] = INT_MAX;
+      minHeapStruct->array[v] = minHeap.NewMinHeapNode(v, distFromDest[v]);
+      minHeapStruct->pos[v] = v;
+  }
+
+  // Make dist value of dest vertex 
+  // as 0 so that it is extracted first
+  minHeapStruct->array[dest] = minHeap.NewMinHeapNode(dest, distFromDest[dest]);
+  minHeapStruct->pos[dest] = dest;
+  distFromDest[dest] = 0;
+  minHeap.DecreaseKey(minHeapStruct, dest, distFromDest[dest]);
+
+  // // Initially size of min heap is equal to V
+  minHeapStruct->size = V;
+
+  printf("distFromDest\n");
+  for(int i = 0; i < V; i++)
+    printf("i: %d, distFromDest[i]:%d \n", i, distFromDest[i]);
+  // In the followin loop, 
+  // min heap contains all nodes
+  // whose shortest distance 
+  // is not yet finalized.
+  while (!minHeap.IsEmpty(minHeapStruct))
+  {
+    // Extract the vertex with 
+    // minimum distance value
+    struct MinHeapNode* minHeapNode = minHeap.ExtractMin(minHeapStruct);
+    
+    // Store the extracted vertex number
+    int u = minHeapNode->v; 
+
+
+    // Traverse through all vertices thats leads to u
+    // and update their distance values
+
+    printf("u: %d-> \n", u);
+    struct AdjListNode* pCrawl = destToSrcGraph-> array[u].head;
+    while (pCrawl != NULL)
+    {
+      int v = pCrawl->dest;
+      printf("distFromDest[%d]:%d + pCrawl->weight: %d < distFromDest[%d]: %d\n", 
+        u, distFromDest[u], pCrawl->weight, v, distFromDest[v]);
+      // pathSequence[u] = v;
+      // If shortest distance to v is
+      // not finalized yet, and distance to v
+      // through u is less than its 
+      // previously calculated distance
+      if (minHeap.IsInMinHeap(minHeapStruct, v) && 
+        // distFromDest[u] != INT_MAX && 
+        pCrawl->weight + distFromDest[u] < distFromDest[v])
+      {
+        printf("inside if\n");
+        distFromDest[v] = distFromDest[u] + pCrawl->weight;
+        pathSequence[v] = u;
+        for(int i = 0; i < V; i++)
+          printf("distFromDest[%d]: %d\n", i, distFromDest[i]);
+        for(int i = 0; i < V; i++)
+          printf("pathSequence[%d]: %d\n", i, pathSequence[i]);
+        // update distance 
+        // value in min heap also
+        minHeap.DecreaseKey(minHeapStruct, v, distFromDest[v]);
+      }
+      pCrawl = pCrawl->next;
+
+      printf("-------\n");
+    }
+    printf("##############\n");
+  }
+  minHeap.~MinHeap();
+
+  printf("Final distFromDest: \n");
+  for(int i = 0; i < V; i++)
+    printf("distFromDest[%d]: %d\n", i, distFromDest[i]);
+
+  printf("Final pathSequence: \n");
+  for(int i = 0; i < V; i++)
+    printf("pathSequence[%d]: %d\n", i, pathSequence[i]);
+
+  int v = src;
+  path.emplace_back(v);
+  while(v != dest)
+  {
+    // path.insert(path.begin(), pathSequence[v]);
+    path.emplace_back(pathSequence[v]);
+    v = pathSequence[v];
+  }
+  // path.emplace_back(dest);
+  // // print the calculated shortest distances
+  // // PrintArr(dist, V);
+  // printf("Path from %d to %d not found in the graph\n", src, dest);
+
+  return path;
+}
+
+
+
+
 
 ModelGraph::~ModelGraph()
 {

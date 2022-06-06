@@ -17,19 +17,21 @@ class ModelGraph
 
   ModelGraph(GraphEdge edges[], int V, int n);
   ~ModelGraph();
-  void CreateGraph();
+  void CreateGraph(struct Graph** graph);
   void PrintAdjacencyMatrix();
   const int BaseNode();
   std::vector<int> EndEffectorNodes();
 
   void Dijkstra(int src, int dist[]);
+  std::vector<int> ShortestPath(int src, int dest);
 
   private:
   struct AdjListNode* NewAdjListNode(int dest, int weight);
-  void AddEdge(struct GraphEdge* edge);
+  void AddEdge(struct Graph** graph, struct GraphEdge* edge);
   void PrintArr(int dist[], int n);  
 
   private:
-  int V_;  // number of nodes in the graph
+  int V_; // number of nodes in the graph
+  int E_; // numver of edges in the graph
   struct Graph* graph_;
 };
