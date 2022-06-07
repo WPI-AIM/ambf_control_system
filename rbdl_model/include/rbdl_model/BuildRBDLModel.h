@@ -63,6 +63,9 @@ private:
     
     template< class MapType >
     void PrintMap(const MapType & map, const std::string & separator, std::ostream & os);
+    
+    template< class MapType, typename T, typename R>
+    R GetValueFromMap(const MapType & map, T t, R r);
 
     bool getBodies();
     bool getJoints();
@@ -98,8 +101,7 @@ private:
     unsigned int addBodyToRBDL(std::string parent_name, unsigned int parent_id, std::string joint_name, std::string child_name);
 
     // Below Maps are used for Getters only. They dont play a role in model creation.
-    // strSizetBm rbdlBodyMap_;
-    
+
     bmStrInt bodyNameHash_;
 };
 

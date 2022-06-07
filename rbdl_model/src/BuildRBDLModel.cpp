@@ -47,6 +47,29 @@ void BuildRBDLModel::PrintMap(const MapType & map, const std::string & separator
   }
 }
 
+template< class MapType, typename T, typename R>
+R BuildRBDLModel::GetValueFromMap(const MapType & map, T t, R r)
+{
+  if constexpr(std::is_same_v<T, std::string>)//char const*>)
+  {
+    bmLeftConstItr bmLeftItr = map.left.find(t);
+    r = bmLeftItr->second;
+    int id = r;
+    assert(t == bmLeftItr->first);
+    return id;
+  }
+  else if constexpr(std::is_same_v<T, int>)
+  {
+    bmRightConstItr bmRightItr = map.right.find(t);
+    r = bmRightItr->second;
+    std::string name = r;
+    assert(t == bmRightItr->first);
+    return name;
+  }
+  return r;
+}
+
+
 /*
  * Parse YAML file and create instances of Body class for each body of the model
  * @return true after successful parsing
@@ -85,9 +108,8 @@ bool BuildRBDLModel::getBodies()
       bodyIndex++;
     }
   }
-
-  // PrintMap( bodyNameHash_.right, ") ", std::cout );
-  // PrintMap( bodyNameHash_.left, " ends in position ", std::cout );
+  // PrintMap(bodyNameHash_.right, ") ", std::cout );
+  // PrintMap(bodyNameHash_.left, ") ", std::cout );
   return true;
 }
 
@@ -137,131 +159,69 @@ bool BuildRBDLModel::getJoints()
 
 bool BuildRBDLModel::buildModelSequence()
 {
-  // int V = bodyParamObjectMap_.size();  // Number of vertices in the graph
-  // int n = jointParamObjectMap_.size(); // Number of edges in the graph
-  // GraphEdge edges[n];
-  // bmLeftConstItr bmLeftItr;
-  // bmRightConstItr bmRightItr;
+  int V = bodyParamObjectMap_.size();  // Number of vertices in the graph
+  int E = jointParamObjectMap_.size(); // Number of edges in the graph
+  GraphEdge edges[E];
+  bmLeftConstItr bmLeftItr;
+  bmRightConstItr bmRightItr;
 
-  // int edgeIndex = 0;
-  // for(jointParamObjectMapItr_ = jointParamObjectMap_.begin(); 
-  //   jointParamObjectMapItr_ != jointParamObjectMap_.end();
-  //   jointParamObjectMapItr_++)
-  // {
-  //   std::string jointName = jointParamObjectMapItr_->first;
-  //   jointParamPtr ptr = jointParamObjectMapItr_->second;
+  int edgeIndex = 0;
+  for(jointParamObjectMapItr_ = jointParamObjectMap_.begin(); 
+    jointParamObjectMapItr_ != jointParamObjectMap_.end();
+    jointParamObjectMapItr_++)
+  {
+    std::string jointName = jointParamObjectMapItr_->first;
+    jointParamPtr ptr = jointParamObjectMapItr_->second;
 
-  //   std::string parentName = ptr->Parent().c_str();
-  //   bmLeftItr = bodyNameHash_.left.find(parentName);
-  //   assert(parentName == bmLeftItr->first);
-  //   int parentId = bmLeftItr->second;
+    std::string parentName = ptr->Parent().c_str();
+    int parentId = GetValueFromMap(bodyNameHash_, parentName, -1);
 
-  //   std::string childName = ptr->Child().c_str();
-  //   bmLeftItr = bodyNameHash_.left.find(childName);
-  //   assert(childName == bmLeftItr->first);
-  //   int childId = bmLeftItr->second;
+    std::string childName = ptr->Child().c_str();
+    int childId = GetValueFromMap(bodyNameHash_, childName, -1);
+    int weight = ptr->Weight();
 
-  //   int weight = ptr->Weight();
-  //   // printf("%s,\t\t %s, %d,\t %s, %d,\t %d\n", 
-  //   //   jointName.c_str(), parentName.c_str(), parentId, childName.c_str(), childId, weight);
+    edges[edgeIndex] = { parentId, childId, weight };
+    edgeIndex++;
+  }
 
-  //   edges[edgeIndex] = { parentId, childId, weight };
-  //   edgeIndex++;
-  // }
+  assert(sizeof(edges)/sizeof(edges[0]) == E);
 
-  // printf("V: %d, n: %d\n", V, n);
-  // assert(sizeof(edges)/sizeof(edges[0]) == n);
-  // printf("buildModelSequence() - edges\n");
-  // for(int idx = 0; idx < n; idx++)
-  // {
-  //   GraphEdge graphEdge = edges[idx];
-  //   printf("{ %d, %d, %d }\n", graphEdge.src, graphEdge.dest, graphEdge.weight);
-  // }
-
-
-  // graph edges array.
-  // GraphEdge edges[] = {
-  //   {0, 1, 4}, {0, 7, 8}, {1, 2, 8}, {1, 7, 11}, {2, 3, 7}, {2, 8, 2}, {2, 5, 4}, 
-  //   {3, 4, 9}, {3, 5, 14},{4, 5, 10}, {5, 6, 2}, {6, 7, 1}, {6, 8, 6}, {7, 8, 7},
-  // };
-  GraphEdge edges[] = {
-    {0, 1, 4}, {0, 7, 100}, {1, 2, 8}, {1, 7, 100}, {2, 3, 7}, {2, 8, 100}, {2, 5, 100}, 
-    {3, 4, 9}, {3, 5, 100},{4, 5, 10}, {5, 6, 2}, {6, 7, 1}, {6, 8, 6}, {7, 8, 7},
-  };
-  int V = 9;
-
-  // GraphEdge edges[] = {
-  //   {0, 1, 2}, {0, 2, 4}, {1, 2, 1}, {1, 3, 5}, {2, 3, 10}
-  // };
-  // int V = 4;
-
-  // calculate number of edges
-  int E = sizeof(edges)/sizeof(edges[0]);
-  // construct graph
   Utilities utilities;
   ModelGraph modelGraph(edges, V, E);
-  
-  std::cout << "Source to destination AdjacencyMatrix\n";
-  modelGraph.PrintAdjacencyMatrix();
+ 
   int baseNodeId = modelGraph.BaseNode();
+  if(baseNodeId == -1) utilities.throwBaseNotFoundException();
+
+  std::string baseNodeName;
+  baseNodeName = GetValueFromMap(bodyNameHash_, baseNodeId, baseNodeName);
+  
   std::vector<int> endEffectorNodesId = modelGraph.EndEffectorNodes();
 
-  int dist[V];
-  modelGraph.Dijkstra(baseNodeId, dist);
+  // Each end effector will have different path
+  std::vector<std::vector<std::string>> paths;
+  for(int eeId : endEffectorNodesId)
+  {
+    std::vector<int> pathById = modelGraph.ShortestPath(baseNodeId, eeId);
+    std::vector<std::string> pathByName;
+    // Add path by name to correspoinding Vector by Index
+    for(int id : pathById)
+    {
+      std::string rigidBodyName;
+      rigidBodyName = GetValueFromMap(bodyNameHash_, id, rigidBodyName);
+      pathByName.emplace_back(rigidBodyName);
+    }
+    paths.emplace_back(pathByName);
+  }
 
-  std::cout << "Distance from source\n";
-  for(int v = 0; v < V; v++) 
-    printf("%d, %d\n", v, dist[v]);
+  for(std::vector<std::string> path : paths)
+  {
+    for(std::string name : path)
+    {
+      printf("%s->", name.c_str());
+    }
+    printf("\n");
+  }
 
-  std::vector<int> path = modelGraph.ShortestPath(baseNodeId, endEffectorNodesId.at(0));
-
-  std::cout << "Path\n";
-  for(int id : path) 
-    printf("%d-->", id);
-  printf("\n");
-
-  // std::vector<int> path = modelGraph.ShortestPath(baseId, endEffectorNodesId.at(0));
-
-  // int baseNodeId = modelGraph.BaseNode();
-  // if(baseNodeId == -1) utilities.throwBaseNotFoundException();
-
-  // bmRightItr = bodyNameHash_.right.find(baseNodeId);
-  // // assert(modelGraph.BaseNode() == bmRightItr->first);
-  // std::string baseName = bmRightItr->second;
-  // printf("baseName: %s\n", baseName.c_str());
-  
-  // bmLeftItr = bodyNameHash_.left.find(baseName);
-  // // assert(baseName == bmLeftItr->first);
-  // int baseId = bmLeftItr->second;
-
-  // std::vector<int> endEffectorNodesId = modelGraph.EndEffectorNodes();
-  // std::vector<std::string> endEffectorNodesName;
-
-  // for(int endEffectorNodeId : endEffectorNodesId)
-  // {
-  //   bmRightItr = bodyNameHash_.right.find(endEffectorNodeId);
-  //   // assert(modelGraph.BaseNode() == bmRightItr->first);
-  //   endEffectorNodesName.emplace_back(bmRightItr->second);
-  // }
-
-  // for(std::string endEffectorNodeName: endEffectorNodesName)
-  // {
-  //   printf("endEffectorNodeName: %s\n", endEffectorNodeName.c_str());
-  // }
-
-  // int dist[V];
-  // modelGraph.Dijkstra(baseId, dist);
-
-
-
-  // std::vector<int> path = modelGraph.ShortestPath(baseId, endEffectorNodesId.at(0));
-  // for(int id : path)
-  // {
-  //   bmRightItr = bodyNameHash_.right.find(id);
-  //   // printf("%d, ", id);
-  //   printf("%s->", bmRightItr->second.c_str());
-  // }
-  // printf("\n");
   return true;
 }
 /*
