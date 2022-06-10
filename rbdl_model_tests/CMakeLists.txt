@@ -17,7 +17,8 @@ FIND_PACKAGE (rbdl_model REQUIRED)
 include_directories(${RBDL_MODEL})
 include_directories(rbdl_model)
 
-set (ambf_msgs_DIR ${CMAKE_MODULE_PATH})
+# set (ambf_msgs_DIR ${CMAKE_MODULE_PATH})
+set (ambf_msgs_DIR /mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/cmake/ )
 
 set (AMBF_CLIENT_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/lib/libambf_client_cpp.so")
 
@@ -28,12 +29,25 @@ include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/am
 FIND_PACKAGE (ambf_client REQUIRED)
 include_directories(${AMBF_CLIENT_INCLUDE_DIR})
 
+set (application_DIR "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/cmake/")
+include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/application/include/")
+FIND_PACKAGE (application REQUIRED)
+# MESSAGE(STATUS "Found Application: ${APPLICATION_INCLUDE_DIR}")
+set (RBDL_MODEL_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/build/devel/lib/librbdl_model.so")
+set (APPLICATION_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/build/devel/lib/libapplication.so")
+
+include_directories(${AMBF_CLIENT_INCLUDE_DIRS} ${APPLICATION_INCLUDE_DIRS})
+include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/application/include/")
+
+FIND_PACKAGE (application REQUIRED)
+include_directories(${APPLICATION})
+include_directories(application)
 
 find_package(catkin REQUIRED COMPONENTS
-   ambf_msgs
-   geometry_msgs
-   message_generation
-   tf
+  ambf_msgs
+  geometry_msgs
+  message_generation
+  tf
 )
 
 
@@ -61,9 +75,11 @@ include_directories( include
                     ${catkin_INCLUDE_DIRS} 
                     ${Eigen_INCLUDE_DIRS} 
                     ${EIGEN3_INCLUDE_DIR} 
-                    ${RBDL_INCLUDE_DIR})
-
-
+                    ${RBDL_INCLUDE_DIR}
+                    ${APPLICATION_INCLUDE_DIR}
+                    ${APPLICATION_INCLUDE_DIRS}
+                    ${CMAKE_SOURCE_DIR}/application/include/
+)
 #find_package (ambf_client REQUIRED)
 # find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
@@ -73,18 +89,20 @@ find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  # ${CMAKE_SOURCE_DIR}/application/include/
 )
 
-include_directories (${GLFW_INCLUDE_DIRS}
-                     ${PROJECT_NAME}/include
+include_directories (
+  # ${GLFW_INCLUDE_DIRS}
+  ${PROJECT_NAME}/include
 )
 
 # find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
-include_directories (${GLFW_INCLUDE_DIRS})
+# include_directories (${GLFW_INCLUDE_DIRS})
 
 set (RBDL_MODEL_TESTS_HDR_FILES
-    include/${PROJECT_NAME}/EigenUtilities.h
+    # include/${PROJECT_NAME}/EigenUtilities.h
     include/${PROJECT_NAME}/rbdl_tests.h
     include/${PROJECT_NAME}/RBDLTestPrep.h    
     )
@@ -145,7 +163,7 @@ set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
     # src/KUKA.cpp
     # src/EigenUtilities.cpp
     src/ModelFromParser/KUKA.cc
-    src/RBDLTestPrep.cc
+    src/RBDLTestPrep.cpp
     src/main.cc
     )
 
@@ -157,10 +175,12 @@ target_link_libraries (kuka_tests
     ${catkin_LIBRARIES} 
     ${Eigen_LIBRARIES} 
     ${AMBF_CLIENT_LIBRARY} 
+    ${APPLICATION_LIBRARY} 
+    ${RBDL_LIBRARY}
     ${RBDL_MODEL_LIBRARY} 
+    ${YAML_CPP_LIBRARIES}
     ${Boost_LIBRARIES} 
     ${UNITTEST++_LIBRARY}
-    ${RBDL_LIBRARY}
     pthread
     )
 

@@ -9,30 +9,17 @@
 #include <chrono>
 #include <vector>
 
-#include "rbdl_model_tests/rbdl_tests.h"
-#include "rbdl/rbdl_mathutils.h"
-#include "rbdl/Logging.h"
-
-#include "rbdl/Model.h"
-#include "rbdl/Kinematics.h"
-#include "rbdl/Dynamics.h"
-#include "rbdl/Constraints.h"
-
 #include "rbdl_model/BuildRBDLModel.h"
-#include "ambf_client/ambf_client.h"
-
-
+#include "application/Prep.h"
 //------------------------------------------------------------------------------
 typedef BuildRBDLModel* BuildRBDLModelPtr;
-typedef Client* AMBFClientPtr;
 typedef Model* RBDLModelPtr; 
 //------------------------------------------------------------------------------
 
 const double TEST_PREC = 1.0e-2;
 
 
-
-constexpr auto tenMill= 10000000;
+// constexpr auto tenMill= 10000000;
 class RBDLTestPrep
 {
 public:
@@ -52,7 +39,6 @@ public:
     }
 
     std::chrono::duration<double> getTime();
-    AMBFClientPtr getAMBFClientInstance();
     BuildRBDLModelPtr getRBDLModelInstance();
 private:
     RBDLTestPrep()= default;
@@ -67,7 +53,7 @@ private:
     // const std::string actuator_config_file_ = "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/ECM2/blender-ecm.yaml";
     // const std::string actuator_config_file_ = "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/PSM/blender-psm.yaml";
     // const std::string actuator_config_file_ = "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/MTM/blender-mtm.yaml";
-   const std::string actuator_config_file_ = "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/Neuro/blender-neuro.yaml";
+//    const std::string actuator_config_file_ = "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/Neuro/blender-neuro.yaml";
 
 };
 

@@ -1,6 +1,6 @@
 #ifndef JOINTPARAM_H
 #define JOINTPARAM_H
-#include <rbdl_model/Utilities.h>
+#include "application/Utilities.h"
 
 /*
  * JointParam Class is used to hold values of Joint parameter

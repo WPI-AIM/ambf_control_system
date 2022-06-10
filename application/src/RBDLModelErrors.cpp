@@ -1,4 +1,4 @@
-#include "rbdl_model/RBDLModelErrors.h"
+#include "application/RBDLModelErrors.h"
 
 namespace RBDLModel
 {

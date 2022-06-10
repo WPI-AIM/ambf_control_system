@@ -1,7 +1,8 @@
 // KUKA All Working except that the body has to be shiftted one level to parent
 
 #include "rbdl_model_tests/KUKA.h"
-#include "rbdl_model_tests/EigenUtilities.h"
+// #include "rbdl_model_tests/EigenUtilities.h"
+
 
 KUKA::KUKA() 
 {

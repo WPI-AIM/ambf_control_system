@@ -3,48 +3,48 @@
 JointParam::JointParam(YAML::Node jointNode)
 {
   // Declare all the yaml parameters that we want to look for
-  Utilities utilities;
+  // Utilities utilities;
 
   YAML::Node name = jointNode["name"];
-  if(!name.IsDefined()) utilities.throwMissingFieldException("joint name: " + name_ + ", name in Joint Params");
-  name_ = utilities.trimTrailingSpaces(name);
+  if(!name.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", name in Joint Params");
+  name_ = Utilities::TrimTrailingSpaces(name);
 
   YAML::Node parent = jointNode["parent"];
-  if(!parent.IsDefined()) utilities.throwMissingFieldException("joint name: " + name_ + ", parent name in Joint Params");
-  parent_ = utilities.trimTrailingSpaces(parent);
-  utilities.eraseSubStr(parent_, "BODY");
+  if(!parent.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", parent name in Joint Params");
+  parent_ = Utilities::TrimTrailingSpaces(parent);
+  Utilities::EraseSubStr(parent_, "BODY");
 
   YAML::Node child = jointNode["child"];
-  if(!child.IsDefined()) utilities.throwMissingFieldException("joint name: " + name_ + ", child name in Joint Params");
-  child_ = utilities.trimTrailingSpaces(child);
-  utilities.eraseSubStr(child_, "BODY");
+  if(!child.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", child name in Joint Params");
+  child_ = Utilities::TrimTrailingSpaces(child);
+  Utilities::EraseSubStr(child_, "BODY");
 
   YAML::Node parent_pivot = jointNode["parent pivot"];
-  if(!parent_pivot.IsDefined()) utilities.throwMissingFieldException("joint name: " + name_ + ", parent pivot in Joint Params");
-  parent_pivot_ = utilities.toXYZ(&parent_pivot);
+  if(!parent_pivot.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", parent pivot in Joint Params");
+  parent_pivot_ = Utilities::ToXYZ(&parent_pivot);
 
   YAML::Node parent_axis = jointNode["parent axis"];
-  if(!parent_axis.IsDefined()) utilities.throwMissingFieldException("joint name: " + name_ + ", parent axis in Joint Params");
-  parent_axis_ = utilities.toXYZ(&parent_axis);
+  if(!parent_axis.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", parent axis in Joint Params");
+  parent_axis_ = Utilities::ToXYZ(&parent_axis);
 
   YAML::Node child_pivot = jointNode["child pivot"];
-  if(!child_pivot.IsDefined()) utilities.throwMissingFieldException("joint name: " + name_ + ", child pivot in Joint Params");
-  child_pivot_ = utilities.toXYZ(&child_pivot);
+  if(!child_pivot.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", child pivot in Joint Params");
+  child_pivot_ = Utilities::ToXYZ(&child_pivot);
 
   YAML::Node child_axis = jointNode["child axis"];
-  if(!child_axis.IsDefined()) utilities.throwMissingFieldException("joint name: " + name_ + ", child axis in Joint Params");
-  child_axis_ = utilities.toXYZ(&child_axis);
+  if(!child_axis.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", child axis in Joint Params");
+  child_axis_ = Utilities::ToXYZ(&child_axis);
 
   YAML::Node type = jointNode["type"];
-  if(!type.IsDefined()) utilities.throwMissingFieldException("joint name: " + name_ + ", type in Joint Params");
-  type_ = utilities.trimTrailingSpaces(type);
+  if(!type.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", type in Joint Params");
+  type_ = Utilities::TrimTrailingSpaces(type);
 
   // weight added to select the desired joint path using Dijkstra's Algorithm
   // If not weight found in YAML its set to 1. Dijkstra cannot have negative weights
   YAML::Node weight = jointNode["weight"];
   if(!weight.IsDefined()) weight_ = 1;
-  else weight_ = utilities.toInt(weight);
-  if(weight_ < 1) utilities.throwInvalidValueException("joint name: " + name_ + ", weight should be at least 1");
+  else weight_ = Utilities::ToInt(weight);
+  if(weight_ < 1) Utilities::ThrowInvalidValueException("joint name: " + name_ + ", weight should be at least 1");
 
   // ToDo: Make sure that only supported joints are included in the model
   // std::string joint_type = type.as<std::string>();
