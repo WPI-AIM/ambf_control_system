@@ -1,5 +1,6 @@
 #include "rbdl_model_tests/ECM.h"
-#include "rbdl_model_tests/EigenUtilities.h"
+#include "application/Utilities.h"
+#include "application/Prep.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -23,7 +24,7 @@ ECM::ECM()
 
 bool ECM::ConnectToAMBF()
 {
-	ambfClientPtr_ = RBDLTestPrep::getInstance()->getAMBFClientInstance();
+	ambfClientPtr_ = AMBFTestPrep::getInstance()->getAMBFClientInstance();
 	
 	if(!ambfClientPtr_->connect()) return false;
 	usleep(1000000);
@@ -62,8 +63,8 @@ void ECM::SetAMBFParams()
     size_t pos = rigidBodyName.find(modelName);
     if (pos != std::string::npos)
     {
-        // If found then erase it from string
-        rigidBodyName.erase(pos, modelName.length());
+			// If found then erase it from string
+			rigidBodyName.erase(pos, modelName.length());
     }
 
 		ambfParamMap_.insert(AMBFParamPair(rigidBodyName, new AMBFParams(

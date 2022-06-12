@@ -61,6 +61,7 @@ public:
   static const Vector3d ToXYZInertia(YAML::Node* node);
   //const int toInt(YAML::Node* node, const std::string param);
   static const int ToInt(YAML::Node bodyNode);
+  static const double ToDouble(YAML::Node node);
   static const Math::Matrix3d VectorToMatrix3d(YAML::Node* node);
 
   static const std::string TrimTrailingSpaces(YAML::Node bodyNode);
@@ -68,7 +69,9 @@ public:
   static void ThrowInvalidFilePathException(const std::string message);
   static void ThrowMissingFieldException(const std::string message);
   static void ThrowInvalidValueException(const std::string m);
+  static void ThrowAMBFInactiveException();
   static void ThrowBaseNotFoundException();
+  static void ThrowKeyNotFoundException(std::string mapName, std::string key);
 
     ~Utilities(void);
 };

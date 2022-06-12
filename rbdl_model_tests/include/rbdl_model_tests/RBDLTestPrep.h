@@ -15,9 +15,7 @@
 typedef BuildRBDLModel* BuildRBDLModelPtr;
 typedef Model* RBDLModelPtr; 
 //------------------------------------------------------------------------------
-
 const double TEST_PREC = 1.0e-2;
-
 
 // constexpr auto tenMill= 10000000;
 class RBDLTestPrep

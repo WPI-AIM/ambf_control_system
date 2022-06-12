@@ -1,39 +1,35 @@
-#ifndef PARSE_YAML_H
-#define PARSE_YAML_H
-#include <yaml-cpp/yaml.h>
+#ifndef BUILDRBDLMODEL_H
+#define BUILDRBDLMODEL_H
 #include <iostream>
 #include <unordered_map>
 #include <queue>
 #include <sstream>
 #include <unordered_set>
 #include <vector>
-#include <boost/optional.hpp>
-#include <boost/bimap.hpp>
 #include <limits>
-
 #include <rbdl/rbdl.h>
 #include <rbdl/rbdl_math.h>
-
-#include "rbdl_model/BodyParam.h"
-#include "rbdl_model/JointParam.h"
-#include "rbdl_model/ModelGraph.h"
+#include "application/Utilities.h"
 
 // #include "ambf_client/ambf_client.h"
-#include "application/Prep.h"
-#include "application/Utilities.h"
+#include "rbdl_model/AMBFParams.h"
+#include "rbdl_model/ParseADF.h"
 
 using namespace RigidBodyDynamics;
 using namespace Math;
 using namespace RigidBodyDynamics::Math;
 //------------------------------------------------------------------------------
-typedef BodyParam* bodyParamPtr;
-typedef JointParam* jointParamPtr;
 typedef RigidBodyDynamics::Body rbdlBody;
 typedef RigidBodyDynamics::Joint rbdlJoint;
 typedef RigidBodyDynamics::JointType rbdlJointType;
-typedef boost::bimap<std::string, int> bmStrInt;
-typedef bmStrInt::left_map::const_iterator bmLeftConstItr;
-typedef bmStrInt::right_map::const_iterator bmRightConstItr;
+typedef AMBFParams* AMBFParamsPtr;
+typedef ParseADF* ParseADFPtr;
+typedef std::unordered_map<std::string, AMBFParamsPtr> AMBFParamMap;
+typedef std::pair<std::string, AMBFParamsPtr> AMBFParamPair;
+typedef Model* RBDLModelPtr;
+//------------------------------------------------------------------------------
+const double TEST_LAX {1.0e-7};
+const useconds_t sleepTime {250000};
 //------------------------------------------------------------------------------
 
 class BuildRBDLModel
@@ -41,53 +37,48 @@ class BuildRBDLModel
 public:
   BuildRBDLModel(const std::string actuator_config_file);
 
-  void printBody();
-  void printJoint();
-  void cleanUp();
+  void PrintBody();
+  void PrintJoint();
+  void CleanUp();
 
   ~BuildRBDLModel(void);
 
-  std::unordered_map<std::string, bodyParamPtr> inline getRBDLBodyToObjectMap() { return bodyParamObjectMap_; }
+  std::unordered_map<std::string, bodyParamPtr> inline GetRBDLBodyToObjectMap() { return bodyParamObjectMap_; }
 
-  std::unordered_map<std::string, unsigned int> inline getRBDLBodyToIDMap() { return rbdlObjectMap_; }
-  std::unordered_map<std::string, unsigned int> inline getRBDLJointToIDMap() { return joint_map; }
+  std::unordered_map<std::string, unsigned int> inline GetRBDLBodyToIDMap() { return rbdlObjectMap_; }
+  std::unordered_map<std::string, unsigned int> inline GetRBDLJointToIDMap() { return joint_map; }
 
-  inline Model* getRBDLModel() { return RBDLmodel_; }
+  // inline Model* RBDLModel() { return RBDLmodel_; }
 
-  std::string inline getBaseRigidBody() { return baseRigidBody_; }
+  std::string inline BaseRigidBodyName() { return baseRigidBodyName_; }
 
-  std::vector<std::string> getAllBodyNames();
-  unsigned int getBodyId(const std::string bodyName);
+  std::vector<std::string> GetAllBodyNames();
+  unsigned int GetBodyId(const std::string bodyName);
 
-  boost::optional<rbdlBody> getRBDLBody(const std::string bodyName);
-  std::unordered_map<std::string, jointParamPtr> getJointChildren(std::string parent);
-  std::vector<std::string> getAllJointNames();
+  boost::optional<rbdlBody> GetRBDLBody(const std::string bodyName);
+  std::unordered_map<std::string, jointParamPtr> GetJointChildren(std::string parent);
+  std::vector<std::string> GetAllJointNames();
 
 private:
   bool ConnectToAMBF();
-  void getNamespace();
-  
-  template< class MapType >
-  void PrintMap(const MapType & map, const std::string & separator, std::ostream & os);
-  
-  template< class MapType, typename T, typename R>
-  R GetValueFromMap(const MapType & map, T t, R r);
+  AMBFParamsPtr FetchFromAMBFParamMap(const std::string parentBodyName);
+  void RegisterBodyToWorldTransformation(const std::string parentBodyName);
 
-  bool getBodies();
-  bool getJoints();
-  bool buildModelSequence();
-  bool buildModel();
+  void RegisterRigidBodysPose();
+  void RegisterHomePoseTransformation();
+  void SetAMBFParams();
+
+  bool BuildModel();
 
 private:
+  ParseADFPtr parseAdf_{nullptr};
   AMBFClientPtr ambfClientPtr_{nullptr};
-  std::string blender_namespace_;
-  YAML::Node baseNode_;
-  std::string actuator_config_file_;
-  std::string baseRigidBody_;
+  std::string baseRigidBodyName_{""};
+  rigidBodyPtr baselinkHandler_{nullptr};
+  std::vector<std::string> controlableJoints_;
 
-  const std::string base_parent_name_ = "world";
-  std::string base_joint_name_;
-  Model *RBDLmodel_ = NULL;
+  std::vector<std::string> endEffectorNodesName_;
+
   std::unordered_map<std::string, bodyParamPtr> bodyParamObjectMap_;
 
   // //                 <parent,                       <jointname, jointParamPtr>>
@@ -101,13 +92,18 @@ private:
   std::unordered_map<std::string, unsigned int> ::iterator rbdl_object_map_itr_;
 
 
-  // const rbdlJointType getRBDLJointType(std::string joint_type);
-  // unsigned int addBodyToRBDL(std::string parent_name, unsigned int parent_id, std::string joint_name, std::string child_name);
-
-  // Below Maps are used for Getters only. They dont play a role in model creation.
-
-  bmStrInt bodyNameHash_;
   std::vector<std::vector<std::string>> paths_;
+
+  AMBFParamMap ambfParamMap_;
+  AMBFParamMap::iterator ambfParamMapItr_;
+
+  RBDLModelPtr rbdlModelPtr_{nullptr};
+  VectorNd Q_;
+  VectorNd QDot_;
+  VectorNd QDDot_;
+  VectorNd Tau_;
+  std::map< std::string, unsigned int > rbdlmBodyMap_;
+  std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr_;
 };
 
-#endif // PARSE_YAML_H
+#endif // BUILDRBDLMODEL_H

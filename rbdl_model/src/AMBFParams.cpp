@@ -1,4 +1,4 @@
-#include "rbdl_model_tests/AMBFParams.h"
+#include "rbdl_model/AMBFParams.h"
 #include "application/Utilities.h"
 
 AMBFParams::AMBFParams(const std::string name, rigidBodyPtr handler) :

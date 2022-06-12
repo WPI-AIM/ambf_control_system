@@ -35,9 +35,24 @@ JointParam::JointParam(YAML::Node jointNode)
   if(!child_axis.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", child axis in Joint Params");
   child_axis_ = Utilities::ToXYZ(&child_axis);
 
+  YAML::Node joint_limits = jointNode["joint limits"];
+  if(!joint_limits.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", joint limits in Joint Params");
+
+  YAML::Node joint_limits_high = joint_limits["high"];
+  if(!joint_limits_high.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", joint limit high in Joint Params");
+  joint_limits_high_ = Utilities::ToDouble(joint_limits_high);
+
+  YAML::Node joint_limits_low = joint_limits["low"];
+  if(!joint_limits_low.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", joint limit low in Joint Params");
+  joint_limits_low_ = Utilities::ToDouble(joint_limits_low);
+
   YAML::Node type = jointNode["type"];
   if(!type.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", type in Joint Params");
   type_ = Utilities::TrimTrailingSpaces(type);
+
+  YAML::Node offset = jointNode["offset"];
+  if(!offset.IsDefined()) offset_ = 0.0;
+  else offset_ = Utilities::ToDouble(offset);
 
   // weight added to select the desired joint path using Dijkstra's Algorithm
   // If not weight found in YAML its set to 1. Dijkstra cannot have negative weights

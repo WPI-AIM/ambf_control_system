@@ -118,6 +118,14 @@ const int Utilities::ToInt(YAML::Node node) {
   return val;
 }
 
+
+const double Utilities::ToDouble(YAML::Node node)
+{
+  int val;
+  if(node.IsDefined()) val = node.as<double>();
+  return val;
+}
+
 ///
 /// \brief toVector3d
 /// \param node
@@ -205,6 +213,7 @@ const std::string Utilities::TrimTrailingSpaces(YAML::Node bodyNode) {
 //   }
 // }
 
+
 void Utilities::ThrowInvalidFilePathException(const std::string message)
 {
   throw RBDLModel::ModelErrors::RBDLModelInvalidFilePathError("Error: Mention ADF file path not fould. Terminating model creation!\n");
@@ -215,6 +224,11 @@ void Utilities::ThrowMissingFieldException(const std::string message)
   throw RBDLModel::ModelErrors::RBDLModelMissingParameterError("Error: Missing " + message + " which is mandate field to build RBDL Model. Terminating model creation!\n");
 }
 
+void Utilities::ThrowAMBFInactiveException()
+{
+  throw std::runtime_error("Error: AMBF Inactive Exception. Terminating model creation!\n");
+}
+
 void Utilities::ThrowInvalidValueException(const std::string message)
 {
   throw std::runtime_error("Error: " + message + " . Terminating model creation!\n");
@@ -223,6 +237,11 @@ void Utilities::ThrowInvalidValueException(const std::string message)
 void Utilities::ThrowBaseNotFoundException()
 {
   throw std::runtime_error("Error: Could not find base for the model. Terminating model creation!\n");
+}
+
+void Utilities::ThrowKeyNotFoundException(std::string mapName, std::string key)
+{
+  throw std::runtime_error("Error: Key: " + key + " not found exception in map " + mapName + ". Terminating execution\n");
 }
 
 Utilities::~Utilities(void) {}
