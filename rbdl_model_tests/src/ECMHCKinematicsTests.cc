@@ -1,6 +1,6 @@
 #include "rbdl_model_tests/RBDLTestPrep.h"
 #include "rbdl_model_tests/ECM.h"
-#include "rbdl_model_tests/EigenUtilities.h"
+#include "application/Utilities.h"
 
 // ECM* ecm = nullptr;
 

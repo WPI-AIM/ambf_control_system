@@ -52,6 +52,7 @@ public:
 
   std::string inline BaseRigidBodyName() { return baseRigidBodyName_; }
 
+  inline RBDLModelPtr RBDLModel() { return rbdlModelPtr_; }
   std::vector<std::string> GetAllBodyNames();
   unsigned int GetBodyId(const std::string bodyName);
 

@@ -138,12 +138,12 @@ void BuildRBDLModel::RegisterHomePoseTransformation()
  */
 bool BuildRBDLModel::BuildModel() 
 {
-	std::cout << "print ambfParamMap_\n";
-  for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
-	{
-		std::string rigidBodyName = ambfParamMapItr_->first;
-		printf("%s\n", rigidBodyName.c_str());
-	}
+	// std::cout << "print ambfParamMap_\n";
+  // for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
+	// {
+	// 	std::string rigidBodyName = ambfParamMapItr_->first;
+	// 	printf("%s\n", rigidBodyName.c_str());
+	// }
 	
 	rbdl_check_api_version(RBDL_API_VERSION);
 
@@ -164,16 +164,14 @@ bool BuildRBDLModel::BuildModel()
     std::string childRigidBodyName = path.at(i + 1);
     std::string jointName = parentRigidBodyName + "-" + childRigidBodyName;
 
-    printf("parentName: %s, childName: %s, jointName: %s\n", 
-      parentRigidBodyName.c_str(), childRigidBodyName.c_str(), jointName.c_str());
+    // printf("parentName: %s, childName: %s, jointName: %s\n", 
+    //   parentRigidBodyName.c_str(), childRigidBodyName.c_str(), jointName.c_str());
 
     bodyParamPtr childParamPtr = parseAdf_->BodyParams(childRigidBodyName);
     
     // mass, com - inertia offset, inertia
     Body childBody = 
       Body(childParamPtr->Mass(), childParamPtr->InertialOffsetPosition(), childParamPtr->Inertia());
-
-		
 
 		SpatialTransform world_parentST;
 		SpatialTransform world_childST;

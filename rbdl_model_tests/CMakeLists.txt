@@ -80,8 +80,6 @@ include_directories( include
                     ${APPLICATION_INCLUDE_DIRS}
                     ${CMAKE_SOURCE_DIR}/application/include/
 )
-#find_package (ambf_client REQUIRED)
-# find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 
 ## Specify additional locations of header files
@@ -89,22 +87,18 @@ find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  # ${CMAKE_SOURCE_DIR}/application/include/
 )
 
 include_directories (
-  # ${GLFW_INCLUDE_DIRS}
   ${PROJECT_NAME}/include
 )
 
 # find_package (GLFW REQUIRED)
 find_package (Boost COMPONENTS program_options filesystem REQUIRED)
-# include_directories (${GLFW_INCLUDE_DIRS})
+
 
 set (RBDL_MODEL_TESTS_HDR_FILES
-    # include/${PROJECT_NAME}/EigenUtilities.h
     include/${PROJECT_NAME}/rbdl_tests.h
-    include/${PROJECT_NAME}/RBDLTestPrep.h    
     )
 
 # ################START################
@@ -147,48 +141,48 @@ set (RBDL_MODEL_TESTS_HDR_FILES
 #     )
 # ################END################
 
-################START################
-#Executible kuka_tests
+# ################START################
+# #Executible kuka_tests
 
-# set (KUKA_RBDL_MODEL_TESTS_FILES
-#     include/${PROJECT_NAME}/AMBFParams.h
-#     include/${PROJECT_NAME}/KUKA.h
+# # set (KUKA_RBDL_MODEL_TESTS_FILES
+# #     include/${PROJECT_NAME}/AMBFParams.h
+# #     include/${PROJECT_NAME}/KUKA.h
+# #     )
+
+# set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
+#     # src/ECMHCDynamicsTests.cc
+#     # src/KukaHCKinematicsTests.cc
+#     # src/KUKABodyTests.cc
+#     # src/AMBFParams.cpp
+#     # src/KUKA.cpp
+#     # src/EigenUtilities.cpp
+#     src/ModelFromParser/KUKA.cc
+#     src/RBDLTestPrep.cpp
+#     src/main.cc
 #     )
 
-set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES
-    # src/ECMHCDynamicsTests.cc
-    # src/KukaHCKinematicsTests.cc
-    # src/KUKABodyTests.cc
-    # src/AMBFParams.cpp
-    # src/KUKA.cpp
-    # src/EigenUtilities.cpp
-    src/ModelFromParser/KUKA.cc
-    src/RBDLTestPrep.cpp
-    src/main.cc
-    )
+# add_executable (kuka_tests
+# ${RBDL_MODEL_TESTS_HDR_FILES} 
+# # ${KUKA_RBDL_MODEL_TESTS_HDR_FILES} 
+# ${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES})
+# target_link_libraries (kuka_tests
+#     ${catkin_LIBRARIES} 
+#     ${Eigen_LIBRARIES} 
+#     ${AMBF_CLIENT_LIBRARY} 
+#     ${APPLICATION_LIBRARY} 
+#     ${RBDL_LIBRARY}
+#     ${RBDL_MODEL_LIBRARY} 
+#     ${YAML_CPP_LIBRARIES}
+#     ${Boost_LIBRARIES} 
+#     ${UNITTEST++_LIBRARY}
+#     pthread
+#     )
 
-add_executable (kuka_tests
-${RBDL_MODEL_TESTS_HDR_FILES} 
-# ${KUKA_RBDL_MODEL_TESTS_HDR_FILES} 
-${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES})
-target_link_libraries (kuka_tests
-    ${catkin_LIBRARIES} 
-    ${Eigen_LIBRARIES} 
-    ${AMBF_CLIENT_LIBRARY} 
-    ${APPLICATION_LIBRARY} 
-    ${RBDL_LIBRARY}
-    ${RBDL_MODEL_LIBRARY} 
-    ${YAML_CPP_LIBRARIES}
-    ${Boost_LIBRARIES} 
-    ${UNITTEST++_LIBRARY}
-    pthread
-    )
-
-set_target_properties(kuka_tests PROPERTIES
-    CXX_STANDARD 17
-    CXX_EXTENSIONS OFF
-    )
-################END################
+# set_target_properties(kuka_tests PROPERTIES
+#     CXX_STANDARD 17
+#     CXX_EXTENSIONS OFF
+#     )
+# ################END################
 
 # ################START################
 # #Executible Parallel Structure_hc_tests
@@ -288,3 +282,42 @@ set_target_properties(kuka_tests PROPERTIES
 #     CXX_EXTENSIONS OFF
 #     )
 # ################END################
+
+################START################
+#Executible model from automation test cases
+
+set (RBDL_MODEL_FROM_AUTOMATION_TESTS_HDR_FILES
+    # include/${PROJECT_NAME}/AMBFParams.h
+    include/${PROJECT_NAME}/ModelFromParser/RBDLModelFromAutomation.h
+    include/${PROJECT_NAME}/ModelFromParser/TestCaseStruct.h
+    )
+
+set(RBDL_MODEL_FROM_AUTOMATION_TESTS_SOURCE_FILES
+    src/ModelFromParser/RBDLModelTestCases.cc
+    src/ModelFromParser/RBDLModelFromAutomation.cpp
+    src/main.cc
+    )
+
+add_executable (rbdl_mode_from_automation_tests
+${RBDL_MODEL_TESTS_HDR_FILES} 
+${RBDL_MODEL_FROM_AUTOMATION_TESTS_HDR_FILES} 
+${RBDL_MODEL_FROM_AUTOMATION_TESTS_SOURCE_FILES})
+
+target_link_libraries (rbdl_mode_from_automation_tests
+    ${catkin_LIBRARIES} 
+    ${Eigen_LIBRARIES} 
+    ${AMBF_CLIENT_LIBRARY} 
+    ${APPLICATION_LIBRARY} 
+    ${RBDL_LIBRARY}
+    ${RBDL_MODEL_LIBRARY} 
+    ${YAML_CPP_LIBRARIES}
+    ${Boost_LIBRARIES} 
+    ${UNITTEST++_LIBRARY}
+    pthread
+    )
+
+set_target_properties(rbdl_mode_from_automation_tests PROPERTIES
+    CXX_STANDARD 17
+    CXX_EXTENSIONS OFF
+    )
+################END################
