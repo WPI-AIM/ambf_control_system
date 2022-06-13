@@ -1,94 +1,136 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.20)
 project(rbdl_model)
 
-
 set(CMAKE_PREFIX_PATH _PATH "/opt/ros/melodic/;${CMAKE_MODULE_PATH}")
-# list(APPEND CMAKE_PREFIX_PATH "/opt/ros/melodic/")
 
-## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+set (ambf_msgs_DIR /mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/cmake/)
+set (ambf_client_DIR "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/")
+set (AMBF_CLIENT_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/lib/libambf_client_cpp.so")
+include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/")
+FIND_PACKAGE (ambf_client REQUIRED)
+MESSAGE(STATUS "Found AMBF: ${AMBF_CLIENT_INCLUDE_DIR}")
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
+set (application_DIR "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/cmake/")
+include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/application/include/")
+FIND_PACKAGE (application REQUIRED)
+MESSAGE(STATUS "Found Application: ${APPLICATION_INCLUDE_DIR}")
+
+include_directories(${AMBF_CLIENT_INCLUDE_DIRS} ${APPLICATION_INCLUDE_DIRS})
+
+
+include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/application/include/")
+
+FIND_PACKAGE (application REQUIRED)
+include_directories(${APPLICATION})
+include_directories(application)
+
 find_package(catkin REQUIRED COMPONENTS
+  ambf_msgs
+  geometry_msgs
+  message_generation
+  tf
 )
 
-catkin_package( INCLUDE_DIRS include
-  LIBRARIES rbdl_model
-#  CATKIN_DEPENDS
+catkin_package( INCLUDE_DIRS include 
+  LIBRARIES rbdl_model application
+  CATKIN_DEPENDS ambf_msgs
 #  DEPENDS system_lib
 )
 
 
-
-
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/home/shreyas/rbdl/CMake/")
-
-#SET (RBDL_DIR "/home/shreyas/rbdl/examples/simple/")
 get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
 set (CMAKE_MODULE_PATH ${PARENT_CMAKE} )
 
 LIST( APPEND CMAKE_MODULE_PATH ${PARENT_DIR} )
 find_package(RBDL REQUIRED)
-include_directories(${RBDL_INCLUDE_DIRS})
+# include_directories(include 
+#   ${catkin_INCLUDE_DIRS} 
+#   ${RBDL_INCLUDE_DIRS} 
+#   ${APPLICATION_INCLUDE_DIR}
+#   ${APPLICATION_INCLUDE_DIRS}
+#   ${CMAKE_SOURCE_DIR}/application/include/
+#   )
+# include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/application/include/")
+# include_directories(${CMAKE_SOURCE_DIR}/application/include/)
+# MESSAGE(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}/application/include/")
 
 FIND_PACKAGE (yaml-cpp REQUIRED)
 FIND_PACKAGE (RBDL REQUIRED)
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
-#find_package(RBDL REQUIRED PATHS "/home/shreyas/rbdl/examples/simple/")
-#include_directories(include ${YAML_CPP_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR} ${Eigen_INCLUDE_DIRS} ${RBDL_INCLUDE_DIR})
-include_directories(include ${YAML_CPP_INCLUDE_DIR} ${Eigen_INCLUDE_DIRS} ${RBDL_INCLUDE_DIR})
+include_directories(include 
+${catkin_INCLUDE_DIRS} 
+  ${RBDL_INCLUDE_DIRS} 
+  ${APPLICATION_INCLUDE_DIR}
+  ${APPLICATION_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}/application/include/
 
-#set(EXECUTABLE_NAME ${PROJECT_NAME})
-#set(EXECUTABLE_NAME rbdl_model)
+  ${AMBF_CLIENT_INCLUDE_DIR}  
+  ${Eigen_INCLUDE_DIRS} 
+  ${EIGEN3_INCLUDE_DIR} 
+  ${RBDL_INCLUDE_DIR}
+  )
 
 
-set (RBDL_MODEL_INCLUDE_DIRS include)
-set (RBDL_MODEL_LIBRARIES rbdl_model)
-
+# set (RBDL_MODEL_INCLUDE_DIRS include)
+# set (RBDL_MODEL_LIBRARIES rbdl_model)
 
 #add_executable(${EXECUTABLE_NAME})
 
 set (HDR_FILES
-  include/${PROJECT_NAME}/Utilities.h
   include/${PROJECT_NAME}/BodyParam.h
   include/${PROJECT_NAME}/JointParam.h
+  include/${PROJECT_NAME}/ParseADF.h
   include/${PROJECT_NAME}/BuildRBDLModel.h
+  include/${PROJECT_NAME}/AMBFParams.h
   include/${PROJECT_NAME}/ModelGraph.h
   include/${PROJECT_NAME}/MinHeap.h
   include/${PROJECT_NAME}/MinHeapStructs.h
   include/${PROJECT_NAME}/ModelStructs.h
   include/${PROJECT_NAME}/GraphEdge.h
-  include/${PROJECT_NAME}/RBDLModelErrors.h
+  # include/${PROJECT_NAME}/RBDLModelErrors.h
 )
 
 set(SOURCE_FILES
-  src/Utilities.cpp
   src/BodyParam.cpp
   src/JointParam.cpp
+  src/ParseADF.cpp
   src/BuildRBDLModel.cpp
+  src/AMBFParams.cpp
   src/ModelGraph.cpp
   src/MinHeap.cpp
-  src/RBDLModelErrors.cpp
-#    src/main.cpp
-    )
+  # src/RBDLModelErrors.cpp
+  )
 
 ## Declare a C++ library
 add_library(rbdl_model ${HDR_FILES} ${SOURCE_FILES})
 
 add_dependencies(rbdl_model ${catkin_EXPORTED_TARGETS})
 
+# add_library(ambf_client_lib STATIC 
+# "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/src/ambf_client.cpp"
+# )
+
+
+# target_include_directories(ambf_client_lib PUBLIC 
+# "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/"
+# )
+
 #add_executable (${PROJECT_NAME} ${HDR_FILES} ${SOURCE_FILES})
 ## Specify libraries to link a library or executable target against
-target_link_libraries(rbdl_model 
+target_link_libraries(rbdl_model PUBLIC
+  # ambf_client_lib
   ${catkin_LIBRARIES} 
+  ${Eigen_LIBRARIES} 
+  ${AMBF_CLIENT_LIBRARY} 
+  ${RBDL_MODEL_LIBRARY} 
   ${Boost_LIBRARIES} 
-  ${Eigen_LIBRARIES}
-  ${RBDL_LIBRARY} 
-  ${YAML_CPP_LIBRARIES} 
+  ${RBDL_LIBRARY}
+  ${YAML_CPP_LIBRARIES}
+  ${APPLICATION_LIBRARY}  
   pthread
   )
+
+# target_link_libraries(rbdl_model PRIVATE )
 
 set_target_properties(rbdl_model PROPERTIES
  CXX_STANDARD 17
@@ -97,38 +139,3 @@ set_target_properties(rbdl_model PROPERTIES
 
 set (RBDL_MODEL_INCLUDE_DIRS include)
 set (RBDL_MODEL_LIBRARIES rbdl_model)
-
-# install(
-#   TARGETS ${PROJECT_NAME}
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}
-# )
-# install(
-#   DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-# )
-
-#find_package (GLFW REQUIRED)
-#find_package (Boost COMPONENTS program_options filesystem REQUIRED)
-#include_directories (${GLFW_INCLUDE_DIRS})
-
-#target_sources(${EXECUTABLE_NAME} PUBLIC ${HDR_FILES} ${SOURCE_FILES})
-#target_include_directories(${EXECUTABLE_NAME} PUBLIC include)
-#target_link_libraries(${EXECUTABLE_NAME} ${AMBF_LIBRARIES} ${YAML_CPP_LIBRARIES} ${GLFW_LIBRARIES} ${Boost_LIBRARIES} ${Eigen_LIBRARIES} ${RBDL_LIBRARY} ambf_client)
-
-#set_target_properties(${EXECUTABLE_NAME} PROPERTIES
-#  CXX_STANDARD 14
-#  CXX_STANDARD_REQUIRED YES
-#  )
-
-#add_dependencies(${EXECUTABLE_NAME} ${catkin_EXPORTED_TARGETS})
-
-
-### Specify libraries to link a library or executable target against
-#target_link_libraries(${EXECUTABLE_NAME} ${catkin_LIBRARIES})
-
-
-#set (RBDL_MODEL_INCLUDE_DIRS include)
-#set (RBDL_MODEL_LIBRARIES rbdl_model)
-
