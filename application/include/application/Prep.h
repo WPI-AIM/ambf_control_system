@@ -19,10 +19,10 @@
 #include "rbdl/Constraints.h"
 
 #include "ambf_client/ambf_client.h"
-
+#include "application/AMBFParamWrapper.h"
 //------------------------------------------------------------------------------
 typedef Client* AMBFClientPtr;
-// typedef Model* RBDLModelPtr; 
+typedef AMBFParamWrapper* AMBFParamWrapperPtr; 
 //------------------------------------------------------------------------------
 constexpr auto tenMill= 10000000;
 
@@ -51,6 +51,7 @@ public:
 
     std::chrono::duration<double> getTime();
     AMBFClientPtr getAMBFClientInstance();
+    AMBFParamWrapperPtr getAMBFParamWrapperInstance();
     inline static const std::string ADFPath() { return ADF::filePath; }
 
 private:

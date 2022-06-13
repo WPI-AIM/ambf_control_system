@@ -17,3 +17,7 @@ AMBFClientPtr AMBFTestPrep::getAMBFClientInstance() {
   return clientPtr;
 }
 
+AMBFParamWrapperPtr AMBFTestPrep::getAMBFParamWrapperInstance() {
+  AMBFParamWrapperPtr ambfParamWrapperPtr = new AMBFParamWrapper();
+  return ambfParamWrapperPtr;
+}

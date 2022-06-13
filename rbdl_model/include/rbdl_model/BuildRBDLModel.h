@@ -12,7 +12,7 @@
 #include "application/Utilities.h"
 
 // #include "ambf_client/ambf_client.h"
-#include "rbdl_model/AMBFParams.h"
+// #include "application/AMBFParams.h"
 #include "rbdl_model/ParseADF.h"
 
 using namespace RigidBodyDynamics;
@@ -22,10 +22,10 @@ using namespace RigidBodyDynamics::Math;
 typedef RigidBodyDynamics::Body rbdlBody;
 typedef RigidBodyDynamics::Joint rbdlJoint;
 typedef RigidBodyDynamics::JointType rbdlJointType;
-typedef AMBFParams* AMBFParamsPtr;
 typedef ParseADF* ParseADFPtr;
-typedef std::unordered_map<std::string, AMBFParamsPtr> AMBFParamMap;
-typedef std::pair<std::string, AMBFParamsPtr> AMBFParamPair;
+// typedef AMBFParams* AMBFParamsPtr;
+// typedef std::unordered_map<std::string, AMBFParamsPtr> AMBFParamMap;
+// typedef std::pair<std::string, AMBFParamsPtr> AMBFParamPair;
 typedef Model* RBDLModelPtr;
 //------------------------------------------------------------------------------
 const double TEST_LAX {1.0e-7};
@@ -62,9 +62,7 @@ public:
 
 private:
   bool ConnectToAMBF();
-  AMBFParamsPtr FetchFromAMBFParamMap(const std::string parentBodyName);
-  void RegisterBodyToWorldTransformation(const std::string parentBodyName);
-
+  
   void RegisterRigidBodysPose();
   void RegisterHomePoseTransformation();
   void SetAMBFParams();
@@ -74,6 +72,7 @@ private:
 private:
   ParseADFPtr parseAdf_{nullptr};
   AMBFClientPtr ambfClientPtr_{nullptr};
+  AMBFParamWrapperPtr ambfParamWrapperPtr_{nullptr};
   std::string baseRigidBodyName_{""};
   rigidBodyPtr baselinkHandler_{nullptr};
   std::vector<std::string> controlableJoints_;
@@ -95,8 +94,6 @@ private:
 
   std::vector<std::vector<std::string>> paths_;
 
-  AMBFParamMap ambfParamMap_;
-  AMBFParamMap::iterator ambfParamMapItr_;
 
   RBDLModelPtr rbdlModelPtr_{nullptr};
   VectorNd Q_;
