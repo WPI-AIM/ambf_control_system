@@ -12,12 +12,12 @@ std::chrono::duration<double> AMBFTestPrep::getTime(){
   return std::chrono::system_clock::now() - begin;
 }
 
-AMBFClientPtr AMBFTestPrep::getAMBFClientInstance() {
-  AMBFClientPtr clientPtr = new Client();
-  return clientPtr;
-}
+// AMBFClientPtr AMBFTestPrep::getAMBFClientInstance() {
+//   AMBFClientPtr clientPtr = new Client();
+//   return clientPtr;
+// }
 
-AMBFParamWrapperPtr AMBFTestPrep::getAMBFParamWrapperInstance() {
-  AMBFParamWrapperPtr ambfParamWrapperPtr = new AMBFParamWrapper();
-  return ambfParamWrapperPtr;
+AMBFWrapperPtr AMBFTestPrep::getAMBFWrapperInstance() {
+  AMBFWrapperPtr ambfWrapperPtr = new AMBFWrapper();
+  return ambfWrapperPtr;
 }

@@ -46,3 +46,5 @@ void AMBFParams::QDesired(float q)
 {
   qDesired_ = q;
 }
+
+AMBFParams::~AMBFParams() {}

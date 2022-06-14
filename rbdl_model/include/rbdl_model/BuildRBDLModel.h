@@ -10,9 +10,6 @@
 #include <rbdl/rbdl.h>
 #include <rbdl/rbdl_math.h>
 #include "application/Utilities.h"
-
-// #include "ambf_client/ambf_client.h"
-// #include "application/AMBFParams.h"
 #include "rbdl_model/ParseADF.h"
 
 using namespace RigidBodyDynamics;
@@ -23,19 +20,15 @@ typedef RigidBodyDynamics::Body rbdlBody;
 typedef RigidBodyDynamics::Joint rbdlJoint;
 typedef RigidBodyDynamics::JointType rbdlJointType;
 typedef ParseADF* ParseADFPtr;
-// typedef AMBFParams* AMBFParamsPtr;
-// typedef std::unordered_map<std::string, AMBFParamsPtr> AMBFParamMap;
-// typedef std::pair<std::string, AMBFParamsPtr> AMBFParamPair;
 typedef Model* RBDLModelPtr;
 //------------------------------------------------------------------------------
 const double TEST_LAX {1.0e-7};
-const useconds_t sleepTime {250000};
 //------------------------------------------------------------------------------
 
 class BuildRBDLModel
 {
 public:
-  BuildRBDLModel(const std::string actuator_config_file);
+  BuildRBDLModel(const std::string actuator_config_file, AMBFWrapperPtr ambfWrapperPtr);
 
   void PrintBody();
   void PrintJoint();
@@ -61,24 +54,21 @@ public:
   std::vector<std::string> GetAllJointNames();
 
 private:
-  bool ConnectToAMBF();
+  // bool ConnectToAMBF();
   
-  void RegisterRigidBodysPose();
-  void RegisterHomePoseTransformation();
-  void SetAMBFParams();
+  // void RegisterRigidBodysPose();
+  // void RegisterHomePoseTransformation();
+  // void SetAMBFParams();
 
   bool BuildModel();
 
 private:
   ParseADFPtr parseAdf_{nullptr};
-  AMBFClientPtr ambfClientPtr_{nullptr};
-  AMBFParamWrapperPtr ambfParamWrapperPtr_{nullptr};
+  AMBFWrapperPtr ambfWrapperPtr_{nullptr};
   std::string baseRigidBodyName_{""};
   rigidBodyPtr baselinkHandler_{nullptr};
   std::vector<std::string> controlableJoints_;
-
   std::vector<std::string> endEffectorNodesName_;
-
   std::unordered_map<std::string, bodyParamPtr> bodyParamObjectMap_;
 
   // //                 <parent,                       <jointname, jointParamPtr>>
