@@ -10,11 +10,8 @@ struct T_W_N
 {
   std::string bodyName;
 
-  Matrix3d r_w_n_ambf;
-  Vector3d p_w_n_ambf;
-
-  Matrix3d r_w_n_rbdl;
-  Vector3d p_w_n_rbdl;
+  SpatialTransform t_w_n_ambf;
+  SpatialTransform t_w_n_rbdl;
 };
 
 

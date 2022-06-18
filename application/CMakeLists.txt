@@ -86,12 +86,16 @@ find_package (Boost COMPONENTS program_options filesystem REQUIRED)
 
 set (APPLICATION_HDR_FILES
     include/${PROJECT_NAME}/Utilities.h
+    include/${PROJECT_NAME}/AMBFWrapper.h
+    include/${PROJECT_NAME}/AMBFParams.h
     include/${PROJECT_NAME}/RBDLModelErrors.h
     include/${PROJECT_NAME}/Prep.h    
     )
 
 set(APPLICATION_SOURCE_FILES
     src/Utilities.cpp
+    src/AMBFWrapper.cpp
+    src/AMBFParams.cpp
     src/RBDLModelErrors.cpp
     src/Prep.cpp
     # src/main.cpp

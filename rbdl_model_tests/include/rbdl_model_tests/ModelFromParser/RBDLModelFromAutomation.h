@@ -24,13 +24,20 @@ public:
   ~RBDLModelFromAutomation();
 
   void PrintModelHierarchy();
-
-
+  inline std::vector<std::string> ControlableJoints() const { return controlableJoints_; }
+  std::vector<t_w_nPtr> T_W_NfromModels(std::vector<double> desiredJointAngles);
+  
   void CleanUp();
 private:
   RBDLModelPtr rbdlModelPtr_{nullptr};
   BuildRBDLModelPtr buildRBDLModelPtr_{nullptr};
-
+  AMBFClientPtr ambfClientPtr_{nullptr};
+  
+  AMBFWrapperPtr ambfWrapperPtr_{nullptr};
+  std::string baseRigidBodyName_{""};
+  rigidBodyPtr baselinkHandler_{nullptr};
+  std::vector<std::string> controlableJoints_;
+  
   VectorNd Q_;
   VectorNd QDot_;
   VectorNd QDDot_;
@@ -38,6 +45,5 @@ private:
   std::map< std::string, unsigned int > rbdlmBodyMap_;
   std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr_;
 
-  template<typename T>
-  t_w_nPtr twnFromModels(T t);
+  unsigned int QIndexFromName(const std::string jointName);
 };

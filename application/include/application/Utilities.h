@@ -17,7 +17,6 @@
 #include "rbdl/rbdl_math.h"
 #include "rbdl/Joint.h"
 #include "rbdl/Body.h"
-// #include "application/Prep.h"
 #include "application/RBDLModelErrors.h"
 
 using namespace RigidBodyDynamics;

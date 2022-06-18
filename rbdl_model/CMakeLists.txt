@@ -81,7 +81,7 @@ set (HDR_FILES
   include/${PROJECT_NAME}/JointParam.h
   include/${PROJECT_NAME}/ParseADF.h
   include/${PROJECT_NAME}/BuildRBDLModel.h
-  include/${PROJECT_NAME}/AMBFParams.h
+  # include/${PROJECT_NAME}/AMBFParams.h
   include/${PROJECT_NAME}/ModelGraph.h
   include/${PROJECT_NAME}/MinHeap.h
   include/${PROJECT_NAME}/MinHeapStructs.h
@@ -95,7 +95,7 @@ set(SOURCE_FILES
   src/JointParam.cpp
   src/ParseADF.cpp
   src/BuildRBDLModel.cpp
-  src/AMBFParams.cpp
+  # src/AMBFParams.cpp
   src/ModelGraph.cpp
   src/MinHeap.cpp
   # src/RBDLModelErrors.cpp

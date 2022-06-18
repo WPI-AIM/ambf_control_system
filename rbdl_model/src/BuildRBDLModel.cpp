@@ -1,136 +1,27 @@
 #include "rbdl_model/BuildRBDLModel.h"
 #include "rbdl_model/GraphEdge.h"
+#include "application/Prep.h"
 
-BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) 
+BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file, AMBFWrapperPtr ambfWrapperPtr) 
 {
-	try
-	{
-		if(!ConnectToAMBF()) Utilities::ThrowAMBFInactiveException();
-	}
-	catch(const char* e)
-	{
-		std::exit(EXIT_FAILURE); 		
-	}
-
+	// ambfWrapperPtr_ = new AMBFWrapper();
+	// ambfWrapperPtr_ = AMBFTestPrep::getInstance()->getAMBFWrapperInstance();
+	ambfWrapperPtr_ = ambfWrapperPtr;
   parseAdf_ = new ParseADF(actuator_config_file);
   baseRigidBodyName_ = parseAdf_->BaseName();
   endEffectorNodesName_ = parseAdf_->EndEffectorsName();
   paths_ = parseAdf_->Paths();
 
-  this->SetAMBFParams();
-  this->RegisterHomePoseTransformation();
-  this->BuildModel();
-}
-
-bool BuildRBDLModel::ConnectToAMBF()
-{
-	ambfClientPtr_ = AMBFTestPrep::getInstance()->getAMBFClientInstance();
-	
-	if(!ambfClientPtr_->connect()) return false;
-	usleep(1000000);
-
-	return true;
-}
-
-AMBFParamsPtr BuildRBDLModel::FetchFromAMBFParamMap(const std::string parentBodyName) 
-{
-	ambfParamMapItr_ = ambfParamMap_.find(parentBodyName);
-	if(ambfParamMapItr_ == ambfParamMap_.end())
-    Utilities::ThrowKeyNotFoundException("ambfParamMapItr", parentBodyName);
-
-	AMBFParamsPtr rigidBodyParams = ambfParamMap_[parentBodyName];
-
-	return rigidBodyParams;
-}
-
-void BuildRBDLModel::RegisterBodyToWorldTransformation(const std::string parentBodyName)
-{
-	AMBFParamsPtr ambfRigidBodyParams = FetchFromAMBFParamMap(parentBodyName);
-	rigidBodyPtr rigidBodyHandler = ambfRigidBodyParams->RididBodyHandler();
-
-	tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
-	tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
-	ambfRigidBodyParams->QuaternionTF(quat_w_n_tf);
-	ambfRigidBodyParams->TranslationVectorTF(p_w_n_tf);
-	ambfParamMap_[parentBodyName] = ambfRigidBodyParams;
-	// printf("parent: %s, Translation: (%f, %f, %f)\n", parentBody.c_str(), p_w_n_tf[0], p_w_n_tf[1], p_w_n_tf[2]);
-}
-
-void BuildRBDLModel::SetAMBFParams()
-{
-	std::vector<std::string> rigidBodyNames = ambfClientPtr_->getRigidBodyNames();
-
 	const std::string modelName = "ecm/";
-	// Do not create handlers for Plane, target_fk, target_ik rigidbodies
-	for(std::string rigidBodyName : rigidBodyNames)
-	{
-		if(rigidBodyName.find("Plane") 		 != std::string::npos ||
-			 rigidBodyName.find("target_fk") != std::string::npos ||
-			 rigidBodyName.find("target_ik") != std::string::npos) continue;
-		
-		// Search for the substring in string
-    size_t pos = rigidBodyName.find(modelName);
-    if (pos != std::string::npos)
-    {
-			// If found then erase it from string
-			rigidBodyName.erase(pos, modelName.length());
-    }
+	ambfWrapperPtr_->ActivateAMBFHandlers(modelName.c_str(), baseRigidBodyName_.c_str());
+	// ambfParamWrapperPtr_->RegisterBodyToWorldTransformation(baseRigidBodyName_);
+	ambfWrapperPtr_->RegisterHomePoseTransformation();
 
-		ambfParamMap_.insert(AMBFParamPair(rigidBodyName, new AMBFParams(
-			rigidBodyName, ambfClientPtr_->getRigidBody(rigidBodyName.c_str(), true)))
-    );
-	}
-	usleep(250000);
-	// Initialize all the handlers
-	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
-	{
-		rigidBodyPtr handler = ambfParamMapItr_->second->RididBodyHandler();
-				
-		// Activate the rigid body if not active
-		if(!handler->is_active())
-		{
-			handler->set_active();
-		}
-	}
-	RegisterBodyToWorldTransformation(baseRigidBodyName_);
-	baselinkHandler_ = ambfParamMap_[baseRigidBodyName_]->RididBodyHandler();
-	controlableJoints_ = baselinkHandler_->get_joint_names();
+  this->BuildModel();
+
+	std::cout << "PrintAMBFfParamMap() from BuildRBDLModel\n";
+	ambfWrapperPtr_->PrintAMBFfParamMap();
 }
-
-void BuildRBDLModel::RegisterRigidBodysPose()
-{
-	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)
-	{
-		const std::string parentBody = ambfParamMapItr_->first;
-
-		AMBFParamsPtr rigidBodyParams = ambfParamMap_[parentBody];
-		rigidBodyPtr rigidBodyHandler = ambfParamMapItr_->second->RididBodyHandler();
-
-		tf::Quaternion quat_w_n_tf = rigidBodyHandler->get_rot();
-		tf::Vector3 p_w_n_tf = rigidBodyHandler->get_pos();
-		
-		rigidBodyParams->QuaternionTF(quat_w_n_tf);
-		rigidBodyParams->TranslationVectorTF(p_w_n_tf);
-		ambfParamMap_[parentBody] = rigidBodyParams;
-	}
-}
-
-void BuildRBDLModel::RegisterHomePoseTransformation()
-{
- for(int i = 0; i < 10; i++)
-  {
-		for(std::string jointName : controlableJoints_)
-		{
-			baselinkHandler_->
-				set_joint_pos<std::string>(jointName, 0.0f);
-		}
-    usleep(sleepTime);
-	
-    RegisterRigidBodysPose();
-  }   
-}
-
-
 
 /*
  * Build RBDL Model
@@ -181,10 +72,7 @@ bool BuildRBDLModel::BuildModel()
 		// parent is world
 		if(parentBodyId == 0)
 		{
-			AMBFParamsPtr ambfRigidBodyParams = FetchFromAMBFParamMap(childRigidBodyName);
-			world_childST.E = ambfRigidBodyParams->RotationMatrix();
-			world_childST.r = ambfRigidBodyParams->TranslationVector();
-
+			world_childST = ambfWrapperPtr_->T_W_N(childRigidBodyName);
 			jointType = Joint(JointTypeFixed);
 			p_parent_child_world = world_childST.r;
 
@@ -266,6 +154,7 @@ void BuildRBDLModel::CleanUp() {
   std::cout << "RBDL Model deleted" << std::endl;
 }
 
-BuildRBDLModel::~BuildRBDLModel(void){
-  delete rbdlModelPtr_;
+BuildRBDLModel::~BuildRBDLModel(void)
+{
+
 }

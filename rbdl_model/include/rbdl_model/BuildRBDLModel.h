@@ -10,9 +10,6 @@
 #include <rbdl/rbdl.h>
 #include <rbdl/rbdl_math.h>
 #include "application/Utilities.h"
-
-// #include "ambf_client/ambf_client.h"
-#include "rbdl_model/AMBFParams.h"
 #include "rbdl_model/ParseADF.h"
 
 using namespace RigidBodyDynamics;
@@ -22,20 +19,16 @@ using namespace RigidBodyDynamics::Math;
 typedef RigidBodyDynamics::Body rbdlBody;
 typedef RigidBodyDynamics::Joint rbdlJoint;
 typedef RigidBodyDynamics::JointType rbdlJointType;
-typedef AMBFParams* AMBFParamsPtr;
 typedef ParseADF* ParseADFPtr;
-typedef std::unordered_map<std::string, AMBFParamsPtr> AMBFParamMap;
-typedef std::pair<std::string, AMBFParamsPtr> AMBFParamPair;
 typedef Model* RBDLModelPtr;
 //------------------------------------------------------------------------------
 const double TEST_LAX {1.0e-7};
-const useconds_t sleepTime {250000};
 //------------------------------------------------------------------------------
 
 class BuildRBDLModel
 {
 public:
-  BuildRBDLModel(const std::string actuator_config_file);
+  BuildRBDLModel(const std::string actuator_config_file, AMBFWrapperPtr ambfWrapperPtr);
 
   void PrintBody();
   void PrintJoint();
@@ -61,25 +54,21 @@ public:
   std::vector<std::string> GetAllJointNames();
 
 private:
-  bool ConnectToAMBF();
-  AMBFParamsPtr FetchFromAMBFParamMap(const std::string parentBodyName);
-  void RegisterBodyToWorldTransformation(const std::string parentBodyName);
-
-  void RegisterRigidBodysPose();
-  void RegisterHomePoseTransformation();
-  void SetAMBFParams();
+  // bool ConnectToAMBF();
+  
+  // void RegisterRigidBodysPose();
+  // void RegisterHomePoseTransformation();
+  // void SetAMBFParams();
 
   bool BuildModel();
 
 private:
   ParseADFPtr parseAdf_{nullptr};
-  AMBFClientPtr ambfClientPtr_{nullptr};
+  AMBFWrapperPtr ambfWrapperPtr_{nullptr};
   std::string baseRigidBodyName_{""};
   rigidBodyPtr baselinkHandler_{nullptr};
   std::vector<std::string> controlableJoints_;
-
   std::vector<std::string> endEffectorNodesName_;
-
   std::unordered_map<std::string, bodyParamPtr> bodyParamObjectMap_;
 
   // //                 <parent,                       <jointname, jointParamPtr>>
@@ -95,8 +84,6 @@ private:
 
   std::vector<std::vector<std::string>> paths_;
 
-  AMBFParamMap ambfParamMap_;
-  AMBFParamMap::iterator ambfParamMapItr_;
 
   RBDLModelPtr rbdlModelPtr_{nullptr};
   VectorNd Q_;
