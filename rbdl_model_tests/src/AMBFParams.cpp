@@ -1,5 +1,5 @@
 #include "rbdl_model_tests/AMBFParams.h"
-#include "application/Utilities.h"
+#include "rbdl_model_tests/EigenUtilities.h"
 
 AMBFParams::AMBFParams(const std::string name, rigidBodyPtr handler) :
   parentBodyName_(name), rigidBodyHandler_(handler) {}
@@ -11,7 +11,7 @@ void AMBFParams::ControllableJointConfigs(const std::vector<ControllableJointCon
 
 const Quaternion AMBFParams::GetQuternion()
 {
-  return Utilities::TFtoRBDLQuaternion(quat_w_n_tf_);
+  return EigenUtilities::TFtoRBDLQuaternion(quat_w_n_tf_);
 }
 
 const Matrix3d AMBFParams::RotationMatrix()
@@ -29,7 +29,7 @@ const Matrix3d AMBFParams::RotationMatrix()
 
 const Vector3d AMBFParams::TranslationVector()
 {
-  return Utilities::TFtoRBDLVector(p_w_n_tf_);
+  return EigenUtilities::TFtoRBDLVector(p_w_n_tf_);
 }
 
 void AMBFParams::QuaternionTF(const tf::Quaternion q)

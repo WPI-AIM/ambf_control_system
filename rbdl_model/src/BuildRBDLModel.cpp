@@ -12,15 +12,12 @@ BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file, AMBFWrapperPtr 
   endEffectorNodesName_ = parseAdf_->EndEffectorsName();
   paths_ = parseAdf_->Paths();
 
-	const std::string modelName = "ecm/";
+	// const std::string modelName = "ecm/";
+	const std::string modelName = parseAdf_->ModelName();
 	ambfWrapperPtr_->ActivateAMBFHandlers(modelName.c_str(), baseRigidBodyName_.c_str());
-	// ambfParamWrapperPtr_->RegisterBodyToWorldTransformation(baseRigidBodyName_);
 	ambfWrapperPtr_->RegisterHomePoseTransformation();
 
   this->BuildModel();
-
-	std::cout << "PrintAMBFfParamMap() from BuildRBDLModel\n";
-	ambfWrapperPtr_->PrintAMBFfParamMap();
 }
 
 /*
@@ -35,7 +32,10 @@ bool BuildRBDLModel::BuildModel()
 	// 	std::string rigidBodyName = ambfParamMapItr_->first;
 	// 	printf("%s\n", rigidBodyName.c_str());
 	// }
-	
+
+	// std::cout << "PrintAMBFfParamMap() from BuildModel()\n";
+	ambfWrapperPtr_->PrintAMBFfParamMap();
+
 	rbdl_check_api_version(RBDL_API_VERSION);
 
   rbdlModelPtr_ = new Model();
@@ -55,8 +55,8 @@ bool BuildRBDLModel::BuildModel()
     std::string childRigidBodyName = path.at(i + 1);
     std::string jointName = parentRigidBodyName + "-" + childRigidBodyName;
 
-    // printf("parentName: %s, childName: %s, jointName: %s\n", 
-    //   parentRigidBodyName.c_str(), childRigidBodyName.c_str(), jointName.c_str());
+    printf("parentName: %s, childName: %s, jointName: %s\n", 
+      parentRigidBodyName.c_str(), childRigidBodyName.c_str(), jointName.c_str());
 
     bodyParamPtr childParamPtr = parseAdf_->BodyParams(childRigidBodyName);
     
@@ -68,18 +68,19 @@ bool BuildRBDLModel::BuildModel()
 		SpatialTransform world_childST;
 		SpatialTransform parent_childST;
 		Vector3d p_parent_child_world;
-		Joint jointType;
+		Joint joint;
 		// parent is world
 		if(parentBodyId == 0)
 		{
 			world_childST = ambfWrapperPtr_->T_W_N(childRigidBodyName);
-			jointType = Joint(JointTypeFixed);
+			joint = Joint(JointTypeFixed);
 			p_parent_child_world = world_childST.r;
 
-			world_parentST = world_childST;
+			// world_parentST = world_childST;
 		}
 		else
 		{
+			world_parentST = ambfWrapperPtr_->T_W_N(parentRigidBodyName);
     	jointParamPtr jointParamPtr = parseAdf_->JointParams(jointName);
 			
 			Vector3d parentAxis =	jointParamPtr->ParentAxis(); parentAxis.normalize();
@@ -87,6 +88,7 @@ bool BuildRBDLModel::BuildModel()
 			Vector3d parentPivot = jointParamPtr->ParentPivot();
 			Vector3d childPivot = jointParamPtr->ChildPivot();
 			const double paret_childOffsetQ = jointParamPtr->Offset();
+			std::string jointType = jointParamPtr->Type();
 
 			// Parent to child body rotation calculations
 			Matrix3d parent_childRot = 
@@ -101,17 +103,28 @@ bool BuildRBDLModel::BuildModel()
 			parent_childST.r = 
 				parentPivot - (parent_childRot.transpose() * childPivot);
 
+			// std::cout << "world_parentST.E" << std::endl << world_parentST.E << std::endl;
+			// std::cout << "parentAxis" << std::endl << parentAxis << std::endl;
+			Vector3d jointAxis = world_parentST.E * parentAxis;
+			// std::cout << "jointAxis" << std::endl << jointAxis << std::endl;
 
-			// TBD: joint type to got fetched from world to body rotation
-			jointType = Joint(JointTypeRevoluteX);
+			// As of now only prismatic and revolute joints are supported
+			if(jointType.compare("revolute") == 0) 
+				joint = Joint(SpatialVector (jointAxis(0), jointAxis(1), jointAxis(2), 0., 0., 0.));
+			else if(jointType.compare("prismatic") == 0)
+				joint = Joint(SpatialVector (0., 0., 0., jointAxis(0), jointAxis(1), jointAxis(2)));
+			else
+				Utilities::ThrowUnsupportedJointException(jointName, jointType);
+
 			p_parent_child_world = world_parentST.E * parent_childST.r;
 		}
 
 		// Joint Axis to be got from ration matrix
 		unsigned int childBodyId = rbdlModelPtr_->AddBody(parentBodyId, Xtrans(p_parent_child_world), 
-		Joint(SpatialVector (0., -1., 0., 0., 0., 0.)), childBody, jointName);
+		joint, childBody, jointName);
+		printf("Added jointName: %s, parentBodyId: %d, childBodyId: %d\n", jointName.c_str(), parentBodyId, childBodyId);
 
-		world_childST = world_childST * parent_childST;
+		// world_childST = world_childST * parent_childST;
 		parentBodyId = childBodyId;
   }
   return true;
@@ -151,7 +164,7 @@ void BuildRBDLModel::CleanUp() {
   // }
 
   // delete RBDLmodel_;
-  std::cout << "RBDL Model deleted" << std::endl;
+  // std::cout << "RBDL Model deleted" << std::endl;
 }
 
 BuildRBDLModel::~BuildRBDLModel(void)

@@ -3,8 +3,6 @@
 BodyParam::BodyParam(YAML::Node bodyNode)
 {
     // Declare all the yaml parameters that we want to look for
-    // Utilities utilities;
-
     YAML::Node name = bodyNode["name"];
     if(!name.IsDefined()) Utilities::ThrowMissingFieldException("name in Body Params");
     name_ = Utilities::TrimTrailingSpaces(name);
@@ -21,6 +19,10 @@ BodyParam::BodyParam(YAML::Node bodyNode)
     YAML::Node inertial_offset = bodyNode["inertial offset"];
     if(!inertial_offset.IsDefined()) Utilities::ThrowMissingFieldException("inertia offset in Body Params");
 
+    YAML::Node passive = bodyNode["passive"];
+    if(!passive.IsDefined()) Utilities::ThrowMissingFieldException("passive in Body Params");
+    passive_ = Utilities::ToBool(passive);
+
     YAML::Node inertial_offset_position = inertial_offset["position"];
     if(!inertial_offset_position.IsDefined()) Utilities::ThrowMissingFieldException("inertia offset position in Body Params");
     inertial_offset_position_ = Utilities::ToXYZ(&inertial_offset_position);
@@ -28,8 +30,6 @@ BodyParam::BodyParam(YAML::Node bodyNode)
     YAML::Node inertial_offset_orientation = inertial_offset["orientation"];
     if(!inertial_offset_orientation.IsDefined()) Utilities::ThrowMissingFieldException("inertia offset orientation in Body Params");
     inertial_offset_orientation_ = Utilities::ToRPY(&inertial_offset_orientation);
-
-    // utilities.~Utilities();
 }
 
 BodyParam::~BodyParam() {

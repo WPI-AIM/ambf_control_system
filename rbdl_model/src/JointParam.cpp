@@ -49,6 +49,9 @@ JointParam::JointParam(YAML::Node jointNode)
   YAML::Node type = jointNode["type"];
   if(!type.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + name_ + ", type in Joint Params");
   type_ = Utilities::TrimTrailingSpaces(type);
+  // As of now only prismatic and revolute joints are supported
+  if(!(type_.compare("revolute") == 0 || type_.compare("prismatic") == 0)) 
+    Utilities::ThrowUnsupportedJointException(name_, type_);
 
   YAML::Node offset = jointNode["offset"];
   if(!offset.IsDefined()) offset_ = 0.0;

@@ -20,8 +20,8 @@ public:
   void ConnectToAMBF();
 
   void ActivateAMBFHandlers(const std::string modelName, std::string baseRigidBodyName);
+  inline std::vector<std::string> ControlableJoints() { return controlableJoints_; }
   void RegisterBodyToWorldTransformation(const std::string parentBodyName);
-  rigidBodyPtr RigidBodyHandler(const std::string parentBodyName);
   void RegisterRigidBodysPose();
 
   void RegisterHomePoseTransformation();
@@ -32,6 +32,7 @@ private:
   void SetAMBFParams(const std::string modelName);
   void ActivateHandlers();
   AMBFParamsPtr FetchFromAMBFParamMap(std::string parentBodyName);
+  rigidBodyPtr RigidBodyHandler(const std::string parentBodyName);
 private:
   AMBFClientPtr ambfClientPtr_;
   std::string baseRigidBodyName_{""};

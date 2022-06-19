@@ -84,7 +84,6 @@ private:
 
   std::vector<std::vector<std::string>> paths_;
 
-
   RBDLModelPtr rbdlModelPtr_{nullptr};
   VectorNd Q_;
   VectorNd QDot_;

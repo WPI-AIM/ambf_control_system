@@ -19,25 +19,28 @@ ParseADF::ParseADF(std::string actuator_config_file)
 
   if (baseNode_.IsNull()) return;
 
-  if(!this->Namespace()) return;
+  Namespace();
   if(!this->Bodies()) return;
   if(!this->Joints()) return;
 
   if(!this->BuildModelSequence()) return;
 }
 
-bool ParseADF::Namespace() 
+void ParseADF::Namespace() 
 {
 
   YAML::Node blender_namespace = baseNode_["namespace"];
-  if(blender_namespace.IsDefined())
-  {
-    blender_namespace_ = 
-      Utilities::TrimTrailingSpaces(blender_namespace);
+  if(!blender_namespace.IsDefined())
+    Utilities::ThrowMissingFieldException("namespace");
+  
+  blender_namespace_ = 
+    Utilities::TrimTrailingSpaces(blender_namespace);
 
-    return true;
-  }
-  return false;
+  Utilities::EraseSubStr(blender_namespace_, "/ambf/env/");
+  std::cout << "namespace: " << blender_namespace_ << std::endl;
+
+  if(blender_namespace_.empty() || !Utilities::HasEnding(blender_namespace_, "/"))
+    Utilities::ThrowInvalidNamespaceException();
 }
 
 
@@ -160,6 +163,24 @@ bool ParseADF::Joints()
   return true;
 }
 
+bodyParamPtr ParseADF::BodyParams(const std::string bodyName)
+{
+  bodyParamObjectMapItr_ = bodyParamObjectMap_.find(bodyName);
+  if(bodyParamObjectMapItr_ == bodyParamObjectMap_.end())
+    Utilities::ThrowKeyNotFoundException("bodyParamObjectMapItr_", bodyName);
+
+  return bodyParamObjectMap_[bodyName];
+}
+
+jointParamPtr ParseADF::JointParams(const std::string jointName)
+{
+  jointParamObjectMapItr_ = jointParamObjectMap_.find(jointName);
+  if(jointParamObjectMapItr_ == jointParamObjectMap_.end())
+    Utilities::ThrowKeyNotFoundException("jointParamObjectMapItr_", jointName);
+
+  return jointParamObjectMap_[jointName];
+}
+
 bool ParseADF::BuildModelSequence()
 {
   int V = bodyParamObjectMap_.size();  // Number of vertices in the graph
@@ -220,6 +241,18 @@ bool ParseADF::BuildModelSequence()
     paths_.emplace_back(pathByName);
   }
 
+  // Check that the rigid bodies is enabled for ROS output. 
+  // Its need for RBDL Model creation.
+  for(std::vector<std::string> path : paths_)
+  {
+    for(std::string bodyName : path)
+    {
+      bodyParamPtr bodyParam = BodyParams(bodyName);
+      if(bodyParam->Passive())
+        Utilities::ThrowDisabledForROS(bodyParam->Name().c_str());
+    }
+  }
+
   for(std::vector<std::string> path : paths_)
   {
     for(std::string name : path)
@@ -232,22 +265,6 @@ bool ParseADF::BuildModelSequence()
   return true;
 }
 
-bodyParamPtr ParseADF::BodyParams(const std::string bodyName)
-{
-  bodyParamObjectMapItr_ = bodyParamObjectMap_.find(bodyName);
-  if(bodyParamObjectMapItr_ == bodyParamObjectMap_.end())
-    Utilities::ThrowKeyNotFoundException("bodyParamObjectMapItr_", bodyName);
 
-  return bodyParamObjectMap_[bodyName];
-}
-
-jointParamPtr ParseADF::JointParams(const std::string jointName)
-{
-  jointParamObjectMapItr_ = jointParamObjectMap_.find(jointName);
-  if(jointParamObjectMapItr_ == jointParamObjectMap_.end())
-    Utilities::ThrowKeyNotFoundException("jointParamObjectMapItr_", jointName);
-
-  return jointParamObjectMap_[jointName];
-}
 
 ParseADF::~ParseADF(){}

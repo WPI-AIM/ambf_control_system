@@ -1,29 +1,33 @@
-#include "rbdl_model_tests/RBDLTestPrep.h"
 #include "rbdl_model_tests/ECM.h"
-#include "application/Utilities.h"
+#include "rbdl_model_tests/rbdl_tests.h"
+ECM* ecm = nullptr;
 
-// ECM* ecm = nullptr;
+TEST_CASE(__FILE__"_Initilize", "") 
+{
+  ecm = new ECM();  
+}
 
+TEST_CASE_METHOD(ECM, __FILE__"_TestECMBodyHierarchy", "") 
+{
+  if(ecm == nullptr) return;
+}
 
-// TEST_CASE(__FILE__"_Initilize", "") 
+// TEST_CASE(__FILE__"_TestHomePose", "") 
 // {
-//   ecm = new ECM();  
+//   if(ecm == nullptr) return;
+//   std::vector<t_w_nPtr> transformations = ecm->HomePoseTransformation();
+//   for(t_w_nPtr t_w_nptr : transformations)
+//   {
+//     std::cout << "body Name: " << t_w_nptr->bodyName << std::endl;
+//     std::cout << "t_w_nptr->r_w_n_ambf" << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
+//     // CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));
+//     CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
+//   }
 // }
-
-// // TEST_CASE(__FILE__"_TestHomePose", "") 
-// // {
-// //   std::vector<t_w_nPtr> transformations = ecm->HomePoseTransformation();
-// //   for(t_w_nPtr t_w_nptr : transformations)
-// //   {
-// //     std::cout << "body Name: " << t_w_nptr->bodyName << std::endl;
-
-// //     CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));
-// //     CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
-// //   }
-// // }
 
 // TEST_CASE(__FILE__"_RandomPose", "") 
 // {
+//   if(ecm == nullptr) return;
 //   std::vector<std::string> jointNames = ecm->ControllableJointNames();
 
 //   ecm->JointAngleWithName(jointNames.at(0), 0.7872554063796997);
@@ -151,40 +155,41 @@
 // //   // std::cout << "qres:" << std::endl << qres << std::endl;
 // // }
 
-// TEST_CASE(__FILE__"_Cleanup", "") 
-// {  
-//   ecm->CleanUp();
+TEST_CASE(__FILE__"_Cleanup", "") 
+{ 
+  if(ecm == nullptr) return;
+  ecm->CleanUp();
+}
+
+// double getAngle(Matrix3d r)
+// {
+//   return acos((r.trace() - 1) / 2.0);
 // }
 
-double getAngle(Matrix3d r)
-{
-  return acos((r.trace() - 1) / 2.0);
-}
-
-Vector3d getAxis(Matrix3d r, double t)
-{
-  std::cout << "t: " << t << std::endl;
+// Vector3d getAxis(Matrix3d r, double t)
+// {
+//   std::cout << "t: " << t << std::endl;
   
-  if(t == 0) return Vector3d(0, 0, 1);
+//   if(t == 0) return Vector3d(0, 0, 1);
 
-  Vector3d k(r(2, 1) - r(1, 2), r(0, 2) - r(2, 0), r(1, 0) - r(0, 1));
-  k *= (1.0 / (2.0 * sin(t)));
-  return k;
-}
+//   Vector3d k(r(2, 1) - r(1, 2), r(0, 2) - r(2, 0), r(1, 0) - r(0, 1));
+//   k *= (1.0 / (2.0 * sin(t)));
+//   return k;
+// }
 
-TEST_CASE(__FILE__"_RoationCheck", "") 
-{  
-  // Matrix3d r_world_base_world;
-  // r_world_base_world.setIdentity();
+// TEST_CASE(__FILE__"_RoationCheck", "") 
+// {  
+//   // Matrix3d r_world_base_world;
+//   // r_world_base_world.setIdentity();
 
-  // double r_world_base_world_t = getAngle(r_world_base_world);
-  // Vector3d world_base_world_k = getAxis(r_world_base_world, r_world_base_world_t);
-  // std::cout << "world_base_world_k" << std::endl << world_base_world_k << std::endl;
+//   // double r_world_base_world_t = getAngle(r_world_base_world);
+//   // Vector3d world_base_world_k = getAxis(r_world_base_world, r_world_base_world_t);
+//   // std::cout << "world_base_world_k" << std::endl << world_base_world_k << std::endl;
 
-  Matrix3d r_base_yaw_world(-1, 0, 0,   0, 0, 1,  0, 1, 0);
+//   Matrix3d r_base_yaw_world(-1, 0, 0,   0, 0, 1,  0, 1, 0);
 
-  double base_yaw_world_t = getAngle(r_base_yaw_world);
-  Vector3d base_yaw_world_k = getAxis(r_base_yaw_world, base_yaw_world_t);
-  std::cout << "base_yaw_world_k" << std::endl << base_yaw_world_k << std::endl;
+//   double base_yaw_world_t = getAngle(r_base_yaw_world);
+//   Vector3d base_yaw_world_k = getAxis(r_base_yaw_world, base_yaw_world_t);
+//   std::cout << "base_yaw_world_k" << std::endl << base_yaw_world_k << std::endl;
 
-}
+// }

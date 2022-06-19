@@ -1,19 +1,25 @@
 #include <unordered_map>
 #include <thread>
 
-#include "rbdl_model_tests/RBDLTestPrep.h"
 #include "rbdl_model_tests/AMBFParams.h"
+#include "ambf_client/ambf_client.h"
+#include <rbdl/rbdl.h>
+#include <rbdl/rbdl_math.h>
 
 using namespace RigidBodyDynamics;
 using namespace RigidBodyDynamics::Math;
+
+typedef Model* RBDLModelPtr;
 typedef AMBFParams* AMBFParamsPtr;
+typedef Client* AMBFClientPtr;
 typedef std::unordered_map<std::string, AMBFParamsPtr> AMBFParamMap;
 typedef std::pair<std::string, AMBFParamsPtr> AMBFParamPair;
 
 //const double TEST_PREC = 1.0e-12;
 const double TEST_LAX {1.0e-7};
 const useconds_t sleepTime {250000};
-
+using namespace RigidBodyDynamics;
+using namespace RigidBodyDynamics::Math;
 
 struct T_W_N
 {
@@ -35,6 +41,7 @@ public:
 
   // To be deleted. Not to expose the model.
   // inline RBDLModelPtr RbdlModel() { return rbdlModelPtr_; }
+  void PrintModelHierarchy();
   inline unsigned int RBDLModelJointSize() { return rbdlModelPtr_->q_size; }
   inline std::vector<std::string> ControllableJointNames() { return controlableJoints_; }
   bool JointAngleWithName(const std::string jointName, double qDesired);
