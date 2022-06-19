@@ -31,7 +31,7 @@ public:
   static const Quaternion TFtoRBDLQuaternion(const tf::Quaternion quat_tf);
 
   static void EraseSubStr(std::string & mainStr, const std::string & toErase);
-
+  static bool HasEnding(std::string const &fullString, std::string const &ending);
   // https://www.techiedelight.com/check-vector-contains-given-element-cpp/
   struct compare
   {
@@ -61,18 +61,21 @@ public:
   //const int toInt(YAML::Node* node, const std::string param);
   static const int ToInt(YAML::Node bodyNode);
   static const double ToDouble(YAML::Node node);
+  static const bool ToBool(YAML::Node node);
   static const Math::Matrix3d VectorToMatrix3d(YAML::Node* node);
 
   static const std::string TrimTrailingSpaces(YAML::Node bodyNode);
 
   static void ThrowInvalidFilePathException(const std::string message);
+  static void ThrowInvalidNamespaceException();
   static void ThrowMissingFieldException(const std::string message);
   static void ThrowInvalidValueException(const std::string m);
   static void ThrowAMBFInactiveException();
   static void ThrowBaseNotFoundException();
-  static void ThrowKeyNotFoundException(std::string mapName, std::string key);
-
-    ~Utilities(void);
+  static void ThrowKeyNotFoundException(const std::string mapName, const std::string key);
+  static void ThrowDisabledForROS(const std::string message);
+  static void ThrowUnsupportedJointException(const std::string jointName, const std::string jointType);
+  ~Utilities(void);
 };
 
 #endif // EigenUtilities_H

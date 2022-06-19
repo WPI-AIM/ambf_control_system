@@ -1,6 +1,6 @@
 #include "rbdl_model_tests/ECM.h"
-#include "application/Utilities.h"
-#include "application/Prep.h"
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -24,7 +24,7 @@ ECM::ECM()
 
 bool ECM::ConnectToAMBF()
 {
-	ambfClientPtr_ = AMBFTestPrep::getInstance()->getAMBFClientInstance();
+	ambfClientPtr_ = new Client();
 	
 	if(!ambfClientPtr_->connect()) return false;
 	usleep(1000000);
@@ -167,7 +167,7 @@ void ECM::CreateRBDLModel()
 	Vector3d maininsertionlink_toollinkPP 	  = { -0.0108,  -0.062,    0.0 };
 	Vector3d maininsertionlink_toollinkCP 	  = { -0.0001, -0.0002, 0.0118 };
 
-	rbdlModelPtr_ = new Model;
+	rbdlModelPtr_ = new Model();
 	rbdlModelPtr_->gravity = Vector3d(0., 0., -9.81);
 
 	// Register Word to Base Transform
@@ -276,6 +276,14 @@ void ECM::CreateRBDLModel()
 	world_pitchendlinkST = world_pitchbottomlinkST * pitchbottomlink_pitchendlinkST;
 	world_maininsertionlinkST = world_pitchendlinkST * pitchendlink_maininsertionlinkST;
 	world_toollinkST = world_maininsertionlinkST * maininsertionlink_toollinkST;
+
+	// std::cout << "world_baselinkST" 				 << std::endl << world_baselinkST 				 << std::endl;
+	// std::cout << "world_yawlinkST" 		 	 		 << std::endl << world_yawlinkST 					 << std::endl;
+	// std::cout << "world_pitchbacklinkST" 	 	 << std::endl << world_pitchbacklinkST 		 << std::endl;
+	// std::cout << "world_pitchbottomlinkST" 	 << std::endl << world_pitchbottomlinkST 	 << std::endl;
+	// std::cout << "world_pitchendlinkST" 		 << std::endl << world_pitchendlinkST 		 << std::endl;
+	// std::cout << "world_maininsertionlinkST" << std::endl << world_maininsertionlinkST << std::endl;
+	// std::cout << "world_toollinkST" 				 << std::endl << world_toollinkST 				 << std::endl;
 	//1--------------------------------------------------------------------//
 	Vector3d p_baselink_yawlink_world 						  = world_baselinkST.E 				  * baselink_yawlinkST.r;
 	Vector3d p_yawlink_pitchbacklink_world 				  = world_yawlinkST.E 				  * yawlink_pitchbacklinkST.r;
@@ -339,6 +347,16 @@ void ECM::CreateRBDLModel()
     std::string bodyName = rbdlmBodyMapItr_->first;
     unsigned int bodyId = rbdlmBodyMapItr_->second;
     std::string parentName = rbdlModelPtr_->GetBodyName(rbdlModelPtr_->GetParentBodyId(bodyId));
+    std::cout << parentName << ", " << bodyName << ", " << bodyId << std::endl;
+  }
+}
+
+void ECM::PrintModelHierarchy()
+{
+	for(unsigned int bodyId = 0; bodyId < rbdlModelPtr_->q_size; bodyId++)
+	{
+    std::string bodyName = rbdlModelPtr_->GetBodyName(bodyId);
+	  std::string parentName = rbdlModelPtr_->GetBodyName(rbdlModelPtr_->GetParentBodyId(bodyId));
     std::cout << parentName << ", " << bodyName << ", " << bodyId << std::endl;
   }
 }

@@ -51,7 +51,14 @@ void Utilities::EraseSubStr(std::string & mainStr, const std::string & toErase)
 }
 
 
-
+bool Utilities::HasEnding(std::string const &fullString, std::string const &ending)
+{
+  if (fullString.length() >= ending.length()) {
+      return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+  } else {
+      return false;
+  }
+}
 
 const Vector3d Utilities::MatrixToRPY(Matrix3d r)
 {
@@ -118,11 +125,17 @@ const int Utilities::ToInt(YAML::Node node) {
   return val;
 }
 
-
 const double Utilities::ToDouble(YAML::Node node)
 {
-  int val;
+  double val;
   if(node.IsDefined()) val = node.as<double>();
+  return val;
+}
+
+const bool Utilities::ToBool(YAML::Node node)
+{
+  bool val;
+  if(node.IsDefined()) val = node.as<bool>();
   return val;
 }
 
@@ -216,12 +229,20 @@ const std::string Utilities::TrimTrailingSpaces(YAML::Node bodyNode) {
 
 void Utilities::ThrowInvalidFilePathException(const std::string message)
 {
-  throw RBDLModel::ModelErrors::RBDLModelInvalidFilePathError("Error: Mention ADF file path not fould. Terminating model creation!\n");
+  throw RBDLModel::ModelErrors::RBDLModelInvalidFilePathError(
+    "Error: Mention ADF file path not fould. Terminating model creation!\n");
+}
+
+void Utilities::ThrowInvalidNamespaceException()
+{
+  throw std::runtime_error(
+    "Invalid namespace format in ADF. Valid format '/ambf/env/<modelName>/'");
 }
 
 void Utilities::ThrowMissingFieldException(const std::string message)
 {
-  throw RBDLModel::ModelErrors::RBDLModelMissingParameterError("Error: Missing " + message + " which is mandate field to build RBDL Model. Terminating model creation!\n");
+  throw RBDLModel::ModelErrors::RBDLModelMissingParameterError(
+    "Error: Missing " + message + " which is mandate field to build RBDL Model. Terminating model creation!\n");
 }
 
 void Utilities::ThrowAMBFInactiveException()
@@ -239,9 +260,23 @@ void Utilities::ThrowBaseNotFoundException()
   throw std::runtime_error("Error: Could not find base for the model. Terminating model creation!\n");
 }
 
-void Utilities::ThrowKeyNotFoundException(std::string mapName, std::string key)
+void Utilities::ThrowKeyNotFoundException(const std::string mapName, const std::string key)
 {
-  throw std::runtime_error("Error: Key: " + key + " not found exception in map " + mapName + ". Terminating execution\n");
+  throw std::runtime_error(
+    "Error: Key: " + key + " not found exception in map " + mapName + ". Terminating execution\n");
+}
+
+void Utilities::ThrowDisabledForROS(const std::string message)
+{
+  throw std::runtime_error(
+    "Error: " + message + " is disabled for ROS which is needed for RBDL model creation. Terminating execution\n");
+}
+
+void Utilities::ThrowUnsupportedJointException(const std::string jointName, const std::string jointType)
+{
+  throw std::runtime_error(
+    "Error: Only Revoulte and Prismatic joints are supported. " + jointName + 
+    " has joint Type " + jointType + " which is not supported. Terminating execution\n");
 }
 
 Utilities::~Utilities(void) {}

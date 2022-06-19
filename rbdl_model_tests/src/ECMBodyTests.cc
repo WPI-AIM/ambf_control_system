@@ -1,5 +1,5 @@
-#include "rbdl_model_tests/RBDLTestPrep.h"
 #include "rbdl_model_tests/ECM.h"
+#include "rbdl_model_tests/rbdl_tests.h"
 
 TEST_CASE_METHOD(ECM, __FILE__"_TestECMPositionHierarchy", "") 
 {

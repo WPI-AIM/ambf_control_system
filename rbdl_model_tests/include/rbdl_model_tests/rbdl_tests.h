@@ -6,6 +6,7 @@
 #include "catch2/catch.hpp"
 #include "rbdl/rbdl_math.h"
 #include <Eigen/Geometry>
+const double TEST_PREC = 1.0e-3;
 
 template <typename T>
 struct IsCloseMatcher : Catch::MatcherBase<T> {

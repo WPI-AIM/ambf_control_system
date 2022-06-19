@@ -25,8 +25,7 @@ public:
   void PrintBody();
   void PrintJoint();
   void CleanUp();
-
-
+  std::string inline ModelName() const { return blender_namespace_; }
   std::string inline BaseName() const { return baseName_; }
   std::vector<std::string> inline EndEffectorsName() const { return endEffectorsName_; }
   std::vector<std::vector<std::string>> Paths() const { return paths_; }
@@ -41,7 +40,7 @@ private:
   template< class MapType, typename T, typename R>
   R GetValueFromMap(const MapType & map, T t, R r);
 
-  bool Namespace();
+  void Namespace();
   bool Bodies();
   bool Joints();
   bool BuildModelSequence();
