@@ -305,6 +305,7 @@ ${RBDL_MODEL_TESTS_HDR_FILES}
 ${RBDL_MODEL_FROM_AUTOMATION_TESTS_HDR_FILES} 
 ${RBDL_MODEL_FROM_AUTOMATION_TESTS_SOURCE_FILES})
 
+
 target_link_libraries (rbdl_mode_from_automation_tests
     ${catkin_LIBRARIES} 
     ${Eigen_LIBRARIES} 

@@ -27,6 +27,7 @@ public:
   void RegisterHomePoseTransformation();
   // World to body Transformation
   SpatialTransform T_W_N(const std::string rigidBodyName);
+  void PoseWithJointAngles(std::vector<double> desiredJointAngles);
   void PrintAMBFfParamMap();
 private:
   void SetAMBFParams(const std::string modelName);

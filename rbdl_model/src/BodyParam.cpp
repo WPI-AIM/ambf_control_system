@@ -10,7 +10,7 @@ BodyParam::BodyParam(YAML::Node bodyNode)
     YAML::Node mass = bodyNode["mass"];
     if(!mass.IsDefined()) Utilities::ThrowMissingFieldException("mass in Body Params");
     mass_ = mass.as<double>();
-    if(mass_ == 0.0) mass_ = 0.0000001;
+    if(mass_ == 0.0) mass_ = 0.001;
 
     YAML::Node inertia = bodyNode["inertia"];
     if(!inertia.IsDefined()) Utilities::ThrowMissingFieldException("inertia in Body Params");

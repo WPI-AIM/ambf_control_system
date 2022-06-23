@@ -6,7 +6,6 @@
 // #include "rbdl_model_tests/RBDLTestPrep.h"
 #include "rbdl_model_tests/AMBFParams.h"
 
-
 using namespace RigidBodyDynamics;
 using namespace RigidBodyDynamics::Math;
 typedef AMBFParams* AMBFParamsPtr;

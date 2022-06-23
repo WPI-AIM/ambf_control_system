@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(application)
 
-list(APPEND CMAKE_PREFIX_PATH "/opt/ros/melodic/")
+list(APPEND CMAKE_PREFIX_PATH "/opt/ros/noetic/")
 
 get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
 set (CMAKE_MODULE_PATH ${PARENT_CMAKE} )

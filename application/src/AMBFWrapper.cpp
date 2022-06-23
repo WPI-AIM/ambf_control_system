@@ -143,6 +143,23 @@ SpatialTransform AMBFWrapper::T_W_N(const std::string rigidBodyName)
 	return t_w_nST;
 }
 
+void AMBFWrapper::PoseWithJointAngles(std::vector<double> desiredJointAngles)
+{
+	assert(controlableJoints_.size() == desiredJointAngles.size());
+
+	for(int i = 0; i < 10; i++)
+  {
+		for(int jIndex = 0; jIndex < desiredJointAngles.size(); jIndex++)
+		{
+			baselinkHandler_->
+				set_joint_pos<int>(jIndex, desiredJointAngles.at(jIndex));
+		}
+    usleep(sleepTime);
+	
+    RegisterRigidBodysPose();
+  } 
+}
+
 void AMBFWrapper::PrintAMBFfParamMap()
 {
 	for(ambfParamMapItr_ = ambfParamMap_.begin(); ambfParamMapItr_ != ambfParamMap_.end(); ambfParamMapItr_++)

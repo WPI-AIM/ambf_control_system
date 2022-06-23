@@ -1,6 +1,5 @@
 #ifndef EigenUtilities_H
 #define EigenUtilities_H
-
 #include<iostream>
 #include<cmath>
 #include <stdlib.h>
