@@ -6,7 +6,7 @@ list(APPEND CMAKE_PREFIX_PATH "/opt/ros/noetic/")
 get_filename_component(PARENT_CMAKE ../cmake ABSOLUTE)
 set (CMAKE_MODULE_PATH ${PARENT_CMAKE} )
 
-# set (RBDL_MODEL_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/build/devel/lib/librbdl_model.so")
+# set (RBDL_MODEL_LIBRARY "~/catkin_ws/src/ambf_control_system/build/devel/lib/librbdl_model.so")
 LIST( APPEND CMAKE_MODULE_PATH ${PARENT_DIR} )
 find_package(RBDL REQUIRED)
 # include_directories(${RBDL_INCLUDE_DIRS})
@@ -18,12 +18,12 @@ find_package(RBDL REQUIRED)
 
 set (ambf_msgs_DIR ${CMAKE_MODULE_PATH})
 
-set (AMBF_CLIENT_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/lib/libambf_client_cpp.so")
+set (AMBF_CLIENT_LIBRARY "~/ambf/build/devel/lib/libambf_client_cpp.so")
 
 FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 #find_package(GTest REQUIRED)
 
-include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/")
+include_directories("~/ambf/ambf_ros_modules/ambf_client/include/")
 FIND_PACKAGE (ambf_client REQUIRED)
 include_directories(${AMBF_CLIENT_INCLUDE_DIRS})
 
@@ -113,12 +113,12 @@ add_dependencies(application ${catkin_EXPORTED_TARGETS})
 # ${APPLICATION_SOURCE_FILES})
 
 add_library(ambf_client_lib STATIC 
-"/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/src/ambf_client.cpp"
+"~/ambf/ambf_ros_modules/ambf_client/src/ambf_client.cpp"
 )
 
 
 target_include_directories(ambf_client_lib PUBLIC 
-"/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/"
+"~/ambf/ambf_ros_modules/ambf_client/include/"
 )
 
 

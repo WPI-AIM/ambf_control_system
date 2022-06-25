@@ -67,8 +67,8 @@ set(ambf_client_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(ambf_client_SOURCE_PREFIX /mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client)
-  set(ambf_client_DEVEL_PREFIX /mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel)
+  set(ambf_client_SOURCE_PREFIX ~/ambf/ambf_ros_modules/ambf_client)
+  set(ambf_client_DEVEL_PREFIX ~/ambf/build/devel)
   set(ambf_client_INSTALL_PREFIX "")
   set(ambf_client_PREFIX ${ambf_client_DEVEL_PREFIX})
 else()
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(ambf_client_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include " STREQUAL " ")
+if(NOT "~/ambf/ambf_ros_modules/ambf_client/include " STREQUAL " ")
   set(ambf_client_INCLUDE_DIRS "")
-  set(_include_dirs "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include")
+  set(_include_dirs "~/ambf/ambf_ros_modules/ambf_client/include")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/lib;/mnt/OneTB/localcodebase/ambf_repos/aimlab/ambf/build/devel/lib;/opt/ros/melodic/lib)
+    foreach(path ~/ambf/build/devel/lib;~/ambf/build/devel/lib;/opt/ros/melodic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
