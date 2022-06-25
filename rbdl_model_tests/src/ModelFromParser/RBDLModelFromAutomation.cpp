@@ -21,11 +21,12 @@ RBDLModelFromAutomation::RBDLModelFromAutomation()
 
 void RBDLModelFromAutomation::PrintModelHierarchy()
 {
-	for(unsigned int bodyId = 0; bodyId < rbdlModelPtr_->q_size; bodyId++)
-	{
-    std::string bodyName = rbdlModelPtr_->GetBodyName(bodyId);
+	for(rbdlmBodyMapItr_ = rbdlmBodyMap_.begin(); rbdlmBodyMapItr_ != rbdlmBodyMap_.end(); rbdlmBodyMapItr_++)
+  {
+    std::string bodyName = rbdlmBodyMapItr_->first;
+    unsigned int bodyId = rbdlmBodyMapItr_->second;
+    std::string parentName = rbdlModelPtr_->GetBodyName(rbdlModelPtr_->GetParentBodyId(bodyId));
 		bool isFixedBody = rbdlModelPtr_->IsFixedBodyId(bodyId);
-	  std::string parentName = rbdlModelPtr_->GetBodyName(rbdlModelPtr_->GetParentBodyId(bodyId));
     std::cout << parentName << ", " << bodyName << ", " << bodyId << ", " << isFixedBody << std::endl;
   }
 }
@@ -38,16 +39,29 @@ unsigned int RBDLModelFromAutomation::QIndexFromName(const std::string jointName
 	return --bodyId;
 }
 
+void RBDLModelFromAutomation::RBDLJointAngle(std::vector<double> desiredJointAngles)
+{
+	for(int jointIndex = 0; jointIndex < controlableJoints_.size(); jointIndex++)
+	{
+		std::string jointName = controlableJoints_.at(jointIndex);
+		double desiredJointAngle = desiredJointAngles.at(jointIndex);
+		unsigned int rbdlQIndex = QIndexFromName(jointName);
+		Q_[rbdlQIndex] = desiredJointAngle;
+	}
+}
+
 std::vector<t_w_nPtr> RBDLModelFromAutomation::T_W_NfromModels(std::vector<double> desiredJointAngles)
 {
+	ambfWrapperPtr_->PoseWithJointAngles(desiredJointAngles);
+	RBDLJointAngle(desiredJointAngles);
 	std::vector<t_w_nPtr> transformationsFromModels;
-	// std::cout << "controlableJoints_.size(): " << controlableJoints_.size() << std::endl;
+	std::cout << "Q_" << std::endl << Q_ << std::endl;
 
 	for(std::string jointName : controlableJoints_)
 	{
 		// std::string jointName = "maininsertionlink-toollink";
 		unsigned int rbdlBodyId = rbdlModelPtr_->GetBodyId(jointName.c_str());
-		unsigned int qIndex = QIndexFromName(jointName);
+		// unsigned int qIndex = QIndexFromName(jointName);
 
 		// std::cout << "jointName: " << jointName << std::endl;
 		// joint_ name: link1-link2, parentName: link1

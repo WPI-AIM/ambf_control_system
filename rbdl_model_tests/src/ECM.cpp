@@ -262,6 +262,20 @@ void ECM::CreateRBDLModel()
 		maininsertionlink_toollinkPP - 
 		(maininsertionlink_toollinkRot.transpose() * maininsertionlink_toollinkCP);
 	//--------------------------------------------------------------------//
+	// std::cout << "baselink_yawlinkRot" 			 					<< std::endl << baselink_yawlinkRot 							<< std::endl;
+	// std::cout << "yawlink_pitchbacklinkRot" 		 			<< std::endl << yawlink_pitchbacklinkRot 					<< std::endl;
+	// std::cout << "pitchbacklink_pitchbottomlinkRot" 	<< std::endl << pitchbacklink_pitchbottomlinkRot 	<< std::endl;
+	// std::cout << "pitchbottomlink_pitchendlinkRot" 		<< std::endl << pitchbottomlink_pitchendlinkRot 	<< std::endl;
+	// std::cout << "pitchendlink_maininsertionlinkRot"	<< std::endl << pitchendlink_maininsertionlinkRot << std::endl;
+	// std::cout << "maininsertionlink_toollinkRot" 			<< std::endl << maininsertionlink_toollinkRot 		<< std::endl;
+
+	std::cout << "baselink_yawlinkRotOffset.rotation()" << std::endl << baselink_yawlinkRotOffset.rotation() 	<< std::endl;
+	std::cout << "yawlink_pitchbacklinkRotOffset.rotation()" 		 			<< std::endl << yawlink_pitchbacklinkRotOffset.rotation() 					<< std::endl;
+	std::cout << "pitchbacklink_pitchbottomlinkRotOffset.rotation()" 	<< std::endl << pitchbacklink_pitchbottomlinkRotOffset.rotation() 	<< std::endl;
+	std::cout << "pitchbottomlink_pitchendlinkRotOffset.rotation()" 		<< std::endl << pitchbottomlink_pitchendlinkRotOffset.rotation() 	<< std::endl;
+	std::cout << "pitchendlink_maininsertionlinkRotOffset.rotation()"	<< std::endl << pitchendlink_maininsertionlinkRotOffset.rotation() << std::endl;
+	std::cout << "maininsertionlink_toollinkRotOffset.rotation()" 			<< std::endl << maininsertionlink_toollinkRotOffset.rotation() 		<< std::endl;
+	
 	// std::cout << "world_baselinkST" 			 					<< std::endl << world_baselinkST 								<< std::endl;
 	// std::cout << "baselink_yawlinkST" 		 					<< std::endl << baselink_yawlinkST 							<< std::endl;
 	// std::cout << "yawlink_pitchbacklinkST" 					<< std::endl << yawlink_pitchbacklinkST 				<< std::endl;
@@ -297,11 +311,15 @@ void ECM::CreateRBDLModel()
 	world_baselinkId = rbdlModelPtr_-> 
 		// AddBody(0, Xtrans(world_baselinkST.r), Joint(JointTypeEulerZYX), baselinkBody_, "world-baselink");
 		AddBody(0, Xtrans(world_baselinkST.r), joint_base, baselinkBody_, "world-baselink");
-	
+	printf("Added jointName: %s, parentBodyId: %d, childBodyId: %d\n", "world-baselink", 0, world_baselinkId);
+
+	Joint joint_yaw = Joint(SpatialVector (0., -1., 0., 0., 0., 0.));
 	baselink_yawlinkId = rbdlModelPtr_->
 		AddBody(world_baselinkId, Xtrans(p_baselink_yawlink_world), 
-		Joint(SpatialVector (0., -1., 0., 0., 0., 0.)), yawlinkBody_, "baselink-yawlink");
-	
+		// Joint(SpatialVector (0., -1., 0., 0., 0., 0.)), 
+		joint_yaw, yawlinkBody_, "baselink-yawlink");
+	printf("Added jointName: %s, parentBodyId: %d, childBodyId: %d\n", "baselink-yawlink", world_baselinkId, baselink_yawlinkId);
+
 	yawlink_pitchbacklinkId = rbdlModelPtr_->
 		AddBody(baselink_yawlinkId, Xtrans(p_yawlink_pitchbacklink_world), 
 		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbacklinkBody_, "yawlink-pitchbacklink");
@@ -347,7 +365,8 @@ void ECM::CreateRBDLModel()
     std::string bodyName = rbdlmBodyMapItr_->first;
     unsigned int bodyId = rbdlmBodyMapItr_->second;
     std::string parentName = rbdlModelPtr_->GetBodyName(rbdlModelPtr_->GetParentBodyId(bodyId));
-    std::cout << parentName << ", " << bodyName << ", " << bodyId << std::endl;
+		bool isFixedBody = rbdlModelPtr_->IsFixedBodyId(bodyId);
+    std::cout << parentName << ", " << bodyName << ", " << bodyId << ", " << isFixedBody << std::endl;
   }
 }
 

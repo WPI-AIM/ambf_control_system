@@ -29,6 +29,10 @@ public:
   
   void CleanUp();
 private:
+  unsigned int QIndexFromName(const std::string jointName);
+  void RBDLJointAngle(std::vector<double> desiredJointAngles);
+
+private:
   RBDLModelPtr rbdlModelPtr_{nullptr};
   BuildRBDLModelPtr buildRBDLModelPtr_{nullptr};
   AMBFClientPtr ambfClientPtr_{nullptr};
@@ -45,5 +49,5 @@ private:
   std::map< std::string, unsigned int > rbdlmBodyMap_;
   std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr_;
 
-  unsigned int QIndexFromName(const std::string jointName);
+
 };
