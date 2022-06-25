@@ -300,13 +300,13 @@ set(RBDL_MODEL_FROM_AUTOMATION_TESTS_SOURCE_FILES
     src/main.cc
     )
 
-add_executable (rbdl_mode_from_automation_tests
+add_executable (rbdl_model_from_automation_tests
 ${RBDL_MODEL_TESTS_HDR_FILES} 
 ${RBDL_MODEL_FROM_AUTOMATION_TESTS_HDR_FILES} 
 ${RBDL_MODEL_FROM_AUTOMATION_TESTS_SOURCE_FILES})
 
 
-target_link_libraries (rbdl_mode_from_automation_tests
+target_link_libraries (rbdl_model_from_automation_tests
     ${catkin_LIBRARIES} 
     ${Eigen_LIBRARIES} 
     ${AMBF_CLIENT_LIBRARY} 
@@ -319,7 +319,47 @@ target_link_libraries (rbdl_mode_from_automation_tests
     pthread
     )
 
-set_target_properties(rbdl_mode_from_automation_tests PROPERTIES
+set_target_properties(rbdl_model_from_automation_tests PROPERTIES
+    CXX_STANDARD 17
+    CXX_EXTENSIONS OFF
+    )
+################END################
+
+################START################
+# Test for validating World to body rotations to 
+# create RBDL model without the need of AMBF 
+
+set (RBDL_MODEL_ROTATIONS_TESTS_HDR_FILES
+    # include/${PROJECT_NAME}/AMBFParams.h
+    include/${PROJECT_NAME}/ModelFromParser/RBDLModelFromAutomation.h
+    include/${PROJECT_NAME}/ModelFromParser/TestCaseStruct.h
+    )
+
+set(RBDL_MODEL_ROTATIONS_TESTS_SOURCE_FILES
+    src/RotationTestCases.cc
+    src/main.cc
+    )
+
+add_executable (rbdl_model_rotation_tests
+${RBDL_MODEL_TESTS_HDR_FILES} 
+# ${RBDL_MODEL_FROM_AUTOMATION_TESTS_HDR_FILES} 
+${RBDL_MODEL_ROTATIONS_TESTS_SOURCE_FILES})
+
+
+target_link_libraries (rbdl_model_rotation_tests
+    ${catkin_LIBRARIES} 
+    ${Eigen_LIBRARIES} 
+    # ${AMBF_CLIENT_LIBRARY} 
+    ${APPLICATION_LIBRARY} 
+    ${RBDL_LIBRARY}
+    ${RBDL_MODEL_LIBRARY} 
+    # ${YAML_CPP_LIBRARIES}
+    ${Boost_LIBRARIES} 
+    ${UNITTEST++_LIBRARY}
+    pthread
+    )
+
+set_target_properties(rbdl_model_rotation_tests PROPERTIES
     CXX_STANDARD 17
     CXX_EXTENSIONS OFF
     )

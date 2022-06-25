@@ -262,6 +262,20 @@ void ECM::CreateRBDLModel()
 		maininsertionlink_toollinkPP - 
 		(maininsertionlink_toollinkRot.transpose() * maininsertionlink_toollinkCP);
 	//--------------------------------------------------------------------//
+	// std::cout << "baselink_yawlinkRot" 			 					<< std::endl << baselink_yawlinkRot 							<< std::endl;
+	// std::cout << "yawlink_pitchbacklinkRot" 		 			<< std::endl << yawlink_pitchbacklinkRot 					<< std::endl;
+	// std::cout << "pitchbacklink_pitchbottomlinkRot" 	<< std::endl << pitchbacklink_pitchbottomlinkRot 	<< std::endl;
+	// std::cout << "pitchbottomlink_pitchendlinkRot" 		<< std::endl << pitchbottomlink_pitchendlinkRot 	<< std::endl;
+	// std::cout << "pitchendlink_maininsertionlinkRot"	<< std::endl << pitchendlink_maininsertionlinkRot << std::endl;
+	// std::cout << "maininsertionlink_toollinkRot" 			<< std::endl << maininsertionlink_toollinkRot 		<< std::endl;
+
+	std::cout << "baselink_yawlinkRotOffset.rotation()" << std::endl << baselink_yawlinkRotOffset.rotation() 	<< std::endl;
+	std::cout << "yawlink_pitchbacklinkRotOffset.rotation()" 		 			<< std::endl << yawlink_pitchbacklinkRotOffset.rotation() 					<< std::endl;
+	std::cout << "pitchbacklink_pitchbottomlinkRotOffset.rotation()" 	<< std::endl << pitchbacklink_pitchbottomlinkRotOffset.rotation() 	<< std::endl;
+	std::cout << "pitchbottomlink_pitchendlinkRotOffset.rotation()" 		<< std::endl << pitchbottomlink_pitchendlinkRotOffset.rotation() 	<< std::endl;
+	std::cout << "pitchendlink_maininsertionlinkRotOffset.rotation()"	<< std::endl << pitchendlink_maininsertionlinkRotOffset.rotation() << std::endl;
+	std::cout << "maininsertionlink_toollinkRotOffset.rotation()" 			<< std::endl << maininsertionlink_toollinkRotOffset.rotation() 		<< std::endl;
+	
 	// std::cout << "world_baselinkST" 			 					<< std::endl << world_baselinkST 								<< std::endl;
 	// std::cout << "baselink_yawlinkST" 		 					<< std::endl << baselink_yawlinkST 							<< std::endl;
 	// std::cout << "yawlink_pitchbacklinkST" 					<< std::endl << yawlink_pitchbacklinkST 				<< std::endl;

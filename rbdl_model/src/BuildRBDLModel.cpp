@@ -26,7 +26,7 @@ BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file, AMBFWrapperPtr 
  */
 bool BuildRBDLModel::BuildModel() 
 {
-	ambfWrapperPtr_->PrintAMBFfParamMap();
+	// ambfWrapperPtr_->PrintAMBFfParamMap();
 
 	rbdl_check_api_version(RBDL_API_VERSION);
 
@@ -60,15 +60,25 @@ bool BuildRBDLModel::BuildModel()
 		SpatialTransform world_childST;
 		SpatialTransform parent_childST;
 		Vector3d p_parent_child_world;
+
+		SpatialTransform world_parentST1;
+		SpatialTransform world_childST1;
+		SpatialTransform parent_childST1;
+		Vector3d p_parent_child_world1;
+
 		Joint joint;
 		// parent is world
 		if(parentBodyId == 0)
 		{
 			world_childST = ambfWrapperPtr_->T_W_N(childRigidBodyName);
+
+			bodyParamPtr bodyParamPtr = parseAdf_->BodyParams(childRigidBodyName);
+			world_childST1.E = Utilities::RPYToMatrix(bodyParamPtr->LocationOrientation());
+			world_childST1.r = bodyParamPtr->LocationPosition();
+
 			joint = Joint(JointTypeFixed);
 			p_parent_child_world = world_childST.r;
-
-			// world_parentST = world_childST;
+			
 		}
 		else
 		{
@@ -105,8 +115,9 @@ bool BuildRBDLModel::BuildModel()
 			else
 				Utilities::ThrowUnsupportedJointException(jointName, jointType);
 
-			std::cout << "jointName: " << jointName << std::endl << "jointAxis: " << std::endl << jointAxis << std::endl;
+			// std::cout << "jointName: " << jointName << std::endl << "jointAxis: " << std::endl << jointAxis << std::endl;
 			p_parent_child_world = world_parentST.E * parent_childST.r;
+			world_childST1 = world_parentST1 * parent_childST;
 		}
 
 		// Joint Axis to be got from ration matrix
@@ -114,7 +125,10 @@ bool BuildRBDLModel::BuildModel()
 		joint, childBody, jointName);
 		// printf("Added jointName: %s, parentBodyId: %d, childBodyId: %d\n", jointName.c_str(), parentBodyId, childBodyId);
 
-		// world_childST = world_childST * parent_childST;
+		std::cout << "jointName: " << jointName << std::endl;
+		std::cout << "world_parentST" << std::endl << world_parentST << std::endl;
+		std::cout << "world_parentST1" << std::endl << world_parentST1 << std::endl;
+		world_parentST1 = world_childST1;
 		parentBodyId = childBodyId;
 
 		std::cout << "------------\n";
