@@ -3,9 +3,8 @@
 
 RBDLModelFromAutomation::RBDLModelFromAutomation() 
 {
-	ambfWrapperPtr_ = AMBFTestPrep::getInstance()->getAMBFWrapperInstance();
 
-	buildRBDLModelPtr_ = new BuildRBDLModel(AMBFTestPrep::ADFPath().c_str(), ambfWrapperPtr_);
+	buildRBDLModelPtr_ = new BuildRBDLModel(AMBFTestPrep::ADFPath().c_str());
 	rbdlModelPtr_ = buildRBDLModelPtr_->RBDLModel();
 
 	Q_     = VectorNd::Constant ((size_t) rbdlModelPtr_->dof_count, 0.);
@@ -16,6 +15,13 @@ RBDLModelFromAutomation::RBDLModelFromAutomation()
 
 	// std::cout << "PrintAMBFfParamMap() from RBDLModelFromAutomation\n";
 	// ambfWrapperPtr_->PrintAMBFfParamMap();
+
+	const std::string modelName = buildRBDLModelPtr_->ModelName();
+	baseRigidBodyName_ = buildRBDLModelPtr_->BaseRigidBodyName();
+	
+	ambfWrapperPtr_ = AMBFTestPrep::getInstance()->getAMBFWrapperInstance();
+	ambfWrapperPtr_->ActivateAMBFHandlers(modelName.c_str(), baseRigidBodyName_.c_str());
+	ambfWrapperPtr_->RegisterHomePoseTransformation();
 	controlableJoints_ = ambfWrapperPtr_->ControlableJoints();
 }
 
@@ -95,7 +101,9 @@ std::vector<t_w_nPtr> RBDLModelFromAutomation::T_W_NfromModels(std::vector<doubl
 RBDLModelFromAutomation::~RBDLModelFromAutomation() 
 {
 	// CleanUp();
-	ambfWrapperPtr_->~AMBFWrapper();
-	delete rbdlModelPtr_;
-	delete buildRBDLModelPtr_;
+	if(rbdlModelPtr_ != nullptr) delete rbdlModelPtr_;
+	
+	if(buildRBDLModelPtr_ != nullptr) delete buildRBDLModelPtr_;
+
+	if(ambfWrapperPtr_ != nullptr) ambfWrapperPtr_->~AMBFWrapper();
 }

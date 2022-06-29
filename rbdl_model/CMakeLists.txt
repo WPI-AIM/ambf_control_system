@@ -3,33 +3,33 @@ project(rbdl_model)
 
 set(CMAKE_PREFIX_PATH _PATH "/opt/ros/melodic/;${CMAKE_MODULE_PATH}")
 
-set (ambf_msgs_DIR /mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/cmake/)
-set (ambf_client_DIR "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/")
-set (AMBF_CLIENT_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/lib/libambf_client_cpp.so")
-include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/")
-FIND_PACKAGE (ambf_client REQUIRED)
-MESSAGE(STATUS "Found AMBF: ${AMBF_CLIENT_INCLUDE_DIR}")
+# set (ambf_msgs_DIR /mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/cmake/)
+# set (ambf_client_DIR "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/")
+# set (AMBF_CLIENT_LIBRARY "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/build/devel/lib/libambf_client_cpp.so")
+# include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf/ambf_ros_modules/ambf_client/include/")
+# FIND_PACKAGE (ambf_client REQUIRED)
+# MESSAGE(STATUS "Found AMBF: ${AMBF_CLIENT_INCLUDE_DIR}")
 
-set (application_DIR "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/cmake/")
-include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/application/include/")
-FIND_PACKAGE (application REQUIRED)
-MESSAGE(STATUS "Found Application: ${APPLICATION_INCLUDE_DIR}")
+# set (application_DIR "/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/cmake/")
+# include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/application/include/")
+# FIND_PACKAGE (application REQUIRED)
+# MESSAGE(STATUS "Found Application: ${APPLICATION_INCLUDE_DIR}")
 
-include_directories(${AMBF_CLIENT_INCLUDE_DIRS} ${APPLICATION_INCLUDE_DIRS})
+# include_directories(${AMBF_CLIENT_INCLUDE_DIRS} ${APPLICATION_INCLUDE_DIRS})
 
 
-include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/application/include/")
+# include_directories("/mnt/OneTB/localcodebase/ambf_repos/ambfvtwodotzero/ambf_control_system/application/include/")
 
-FIND_PACKAGE (application REQUIRED)
-include_directories(${APPLICATION})
-include_directories(application)
+# FIND_PACKAGE (application REQUIRED)
+# include_directories(${APPLICATION})
+# include_directories(application)
 
-find_package(catkin REQUIRED COMPONENTS
-  ambf_msgs
-  geometry_msgs
-  message_generation
-  tf
-)
+# find_package(catkin REQUIRED COMPONENTS
+#   ambf_msgs
+#   geometry_msgs
+#   message_generation
+#   tf
+# )
 
 catkin_package( INCLUDE_DIRS include 
   LIBRARIES rbdl_model application
@@ -60,11 +60,11 @@ FIND_PACKAGE (Eigen3 3.0.0 REQUIRED)
 include_directories(include 
 ${catkin_INCLUDE_DIRS} 
   ${RBDL_INCLUDE_DIRS} 
-  ${APPLICATION_INCLUDE_DIR}
-  ${APPLICATION_INCLUDE_DIRS}
-  ${CMAKE_SOURCE_DIR}/application/include/
+  # ${APPLICATION_INCLUDE_DIR}
+  # ${APPLICATION_INCLUDE_DIRS}
+  # ${CMAKE_SOURCE_DIR}/application/include/
 
-  ${AMBF_CLIENT_INCLUDE_DIR}  
+  # ${AMBF_CLIENT_INCLUDE_DIR}  
   ${Eigen_INCLUDE_DIRS} 
   ${EIGEN3_INCLUDE_DIR} 
   ${RBDL_INCLUDE_DIR}
@@ -87,7 +87,8 @@ set (HDR_FILES
   include/${PROJECT_NAME}/MinHeapStructs.h
   include/${PROJECT_NAME}/ModelStructs.h
   include/${PROJECT_NAME}/GraphEdge.h
-  # include/${PROJECT_NAME}/RBDLModelErrors.h
+  include/${PROJECT_NAME}/RBDLUtilities.h
+  include/${PROJECT_NAME}/RBDLModelErrors.h
 )
 
 
@@ -99,7 +100,8 @@ set(SOURCE_FILES
   # src/AMBFParams.cpp
   src/ModelGraph.cpp
   src/MinHeap.cpp
-  # src/RBDLModelErrors.cpp
+  src/RBDLUtilities.cpp
+  src/RBDLModelErrors.cpp
   )
 
 ## Declare a C++ library
@@ -122,7 +124,7 @@ target_link_libraries(rbdl_model PUBLIC
   # ambf_client_lib
   ${catkin_LIBRARIES} 
   ${Eigen_LIBRARIES} 
-  ${AMBF_CLIENT_LIBRARY} 
+  # ${AMBF_CLIENT_LIBRARY} 
   ${RBDL_MODEL_LIBRARY} 
   ${Boost_LIBRARIES} 
   ${RBDL_LIBRARY}

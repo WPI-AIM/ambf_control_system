@@ -6,8 +6,7 @@
 #include "rbdl_model/BodyParam.h"
 #include "rbdl_model/JointParam.h"
 #include "rbdl_model/ModelGraph.h"
-#include "application/Prep.h"
-#include "application/Utilities.h"
+#include "rbdl_model/RBDLUtilities.h"
 
 //------------------------------------------------------------------------------
 typedef BodyParam* bodyParamPtr;

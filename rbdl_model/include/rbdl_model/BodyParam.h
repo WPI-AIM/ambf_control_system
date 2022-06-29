@@ -1,12 +1,12 @@
 #ifndef BODYPARAM_H
 #define BODYPARAM_H
 #include <iostream>
-#include "application/Utilities.h"
+#include "rbdl_model/RBDLUtilities.h"
 
 /*
  * BodyParam Class is used to hold values of Body parameter
  */
-using namespace RBDLModel;
+// using namespace RBDLModel;
 
 class BodyParam
 {

@@ -9,7 +9,7 @@
 #include <limits>
 #include <rbdl/rbdl.h>
 #include <rbdl/rbdl_math.h>
-#include "application/Utilities.h"
+#include "rbdl_model/RBDLUtilities.h"
 #include "rbdl_model/ParseADF.h"
 
 using namespace RigidBodyDynamics;
@@ -28,7 +28,7 @@ const double TEST_LAX {1.0e-7};
 class BuildRBDLModel
 {
 public:
-  BuildRBDLModel(const std::string actuator_config_file, AMBFWrapperPtr ambfWrapperPtr);
+  BuildRBDLModel(const std::string actuator_config_file);
 
   void PrintBody();
   void PrintJoint();
@@ -43,7 +43,8 @@ public:
 
   // inline Model* RBDLModel() { return RBDLmodel_; }
 
-  std::string inline BaseRigidBodyName() { return baseRigidBodyName_; }
+  const std::string inline ModelName() const { return modelName_; }
+  const std::string inline BaseRigidBodyName() const { return baseRigidBodyName_; }
 
   inline RBDLModelPtr RBDLModel() { return rbdlModelPtr_; }
   std::vector<std::string> GetAllBodyNames();
@@ -59,14 +60,14 @@ private:
   // void RegisterRigidBodysPose();
   // void RegisterHomePoseTransformation();
   // void SetAMBFParams();
-
+  const SpatialTransform T_Parent_ChildST(const Vector3d pp, const Vector3d cp,
+  const Vector3d pa, const Vector3d ca, const double offsetQ);
   bool BuildModel();
 
 private:
   ParseADFPtr parseAdf_{nullptr};
-  AMBFWrapperPtr ambfWrapperPtr_{nullptr};
+  std::string modelName_{""};
   std::string baseRigidBodyName_{""};
-  rigidBodyPtr baselinkHandler_{nullptr};
   std::vector<std::string> controlableJoints_;
   std::vector<std::string> endEffectorNodesName_;
   std::unordered_map<std::string, bodyParamPtr> bodyParamObjectMap_;

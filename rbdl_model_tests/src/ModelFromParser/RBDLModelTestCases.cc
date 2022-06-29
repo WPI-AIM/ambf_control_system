@@ -26,6 +26,7 @@ TEST_CASE(__FILE__"_Body", "")
 
 //   // Create Vector size of controllabel Joints
 //   std::vector<double> desiredJointAngles(controllableJoints.size(), 0.0);
+
 //   std::vector<t_w_nPtr> transformationsFromModels = rbdlModelWrapper->T_W_NfromModels(desiredJointAngles);
 
 //   for(t_w_nPtr t_w_nptr : transformationsFromModels)
@@ -66,7 +67,7 @@ TEST_CASE(__FILE__"_RandomPose", "")
 
 TEST_CASE(__FILE__"_CleanUp", "") 
 {
-  if(rbdlModelWrapper = nullptr) return;
-  
-  delete rbdlModelWrapper;
+  if(rbdlModelWrapper == nullptr) return;
+  rbdlModelWrapper->~RBDLModelFromAutomation();
+  // delete rbdlModelWrapper;
 }

@@ -31,16 +31,16 @@ void ParseADF::Namespace()
 
   YAML::Node blender_namespace = baseNode_["namespace"];
   if(!blender_namespace.IsDefined())
-    Utilities::ThrowMissingFieldException("namespace");
-  
+    RBDLUtilities::ThrowMissingFieldException("namespace");
+    
   blender_namespace_ = 
-    Utilities::TrimTrailingSpaces(blender_namespace);
+    RBDLUtilities::TrimTrailingSpaces(blender_namespace);
 
-  Utilities::EraseSubStr(blender_namespace_, "/ambf/env/");
+  RBDLUtilities::EraseSubStr(blender_namespace_, "/ambf/env/");
   std::cout << "namespace: " << blender_namespace_ << std::endl;
 
-  if(blender_namespace_.empty() || !Utilities::HasEnding(blender_namespace_, "/"))
-    Utilities::ThrowInvalidNamespaceException();
+  if(blender_namespace_.empty() || !RBDLUtilities::HasEnding(blender_namespace_, "/"))
+    RBDLUtilities::ThrowInvalidNamespaceException();
 }
 
 
@@ -98,7 +98,7 @@ bool ParseADF::Bodies()
     // Get the name of the body from YAML. Model cannot be processed if the body defined in the list
     // doenst have parameters defined in the YAML. TBD
     if(body_yaml.IsDefined())
-      bodyName = Utilities::TrimTrailingSpaces(body_yaml["name"]);
+      bodyName = RBDLUtilities::TrimTrailingSpaces(body_yaml["name"]);
     else
     {
       std::ostringstream errormsg;
@@ -136,21 +136,21 @@ bool ParseADF::Joints()
     
 
     std::string joint_name;
-    if(joint_yaml.IsDefined()) joint_name = Utilities::TrimTrailingSpaces(joint_yaml["name"]);
+    if(joint_yaml.IsDefined()) joint_name = RBDLUtilities::TrimTrailingSpaces(joint_yaml["name"]);
     std::string parent_name;
 
     YAML::Node name = baseNode_[joint_name_expanded]["name"];
-    if(!name.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + joint_name_expanded + ", name in Joint Params");
+    if(!name.IsDefined()) RBDLUtilities::ThrowMissingFieldException("joint name: " + joint_name_expanded + ", name in Joint Params");
 
     YAML::Node parent = baseNode_[joint_name_expanded]["parent"];
-    if(!parent.IsDefined()) Utilities::ThrowMissingFieldException("parent name of joint: " + joint_name_expanded + ", in Joint Params");
-    parent_name = Utilities::TrimTrailingSpaces(parent);
-    Utilities::EraseSubStr(parent_name, "BODY");
+    if(!parent.IsDefined()) RBDLUtilities::ThrowMissingFieldException("parent name of joint: " + joint_name_expanded + ", in Joint Params");
+    parent_name = RBDLUtilities::TrimTrailingSpaces(parent);
+    RBDLUtilities::EraseSubStr(parent_name, "BODY");
 
     // Ignore p2p joints
     YAML::Node type = baseNode_[joint_name_expanded]["type"];
-    if(!type.IsDefined()) Utilities::ThrowMissingFieldException("joint name: " + joint_name_expanded + ", type in Joint Params");
-    std::string joint_type = Utilities::TrimTrailingSpaces(type);
+    if(!type.IsDefined()) RBDLUtilities::ThrowMissingFieldException("joint name: " + joint_name_expanded + ", type in Joint Params");
+    std::string joint_type = RBDLUtilities::TrimTrailingSpaces(type);
     if(joint_type.compare("p2p") == 0) continue;
 
     // Children for earch body sorted in a map
@@ -167,7 +167,7 @@ bodyParamPtr ParseADF::BodyParams(const std::string bodyName)
 {
   bodyParamObjectMapItr_ = bodyParamObjectMap_.find(bodyName);
   if(bodyParamObjectMapItr_ == bodyParamObjectMap_.end())
-    Utilities::ThrowKeyNotFoundException("bodyParamObjectMapItr_", bodyName);
+    RBDLUtilities::ThrowKeyNotFoundException("bodyParamObjectMapItr_", bodyName);
 
   return bodyParamObjectMap_[bodyName];
 }
@@ -176,7 +176,7 @@ jointParamPtr ParseADF::JointParams(const std::string jointName)
 {
   jointParamObjectMapItr_ = jointParamObjectMap_.find(jointName);
   if(jointParamObjectMapItr_ == jointParamObjectMap_.end())
-    Utilities::ThrowKeyNotFoundException("jointParamObjectMapItr_", jointName);
+    RBDLUtilities::ThrowKeyNotFoundException("jointParamObjectMapItr_", jointName);
 
   return jointParamObjectMap_[jointName];
 }
@@ -213,7 +213,7 @@ bool ParseADF::BuildModelSequence()
   ModelGraph modelGraph(edges, V, E);
  
   int baseNodeId = modelGraph.BaseNode();
-  if(baseNodeId == -1) Utilities::ThrowBaseNotFoundException();
+  if(baseNodeId == -1) RBDLUtilities::ThrowBaseNotFoundException();
 
   // std::string baseNodeName;
   baseName_ = GetValueFromMap(bodyNameHash_, baseNodeId, baseName_);
@@ -249,7 +249,7 @@ bool ParseADF::BuildModelSequence()
     {
       bodyParamPtr bodyParam = BodyParams(bodyName);
       if(bodyParam->Passive())
-        Utilities::ThrowDisabledForROS(bodyParam->Name().c_str());
+        RBDLUtilities::ThrowDisabledForROS(bodyParam->Name().c_str());
     }
   }
 
