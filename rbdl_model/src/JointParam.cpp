@@ -26,7 +26,7 @@ JointParam::JointParam(YAML::Node jointNode)
   YAML::Node parent_axis = jointNode["parent axis"];
   if(!parent_axis.IsDefined()) RBDLUtilities::ThrowMissingFieldException("joint name: " + name_ + ", parent axis in Joint Params");
   parent_axis_ = RBDLUtilities::ToXYZ(&parent_axis);
-  RBDLUtilities::RoundVector<Vector3d>(parent_axis_);
+  RBDLUtilities::Round<Vector3d>(parent_axis_);
   
   YAML::Node child_pivot = jointNode["child pivot"];
   if(!child_pivot.IsDefined()) RBDLUtilities::ThrowMissingFieldException("joint name: " + name_ + ", child pivot in Joint Params");
@@ -35,7 +35,7 @@ JointParam::JointParam(YAML::Node jointNode)
   YAML::Node child_axis = jointNode["child axis"];
   if(!child_axis.IsDefined()) RBDLUtilities::ThrowMissingFieldException("joint name: " + name_ + ", child axis in Joint Params");
   child_axis_ = RBDLUtilities::ToXYZ(&child_axis);
-  RBDLUtilities::RoundVector<Vector3d>(child_axis_);
+  RBDLUtilities::Round<Vector3d>(child_axis_);
 
   YAML::Node joint_limits = jointNode["joint limits"];
   if(!joint_limits.IsDefined()) RBDLUtilities::ThrowMissingFieldException("joint name: " + name_ + ", joint limits in Joint Params");

@@ -76,13 +76,10 @@ bool BuildRBDLModel::BuildModel()
 		// parent is world
 		if(parentBodyId == 0)
 		{
-			// world_childST = ambfWrapperPtr_->T_W_N(childRigidBodyName);
-
 			bodyParamPtr bodyParamPtr = parseAdf_->BodyParams(childRigidBodyName);
 			world_child = RBDLUtilities::RPYToMatrix(bodyParamPtr->LocationOrientation());
 
 			joint = Joint(JointTypeFixed);
-			// p_parent_child_world = world_childST.r;	
 			p_parent_child_world = bodyParamPtr->LocationPosition();
 		}
 		else
@@ -110,7 +107,7 @@ bool BuildRBDLModel::BuildModel()
 			// std::cout << "jointName: " << jointName << std::endl << "jointAxis: " << std::endl << jointAxis << std::endl;
 			p_parent_child_world = world_parent * parent_childST.r;
 			world_child = world_parent * parent_childST.E;
-			RBDLUtilities::RoundVector<Matrix3d>(world_child);
+			RBDLUtilities::Round<Matrix3d>(world_child);
 		}
 
 		// Joint Axis to be got from ration matrix

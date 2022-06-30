@@ -80,8 +80,6 @@ std::vector<t_w_nPtr> RBDLModelFromAutomation::T_W_NfromModels(std::vector<doubl
 
 		t_w_nptr->bodyName = parentName;
 		// Collect AMBF and RBDL Transformation Matrices
-		// t_w_nptr->r_w_n_ambf = ambfParamMap_[parentName]->RotationMatrix();
-		// t_w_nptr->p_w_n_ambf = ambfParamMap_[parentName]->TranslationVector();
 		t_w_nptr->t_w_n_ambf = ambfWrapperPtr_->T_W_N(parentName);
 
 		ForwardDynamics(*rbdlModelPtr_, Q_, QDot_, Tau_, QDDot_);

@@ -65,7 +65,7 @@ public:
   static void Round(Matrix3d& inout, double threshold);
   
   template <typename T>
-  static void RoundVector(T& inout)
+  static void Round(T& inout)
   {
     int rows = inout.rows();
     int cols = inout.cols();
