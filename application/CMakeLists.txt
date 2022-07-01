@@ -16,7 +16,6 @@ find_package(RBDL REQUIRED)
 # include_directories(${RBDL_MODEL})
 # include_directories(rbdl_model)
 
-set (ambf_msgs_DIR ${CMAKE_MODULE_PATH})
 
 set (AMBF_CLIENT_LIBRARY "~/ambf/build/devel/lib/libambf_client_cpp.so")
 
@@ -29,10 +28,10 @@ include_directories(${AMBF_CLIENT_INCLUDE_DIRS})
 
 
 find_package(catkin REQUIRED COMPONENTS
-   ambf_msgs
-   geometry_msgs
-   message_generation
-   tf
+  ambf_msgs
+  geometry_msgs
+  message_generation
+  tf
 )
 
 
@@ -46,7 +45,6 @@ catkin_package(INCLUDE_DIRS include ${AMBF_CLIENT_INCLUDE_DIRS}
 
 catkin_package( INCLUDE_DIRS include
   LIBRARIES 
-  # rbdl_model
 #  CATKIN_DEPENDS
 #  DEPENDS system_lib
 )
@@ -88,7 +86,6 @@ set (APPLICATION_HDR_FILES
     include/${PROJECT_NAME}/Utilities.h
     include/${PROJECT_NAME}/AMBFWrapper.h
     include/${PROJECT_NAME}/AMBFParams.h
-    include/${PROJECT_NAME}/RBDLModelErrors.h
     include/${PROJECT_NAME}/Prep.h    
     )
 
@@ -96,12 +93,8 @@ set(APPLICATION_SOURCE_FILES
     src/Utilities.cpp
     src/AMBFWrapper.cpp
     src/AMBFParams.cpp
-    src/RBDLModelErrors.cpp
     src/Prep.cpp
-    # src/main.cpp
     )
-
-
 
 ## Declare a C++ library
 add_library(application ${APPLICATION_HDR_FILES} ${APPLICATION_SOURCE_FILES})

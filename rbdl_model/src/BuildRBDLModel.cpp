@@ -1,24 +1,40 @@
 #include "rbdl_model/BuildRBDLModel.h"
 #include "rbdl_model/GraphEdge.h"
-#include "application/Prep.h"
 
-BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file, AMBFWrapperPtr ambfWrapperPtr) 
+
+BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) 
 {
-	// ambfWrapperPtr_ = new AMBFWrapper();
-	// ambfWrapperPtr_ = AMBFTestPrep::getInstance()->getAMBFWrapperInstance();
-	ambfWrapperPtr_ = ambfWrapperPtr;
   parseAdf_ = new ParseADF(actuator_config_file);
+	modelName_ = parseAdf_->ModelName();
   baseRigidBodyName_ = parseAdf_->BaseName();
   endEffectorNodesName_ = parseAdf_->EndEffectorsName();
   paths_ = parseAdf_->Paths();
-
-	// const std::string modelName = "ecm/";
-	const std::string modelName = parseAdf_->ModelName();
-	ambfWrapperPtr_->ActivateAMBFHandlers(modelName.c_str(), baseRigidBodyName_.c_str());
-	ambfWrapperPtr_->RegisterHomePoseTransformation();
-
   this->BuildModel();
 }
+
+
+const SpatialTransform BuildRBDLModel::T_Parent_ChildST(const Vector3d pp, const Vector3d cp,
+  const Vector3d pa, const Vector3d ca, const double offsetQ)
+{
+  Matrix3d p_cRot = 
+	Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(pa, ca));
+	// Utilities::Round(p_cRot, 0.00001);
+
+	Eigen::Affine3d p_cRotOffset(
+    Eigen::AngleAxisd(offsetQ, ca));
+	
+	Matrix3d p_cRotOffsetToMatrix = p_cRotOffset.rotation();
+	// Utilities::Round(p_cRotOffsetToMatrix, 0.0001);
+
+  SpatialTransform parent_childST;
+  parent_childST.E = 
+    p_cRot.transpose() * p_cRotOffsetToMatrix;
+	parent_childST.r = 
+		pp - (p_cRot.transpose() * cp);
+  
+  return parent_childST;
+}
+
 
 /*
  * Build RBDL Model
@@ -26,8 +42,6 @@ BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file, AMBFWrapperPtr 
  */
 bool BuildRBDLModel::BuildModel() 
 {
-	// ambfWrapperPtr_->PrintAMBFfParamMap();
-
 	rbdl_check_api_version(RBDL_API_VERSION);
 
   rbdlModelPtr_ = new Model();
@@ -37,7 +51,9 @@ bool BuildRBDLModel::BuildModel()
 
   std::vector<std::string> path = paths_.at(0);
 	path.insert(path.begin(), "world");
-
+	
+	Matrix3d world_parent;
+	Matrix3d world_child;
 
   for(int i = 0; i < path.size() - 1; i++)
   {
@@ -47,42 +63,27 @@ bool BuildRBDLModel::BuildModel()
     std::string childRigidBodyName = path.at(i + 1);
     std::string jointName = parentRigidBodyName + "-" + childRigidBodyName;
 
-    // printf("parentName: %s, childName: %s, jointName: %s\n", 
-    //   parentRigidBodyName.c_str(), childRigidBodyName.c_str(), jointName.c_str());
-
     bodyParamPtr childParamPtr = parseAdf_->BodyParams(childRigidBodyName);
     
     // mass, com - inertia offset, inertia
     Body childBody = 
       Body(childParamPtr->Mass(), childParamPtr->InertialOffsetPosition(), childParamPtr->Inertia());
 
-		SpatialTransform world_parentST;
-		SpatialTransform world_childST;
 		SpatialTransform parent_childST;
 		Vector3d p_parent_child_world;
-
-		SpatialTransform world_parentST1;
-		SpatialTransform world_childST1;
-		SpatialTransform parent_childST1;
-		Vector3d p_parent_child_world1;
 
 		Joint joint;
 		// parent is world
 		if(parentBodyId == 0)
 		{
-			world_childST = ambfWrapperPtr_->T_W_N(childRigidBodyName);
-
 			bodyParamPtr bodyParamPtr = parseAdf_->BodyParams(childRigidBodyName);
-			world_childST1.E = Utilities::RPYToMatrix(bodyParamPtr->LocationOrientation());
-			world_childST1.r = bodyParamPtr->LocationPosition();
+			world_child = RBDLUtilities::RPYToMatrix(bodyParamPtr->LocationOrientation());
 
 			joint = Joint(JointTypeFixed);
-			p_parent_child_world = world_childST.r;
-			
+			p_parent_child_world = bodyParamPtr->LocationPosition();
 		}
 		else
 		{
-			world_parentST = ambfWrapperPtr_->T_W_N(parentRigidBodyName);
     	jointParamPtr jointParamPtr = parseAdf_->JointParams(jointName);
 			
 			Vector3d parentAxis =	jointParamPtr->ParentAxis(); parentAxis.normalize();
@@ -92,32 +93,21 @@ bool BuildRBDLModel::BuildModel()
 			const double paret_childOffsetQ = jointParamPtr->Offset();
 			std::string jointType = jointParamPtr->Type();
 
-			// Parent to child body rotation calculations
-			Matrix3d parent_childRot = 
-			Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(parentAxis, childAxis));
-			
-			// TBD axis of rotation to be fould out
-			Eigen::Affine3d 
-				parent_childRotOffset(Eigen::AngleAxisd(paret_childOffsetQ, -Vector3d::UnitZ()));
-				
-			// SpatialTransform parent_childST;
-			parent_childST.E = parent_childRot.transpose() * parent_childRotOffset.rotation();
-			parent_childST.r = 
-				parentPivot - (parent_childRot.transpose() * childPivot);
+			parent_childST = T_Parent_ChildST(parentPivot, childPivot,
+  			parentAxis, childAxis, paret_childOffsetQ);
 
-			// std::cout << "world_parentST.E" << std::endl << world_parentST.E << std::endl;
-			// std::cout << "parentAxis" << std::endl << parentAxis << std::endl;
-			Vector3d jointAxis = world_parentST.E * parentAxis;
+			Vector3d jointAxis = world_parent * parentAxis;
 			if(jointType.compare("revolute") == 0) 
 				joint = Joint(SpatialVector (jointAxis(0), jointAxis(1), jointAxis(2), 0., 0., 0.));
 			else if(jointType.compare("prismatic") == 0)
 				joint = Joint(SpatialVector (0., 0., 0., jointAxis(0), jointAxis(1), jointAxis(2)));
 			else
-				Utilities::ThrowUnsupportedJointException(jointName, jointType);
+				RBDLUtilities::ThrowUnsupportedJointException(jointName, jointType);
 
 			// std::cout << "jointName: " << jointName << std::endl << "jointAxis: " << std::endl << jointAxis << std::endl;
-			p_parent_child_world = world_parentST.E * parent_childST.r;
-			world_childST1 = world_parentST1 * parent_childST;
+			p_parent_child_world = world_parent * parent_childST.r;
+			world_child = world_parent * parent_childST.E;
+			RBDLUtilities::Round<Matrix3d>(world_child);
 		}
 
 		// Joint Axis to be got from ration matrix
@@ -125,13 +115,8 @@ bool BuildRBDLModel::BuildModel()
 		joint, childBody, jointName);
 		// printf("Added jointName: %s, parentBodyId: %d, childBodyId: %d\n", jointName.c_str(), parentBodyId, childBodyId);
 
-		std::cout << "jointName: " << jointName << std::endl;
-		std::cout << "world_parentST" << std::endl << world_parentST << std::endl;
-		std::cout << "world_parentST1" << std::endl << world_parentST1 << std::endl;
-		world_parentST1 = world_childST1;
+		world_parent = world_child;
 		parentBodyId = childBodyId;
-
-		std::cout << "------------\n";
   }
 
   return true;
@@ -156,25 +141,25 @@ std::vector<std::string> BuildRBDLModel::GetAllBodyNames() {
  * Clean up memory
  */
 void BuildRBDLModel::CleanUp() {
-  // std::unordered_map<std::string, bodyParamPtr>::iterator bodyParamMapIt;
-  // for ( bodyParamMapIt = bodyParamObjectMap_.begin(); bodyParamMapIt != bodyParamObjectMap_.end(); ++bodyParamMapIt ) {
-  //   bodyParamMapIt->second->~BodyParam();
-  // }
+  std::unordered_map<std::string, bodyParamPtr>::iterator bodyParamMapIt;
+  for ( bodyParamMapIt = bodyParamObjectMap_.begin(); bodyParamMapIt != bodyParamObjectMap_.end(); ++bodyParamMapIt ) {
+    bodyParamMapIt->second->~BodyParam();
+  }
 
-  // std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr> >::iterator itr;
-  // std::unordered_map<std::string, jointParamPtr>::iterator ptr;
+  std::unordered_map<std::string, std::unordered_map<std::string, jointParamPtr> >::iterator itr;
+  std::unordered_map<std::string, jointParamPtr>::iterator ptr;
 
-  // for (itr = jointParamObjectMap_.begin(); itr != jointParamObjectMap_.end(); itr++) {
-  //   for (ptr = itr->second.begin(); ptr != itr->second.end(); ptr++) {
-  //     ptr->second->~JointParam();
-  //   }
-  // }
+  for (jointParamObjectMapItr_ = jointParamObjectMap_.begin(); jointParamObjectMapItr_ != jointParamObjectMap_.end(); jointParamObjectMapItr_++) {
+    for (ptr = itr->second.begin(); ptr != itr->second.end(); ptr++) {
+      ptr->second->~JointParam();
+    }
+  }
 
-  // delete RBDLmodel_;
-  // std::cout << "RBDL Model deleted" << std::endl;
+  if(rbdlModelPtr_ != nullptr) delete rbdlModelPtr_;
+  std::cout << "RBDL Model deleted" << std::endl;
 }
 
 BuildRBDLModel::~BuildRBDLModel(void)
 {
-
+	// CleanUp();
 }
