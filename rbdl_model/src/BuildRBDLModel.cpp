@@ -18,13 +18,13 @@ const SpatialTransform BuildRBDLModel::T_Parent_ChildST(const Vector3d pp, const
 {
   Matrix3d p_cRot = 
 	Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(pa, ca));
-	// Utilities::Round(p_cRot, 0.00001);
+	// RBDLUtilities::Round<Matrix3d>(p_cRot);
 
 	Eigen::Affine3d p_cRotOffset(
     Eigen::AngleAxisd(offsetQ, ca));
 	
 	Matrix3d p_cRotOffsetToMatrix = p_cRotOffset.rotation();
-	// Utilities::Round(p_cRotOffsetToMatrix, 0.0001);
+	// RBDLUtilities::Round<Matrix3d>(p_cRotOffsetToMatrix);
 
   SpatialTransform parent_childST;
   parent_childST.E = 
@@ -72,6 +72,8 @@ bool BuildRBDLModel::BuildModel()
 		SpatialTransform parent_childST;
 		Vector3d p_parent_child_world;
 
+		if(jointName.compare("pitchendlink-maininsertionlink") == 0)
+			std::cout << "jointName\n";
 		Joint joint;
 		// parent is world
 		if(parentBodyId == 0)
@@ -107,16 +109,20 @@ bool BuildRBDLModel::BuildModel()
 			// std::cout << "jointName: " << jointName << std::endl << "jointAxis: " << std::endl << jointAxis << std::endl;
 			p_parent_child_world = world_parent * parent_childST.r;
 			world_child = world_parent * parent_childST.E;
-			RBDLUtilities::Round<Matrix3d>(world_child);
 		}
+		// RBDLUtilities::Round<Matrix3d>(world_child);
 
 		// Joint Axis to be got from ration matrix
 		unsigned int childBodyId = rbdlModelPtr_->AddBody(parentBodyId, Xtrans(p_parent_child_world), 
 		joint, childBody, jointName);
-		// printf("Added jointName: %s, parentBodyId: %d, childBodyId: %d\n", jointName.c_str(), parentBodyId, childBodyId);
-
+		printf("Added jointName: %s, parentBodyId: %d, childBodyId: %d\n", jointName.c_str(), parentBodyId, childBodyId);
+		std::cout << "p_parent_child_world" << std::endl << p_parent_child_world << std::endl;
+		std::cout << "world_child" << std::endl << world_child << std::endl;
+		
 		world_parent = world_child;
 		parentBodyId = childBodyId;
+
+		std::cout << "---------------------\n";
   }
 
   return true;

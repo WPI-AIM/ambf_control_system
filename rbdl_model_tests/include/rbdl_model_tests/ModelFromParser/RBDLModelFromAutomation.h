@@ -48,6 +48,4 @@ private:
   VectorNd Tau_;
   std::map< std::string, unsigned int > rbdlmBodyMap_;
   std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr_;
-
-
 };

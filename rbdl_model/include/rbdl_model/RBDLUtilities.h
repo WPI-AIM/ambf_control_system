@@ -75,7 +75,7 @@ public:
       for(int row = 0; row < rows; row++)
       {
         double val = inout(row, col);
-        if(val < -1.0 || val > 1.0) return;
+        if(val < -1.5 || val > 1.5) return;
 
         if(val < -0.5) inout(row, col) = -1.0;
         else if(val >= -0.5 && val <  0.0) inout(row, col) = 0;

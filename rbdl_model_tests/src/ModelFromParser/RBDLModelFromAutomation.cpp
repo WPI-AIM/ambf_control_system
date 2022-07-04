@@ -70,21 +70,18 @@ std::vector<t_w_nPtr> RBDLModelFromAutomation::T_W_NfromModels(std::vector<doubl
 		// unsigned int qIndex = QIndexFromName(jointName);
 
 		// std::cout << "jointName: " << jointName << std::endl;
-		// joint_ name: link1-link2, parentName: link1
 		t_w_nPtr t_w_nptr = new T_W_N();
 		size_t npos = jointName.find("-", 0);
 		if(npos == -1) return std::vector<t_w_nPtr> {};
 
 		const std::string parentName = jointName.substr(npos + 1, jointName.size());
-		// std::cout << "parentName: " << parentName << std::endl;
-
 		t_w_nptr->bodyName = parentName;
 		// Collect AMBF and RBDL Transformation Matrices
 		t_w_nptr->t_w_n_ambf = ambfWrapperPtr_->T_W_N(parentName);
 
 		ForwardDynamics(*rbdlModelPtr_, Q_, QDot_, Tau_, QDDot_);
 
-		// // printf("Joint: %s, rbdlBodyId: %d\n", jointName.c_str(), rbdlBodyId);
+		// printf("Joint: %s, rbdlBodyId: %d\n", jointName.c_str(), rbdlBodyId);
 		t_w_nptr->t_w_n_rbdl.E = CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, rbdlBodyId, true);
 		t_w_nptr->t_w_n_rbdl.r = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, rbdlBodyId, Vector3d(0., 0., 0.), true);
 
@@ -94,14 +91,9 @@ std::vector<t_w_nPtr> RBDLModelFromAutomation::T_W_NfromModels(std::vector<doubl
 	return transformationsFromModels;
 }
 
-
-
 RBDLModelFromAutomation::~RBDLModelFromAutomation() 
 {
-	// CleanUp();
 	if(rbdlModelPtr_ != nullptr) delete rbdlModelPtr_;
-	
 	if(buildRBDLModelPtr_ != nullptr) delete buildRBDLModelPtr_;
-
 	if(ambfWrapperPtr_ != nullptr) ambfWrapperPtr_->~AMBFWrapper();
 }
