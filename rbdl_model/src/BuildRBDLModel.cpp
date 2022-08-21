@@ -1,7 +1,6 @@
 #include "rbdl_model/BuildRBDLModel.h"
 #include "rbdl_model/GraphEdge.h"
 
-
 BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file) 
 {
   parseAdf_ = new ParseADF(actuator_config_file);
@@ -11,7 +10,6 @@ BuildRBDLModel::BuildRBDLModel(std::string actuator_config_file)
   paths_ = parseAdf_->Paths();
   this->BuildModel();
 }
-
 
 const SpatialTransform BuildRBDLModel::T_Parent_ChildST(const Vector3d pp, const Vector3d cp,
   const Vector3d pa, const Vector3d ca, const double offsetQ)
@@ -72,8 +70,8 @@ bool BuildRBDLModel::BuildModel()
 		SpatialTransform parent_childST;
 		Vector3d p_parent_child_world;
 
-		if(jointName.compare("pitchendlink-maininsertionlink") == 0)
-			std::cout << "jointName\n";
+		// if(jointName.compare("pitchendlink-maininsertionlink") == 0)
+		// 	std::cout << "jointName\n";
 		Joint joint;
 		// parent is world
 		if(parentBodyId == 0)
@@ -115,14 +113,14 @@ bool BuildRBDLModel::BuildModel()
 		// Joint Axis to be got from ration matrix
 		unsigned int childBodyId = rbdlModelPtr_->AddBody(parentBodyId, Xtrans(p_parent_child_world), 
 		joint, childBody, jointName);
-		printf("Added jointName: %s, parentBodyId: %d, childBodyId: %d\n", jointName.c_str(), parentBodyId, childBodyId);
-		std::cout << "p_parent_child_world" << std::endl << p_parent_child_world << std::endl;
-		std::cout << "world_child" << std::endl << world_child << std::endl;
+		// printf("Added jointName: %s, parentBodyId: %d, childBodyId: %d\n", jointName.c_str(), parentBodyId, childBodyId);
+		// std::cout << "p_parent_child_world" << std::endl << p_parent_child_world << std::endl;
+		// std::cout << "world_child" << std::endl << world_child << std::endl;
 		
 		world_parent = world_child;
 		parentBodyId = childBodyId;
 
-		std::cout << "---------------------\n";
+		// std::cout << "---------------------\n";
   }
 
   return true;

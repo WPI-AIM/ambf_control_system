@@ -1,4 +1,4 @@
-#include "rbdl_model_tests/ECM.h"
+#include "rbdl_model_tests/ECMCL.h"
 
 
 #include <stdio.h>
@@ -118,10 +118,11 @@ void ECM::SetBodyParams()
 
 void ECM::CreateRBDLModel()
 {
-  unsigned int world_baselinkId, baselink_yawlinkId, yawlink_pitchbacklinkId, yawlink_pitchfrontlinkId, 
-	pitchbacklink_pitchbottomlinkId, pitchbacklink_pitchbottomlink_v_Id, pitchbottomlink_pitchendlinkId, pitchendlink_maininsertionlinkId,
-	pitchfrontlink_pitchtoplinkId, pitchfrontlink_pitchbottomlinkId, pitchtoplink_pitchendlinkId,
-	maininsertionlink_toollinkId;
+  unsigned int world_baselinkId, baselink_yawlinkId, 
+	yawlink_pitchbacklinkId, pitchbacklink_pitchbottomlinkId, pitchbottomlink_pitchendlinkId, 
+	yawlink_pitchfrontlinkId, pitchfrontlink_pitchtoplinkId, pitchfrontlink_pitchbottomlinkId,
+	pitchtoplink_pitchendlinkId, 
+	pitchendlink_maininsertionlinkId,	maininsertionlink_toollinkId;
 
   const double ROOT_baselinkOffsetQ                  = 0.0;
   const double baselink_yawlinkOffsetQ               = -3.1414;
@@ -142,6 +143,7 @@ void ECM::CreateRBDLModel()
 	Vector3d baselink_yawlinkPP 							= { 00.0000, 00.0000, 00.0000 };
 	Vector3d baselink_yawlinkCP 							= { 00.0001, 00.0000, 00.5369 };
 
+	//-----------------------------------------------------//
 	Vector3d yawlink_pitchbacklinkPA 					= { 1.0,     0.0,    0.0 };
 	Vector3d yawlink_pitchbacklinkCA 					= { 0.0,     0.0,    1.0 };
 	Vector3d yawlink_pitchbacklinkPP 					= { 0.0, -0.0098, 0.1624 };
@@ -156,7 +158,27 @@ void ECM::CreateRBDLModel()
 	Vector3d pitchbottomlink_pitchendlinkCA 	= {    0.0,     0.0,     1.0 };
 	Vector3d pitchbottomlink_pitchendlinkPP 	= { 0.3401, -0.0001, -0.0005 };
 	Vector3d pitchbottomlink_pitchendlinkCP 	= {    0.0,     0.0,  0.0001 };
-	
+	//-----------------------------------------------------//
+	Vector3d yawlink_pitchfrontlinkPA 					= { 1.0,     0.0,    0.0 };
+	Vector3d yawlink_pitchfrontlinkCA 					= { 0.0,     0.0,    1.0 };
+	Vector3d yawlink_pitchfrontlinkPP 					= { 0.0, 		 0.0,  0.199 };
+	Vector3d yawlink_pitchfrontlinkCP 					= { 0.0,     0.0,    0.0 };
+
+	Vector3d pitchfrontlink_pitchbottomlinkPA 	= { 	 	1.0,     0.0,     0.0 };
+	Vector3d pitchfrontlink_pitchbottomlinkCA 	= { 		0.0,     0.0,     1.0 };
+	Vector3d pitchfrontlink_pitchbottomlinkPP 	= { -0.1031, -0.2868,  	  0.0 };
+	Vector3d pitchfrontlink_pitchbottomlinkCP 	= { -0.0001, -0.0001, -0.0005 };
+
+	Vector3d pitchfrontlink_pitchtoplinkPA 	= { 	 	0.0,     0.0,     1.0 };
+	Vector3d pitchfrontlink_pitchtoplinkCA 	= { 		0.0,     0.0,     1.0 };
+	Vector3d pitchfrontlink_pitchtoplinkPP 	= { -0.1084, -0.3242,  	  0.0 };
+	Vector3d pitchfrontlink_pitchtoplinkCP 	= { -0.0000, -0.0000, -0.0006 };
+
+	Vector3d pitchtoplink_pitchendlinkPA 	= {     0.0,     0.0,     1.0 };
+	Vector3d pitchtoplink_pitchendlinkCA 	= {     0.0,     0.0,     1.0 };
+	Vector3d pitchtoplink_pitchendlinkPP 	= {  0.3404, -0.0002, -0.0006 };
+	Vector3d pitchtoplink_pitchendlinkCP 	= { -0.0051, -0.0376,  0.0001 };
+	//-----------------------------------------------------//
 	Vector3d pitchendlink_maininsertionlinkPA = {     0.0,     1.0,    0.0 };
 	Vector3d pitchendlink_maininsertionlinkCA = {     1.0,     0.0,    0.0 };
 	Vector3d pitchendlink_maininsertionlinkPP = {  0.1031, -0.0961, 0.0001 };
@@ -192,6 +214,18 @@ void ECM::CreateRBDLModel()
 
 	pitchendlink_maininsertionlinkPA.normalize();
 	pitchendlink_maininsertionlinkCA.normalize();
+
+	yawlink_pitchfrontlinkPA.normalize();
+	yawlink_pitchfrontlinkCA.normalize();
+
+	pitchfrontlink_pitchbottomlinkPA.normalize();
+	pitchfrontlink_pitchbottomlinkCA.normalize();
+
+	pitchfrontlink_pitchtoplinkPA.normalize();
+	pitchfrontlink_pitchtoplinkCA.normalize();
+
+	pitchtoplink_pitchendlinkPA.normalize();
+	pitchtoplink_pitchendlinkCA.normalize();
 	//1--------------------------------------------------------------------//
 	Matrix3d baselink_yawlinkRot = 
 	Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(baselink_yawlinkPA, baselink_yawlinkCA));
@@ -238,6 +272,46 @@ void ECM::CreateRBDLModel()
 		pitchbottomlink_pitchendlinkPP - 
 		(pitchbottomlink_pitchendlinkRot.transpose() * pitchbottomlink_pitchendlinkCP);
 	//--------------------------------------------------------------------//
+	Matrix3d yawlink_pitchfrontlinkRot = 
+	Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(yawlink_pitchfrontlinkPA, yawlink_pitchfrontlinkCA));
+	Eigen::Affine3d yawlink_pitchfrontlinkRotOffset(
+		Eigen::AngleAxisd(yawlink_pitchfrontlinkOffsetQ, -Vector3d::UnitZ()));
+	
+	SpatialTransform yawlink_pitchfrontlinkST;
+	yawlink_pitchfrontlinkST.E = yawlink_pitchfrontlinkRot.transpose() * yawlink_pitchfrontlinkRotOffset.rotation();
+	yawlink_pitchfrontlinkST.r = 
+		yawlink_pitchfrontlinkPP - (yawlink_pitchfrontlinkRot.transpose() * yawlink_pitchfrontlinkCP);
+	//1--------------------------------------------------------------------//
+	Matrix3d pitchfrontlink_pitchbottomlinkRot = 
+	Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(pitchfrontlink_pitchbottomlinkPA, pitchfrontlink_pitchbottomlinkCA));
+	Eigen::Affine3d pitchfrontlink_pitchbottomlinkRotOffset(
+		Eigen::AngleAxisd(pitchfrontlink_pitchbottomlinkOffsetQ, -Vector3d::UnitZ()));
+	
+	SpatialTransform pitchfrontlink_pitchbottomlinkST;
+	pitchfrontlink_pitchbottomlinkST.E = pitchfrontlink_pitchbottomlinkRot.transpose() * pitchfrontlink_pitchbottomlinkRotOffset.rotation();
+	pitchfrontlink_pitchbottomlinkST.r = 
+		pitchfrontlink_pitchbottomlinkPP - (pitchfrontlink_pitchbottomlinkRot.transpose() * pitchfrontlink_pitchbottomlinkCP);
+	//1--------------------------------------------------------------------//
+	Matrix3d pitchfrontlink_pitchtoplinkRot = 
+	Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(pitchfrontlink_pitchtoplinkPA, pitchfrontlink_pitchtoplinkCA));
+	Eigen::Affine3d pitchfrontlink_pitchtoplinkRotOffset(
+		Eigen::AngleAxisd(pitchfrontlink_pitchtoplinkOffsetQ, -Vector3d::UnitZ()));
+	
+	SpatialTransform pitchfrontlink_pitchtoplinkST;
+	pitchfrontlink_pitchtoplinkST.E = pitchfrontlink_pitchtoplinkRot.transpose() * pitchfrontlink_pitchtoplinkRotOffset.rotation();
+	pitchfrontlink_pitchtoplinkST.r = 
+		pitchfrontlink_pitchtoplinkPP - (pitchfrontlink_pitchtoplinkRot.transpose() * pitchfrontlink_pitchtoplinkCP);
+	//1--------------------------------------------------------------------//
+	Matrix3d pitchtoplink_pitchendlinkRot = 
+	Eigen::Matrix3d(Eigen::Quaterniond::FromTwoVectors(pitchtoplink_pitchendlinkPA, pitchtoplink_pitchendlinkCA));
+	Eigen::Affine3d pitchtoplink_pitchendlinkRotOffset(
+		Eigen::AngleAxisd(pitchtoplink_pitchendlinkOffsetQ, -Vector3d::UnitZ()));
+	
+	SpatialTransform pitchtoplink_pitchendlinkST;
+	pitchtoplink_pitchendlinkST.E = pitchtoplink_pitchendlinkRot.transpose() * pitchtoplink_pitchendlinkRotOffset.rotation();
+	pitchtoplink_pitchendlinkST.r = 
+		pitchtoplink_pitchendlinkPP - (pitchtoplink_pitchendlinkRot.transpose() * pitchtoplink_pitchendlinkCP);
+	//1--------------------------------------------------------------------//
 		Matrix3d pitchendlink_maininsertionlinkRot = 
 	Eigen::Matrix3d(
 		Eigen::Quaterniond::FromTwoVectors(pitchendlink_maininsertionlinkPA, pitchendlink_maininsertionlinkCA));
@@ -288,6 +362,12 @@ void ECM::CreateRBDLModel()
 	world_pitchbacklinkST = world_yawlinkST * yawlink_pitchbacklinkST;
 	world_pitchbottomlinkST = world_pitchbacklinkST * pitchbacklink_pitchbottomlinkST;
 	world_pitchendlinkST = world_pitchbottomlinkST * pitchbottomlink_pitchendlinkST;
+
+	world_pitchfrontlinkST = world_yawlinkST * yawlink_pitchfrontlinkST;
+	world_pitchbottomlink2ST = world_pitchfrontlinkST * pitchfrontlink_pitchbottomlinkST;
+	world_pitchtoplinkST = world_pitchfrontlinkST * pitchfrontlink_pitchtoplinkST;
+	world_pitchendlinkST = world_pitchtoplinkST * pitchtoplink_pitchendlinkST;
+
 	world_maininsertionlinkST = world_pitchendlinkST * pitchendlink_maininsertionlinkST;
 	world_toollinkST = world_maininsertionlinkST * maininsertionlink_toollinkST;
 
@@ -299,10 +379,24 @@ void ECM::CreateRBDLModel()
 	// std::cout << "world_maininsertionlinkST" << std::endl << world_maininsertionlinkST << std::endl;
 	// std::cout << "world_toollinkST" 				 << std::endl << world_toollinkST 				 << std::endl;
 	//1--------------------------------------------------------------------//
-	Vector3d p_baselink_yawlink_world 						  = world_baselinkST.E 				  * baselink_yawlinkST.r;
-	Vector3d p_yawlink_pitchbacklink_world 				  = world_yawlinkST.E 				  * yawlink_pitchbacklinkST.r;
-	Vector3d p_pitchbacklink_pitchbottomlink_world  = world_pitchbacklinkST.E 	  * pitchbacklink_pitchbottomlinkST.r;
-	Vector3d p_pitchbottomlink_pitchendlink_world   = world_pitchbottomlinkST.E   * pitchbottomlink_pitchendlinkST.r;
+	Vector3d p_baselink_yawlink_world 
+		= world_baselinkST.E * baselink_yawlinkST.r;
+	Vector3d p_yawlink_pitchbacklink_world 	
+		= world_yawlinkST.E * yawlink_pitchbacklinkST.r;
+	Vector3d p_pitchbacklink_pitchbottomlink_world  
+		= world_pitchbacklinkST.E * pitchbacklink_pitchbottomlinkST.r;
+	Vector3d p_pitchbottomlink_pitchendlink_world 
+		= world_pitchbottomlinkST.E * pitchbottomlink_pitchendlinkST.r;
+
+	Vector3d p_yawlink_pitchfrontlink_world 
+		= world_yawlinkST.E * yawlink_pitchfrontlinkST.r;
+	Vector3d p_pitchfrontlink_pitchbottomlink_world 
+		= world_pitchfrontlinkST.E * pitchfrontlink_pitchbottomlinkST.r;
+	Vector3d p_pitchfrontlink_pitchtoplink_world 
+		= world_pitchfrontlinkST.E * pitchfrontlink_pitchtoplinkST.r;
+	Vector3d p_pitchtoplink_pitchendlink_world 
+		= world_pitchtoplinkST.E * pitchtoplink_pitchendlinkST.r;
+
 	Vector3d p_pitchendlink_maininsertionlink_world = world_pitchendlinkST.E 		  * pitchendlink_maininsertionlinkST.r;
 	Vector3d p_maininsertionlink_toollink_world     = world_maininsertionlinkST.E * maininsertionlink_toollinkST.r;
 	//1--------------------------------------------------------------------//
@@ -320,14 +414,31 @@ void ECM::CreateRBDLModel()
 		AddBody(baselink_yawlinkId, Xtrans(p_yawlink_pitchbacklink_world), 
 		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbacklinkBody_, "yawlink-pitchbacklink");
 
-	pitchbacklink_pitchbottomlink_v_Id = rbdlModelPtr_->
+	pitchbacklink_pitchbottomlinkId = rbdlModelPtr_->
 		AddBody(yawlink_pitchbacklinkId, Xtrans(p_pitchbacklink_pitchbottomlink_world), 
 		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbottomlinkBody_, "pitchbacklink-pitchbottomlink");
 
 	pitchbottomlink_pitchendlinkId = rbdlModelPtr_->
-		AddBody(pitchbacklink_pitchbottomlink_v_Id, Xtrans(p_pitchbottomlink_pitchendlink_world), 
+		AddBody(pitchbacklink_pitchbottomlinkId, Xtrans(p_pitchbottomlink_pitchendlink_world), 
 		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchendlinkBody_, "pitchbottomlink-pitchendlink");
 	
+	yawlink_pitchfrontlinkId = rbdlModelPtr_->
+		AddBody(baselink_yawlinkId, Xtrans(p_yawlink_pitchfrontlink_world), 
+		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchfrontlinkBody_, "yawlink-pitchfrontlink");
+
+	pitchfrontlink_pitchbottomlinkId = rbdlModelPtr_->
+		AddBody(yawlink_pitchfrontlinkId, Xtrans(p_pitchfrontlink_pitchbottomlink_world), 
+		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), virtualBody_, "pitchfrontlink-pitchbottomlink");
+
+	pitchfrontlink_pitchtoplinkId = rbdlModelPtr_->
+		AddBody(yawlink_pitchfrontlinkId, Xtrans(p_pitchfrontlink_pitchtoplink_world), 
+		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchtoplinkBody_, 
+		"pitchfrontlink-pitchtoplink");
+
+	pitchtoplink_pitchendlinkId = rbdlModelPtr_->
+		AddBody(pitchfrontlink_pitchtoplinkId, Xtrans(p_pitchtoplink_pitchendlink_world), 
+		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), virtualBody_, "pitchtoplink-pitchendlink");
+
 	pitchendlink_maininsertionlinkId = rbdlModelPtr_->
 		AddBody(pitchbottomlink_pitchendlinkId, Xtrans(p_pitchendlink_maininsertionlink_world), 
 		Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody_, "pitchendlink-maininsertionlink");
@@ -335,7 +446,7 @@ void ECM::CreateRBDLModel()
 	maininsertionlink_toollinkId = rbdlModelPtr_->
 		AddBody(pitchendlink_maininsertionlinkId, Xtrans(p_maininsertionlink_toollink_world), 
 		Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody_, "maininsertionlink-toollink");
-	//--------------------------------------------------------------------//
+	// --------------------------------------------------------------------//
 	// unsigned int userDefinedId = 7;
 	// cs_.AddLoopConstraint(yawlink_pitchfrontlinkId, pitchbacklink_pitchbottomlink_v_Id, X_p_, X_s_, 
 	// 	SpatialVector(0, 0, 0, 1, 0, 0), bgStab_, 0.1, "LoopXY_Rz", userDefinedId);
@@ -429,7 +540,9 @@ bool ECM::ExecutePoseInAMBF()
 	std::cout << "Q_" << std::endl << Q_ << std::endl;
 
 	std::vector<std::string> controllableJoints = baselinkHandler_->get_joint_names();
-  for(int i = 0; i < 10; i++)
+  std::vector<float> ambfJointAngles;
+
+	for(int i = 0; i < 10; i++)
   {
 		for(std::string jointName : controllableJoints)
 		{
@@ -439,10 +552,44 @@ bool ECM::ExecutePoseInAMBF()
 			baselinkHandler_->
 				set_joint_pos<std::string>(jointName, Q_(qIndex));
 		}
+		// baselinkHandler_->set_joint_pos<std::string>("baselink-yawlink", 0.0f);
+		// baselinkHandler_->set_joint_pos<std::string>("yawlink-pitchbacklink", 1.0562572479248047f);
+		// baselinkHandler_->set_joint_pos<std::string>("pitchendlink-maininsertionlink", 0.0f);
+		// baselinkHandler_->set_joint_pos<std::string>("maininsertionlink-toollink", 0.0f);
+
     usleep(sleepTime);
-	
+		ambfJointAngles = baselinkHandler_->get_all_joint_pos();
     RegisterRigidBodysPose();
   }
+
+	for(int i = 0; i < controllableJoints.size(); i++)
+	{
+		std::string jointName = controllableJoints.at(i);
+		float ambfJointAngle = ambfJointAngles.at(i);
+		printf("jointName: %s, ambfJointAngle: %f\n", jointName.c_str(), ambfJointAngle);
+
+		int qIndex = QIndexFromJointName(jointName);
+		if (qIndex != -1)
+		{
+			Q_(qIndex) = ambfJointAngle;
+		} 
+	}
+
+	std::cout << "Q_\n" << Q_ << std::endl; 
+
+	for(int i = 0; i < controllableJoints.size(); i++)
+	{
+		std::string jointName = controllableJoints.at(i);
+		float ambfJointAngle = ambfJointAngles.at(i);
+		int qIndex = QIndexFromJointName(jointName);
+		float rbdlJointAngle = Q_(qIndex);
+
+		assert(ambfJointAngle == rbdlJointAngle);
+	}
+	// std::cout << "ambfJointAngles\n";
+	// for(float jointangle : ambfJointAngles)
+  //   std::cout << jointangle << ", ";
+  // std::cout << std::endl;
 
 	// To be deleted
 	// std::cout << "iterating ambfParamMap_\n";
@@ -459,7 +606,6 @@ bool ECM::ExecutePoseInAMBF()
 	// 	std::cout << "p_w_n_ambf: " << std::endl << p_w_n_ambf << std::endl << std::endl;
   // }
   // std::cout << std::endl << "------------------" << std::endl;
-
 
 	return true;
 }
@@ -531,58 +677,6 @@ std::vector<t_w_nPtr> ECM::HomePoseTransformation()
     std::string jointName = rbdlModelPtr_->GetBodyName(bodyId);
 		transformations.emplace_back(twnFromModels(jointName));
   }
-
-	// This can be written over a loop if needed. Update RBDL home pose roation to be
-	// the values calcuated.
-	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
-		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "baselink";});
-	if ( transformationsItr != transformations.end() )
-	{
-		(*transformationsItr)->r_w_n_rbdl = world_baselinkST.E;
-	}
-
-	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
-		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "yawlink";});
-	if ( transformationsItr != transformations.end() )
-	{
-		(*transformationsItr)->r_w_n_rbdl = world_yawlinkST.E;
-	}
-
-	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
-		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "pitchbacklink";});
-	if ( transformationsItr != transformations.end() )
-	{
-		(*transformationsItr)->r_w_n_rbdl = world_pitchbacklinkST.E;
-	}
-
-	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
-		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "pitchbottomlink";});
-	if ( transformationsItr != transformations.end() )
-	{
-		(*transformationsItr)->r_w_n_rbdl = world_pitchbottomlinkST.E;
-	}
-
-	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
-		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "pitchendlink";});
-	if ( transformationsItr != transformations.end() )
-	{
-		(*transformationsItr)->r_w_n_rbdl = world_pitchendlinkST.E;
-	}
-
-	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
-		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "maininsertionlink";});
-	if ( transformationsItr != transformations.end() )
-	{
-		(*transformationsItr)->r_w_n_rbdl = world_maininsertionlinkST.E;
-	}
-
-	transformationsItr = std::find_if(transformations.begin(), transformations.end(),
-		[&](t_w_nPtr const & t_w_nptr) {return t_w_nptr->bodyName == "toollink";});
-	if ( transformationsItr != transformations.end() )
-	{
-		(*transformationsItr)->r_w_n_rbdl = world_toollinkST.E;
-	}
-
 	return transformations;
 }
 void ECM::CleanUp()

@@ -33,11 +33,11 @@ struct T_W_N
 };
 typedef T_W_N* t_w_nPtr;
 
-class ECM 
+class PS 
 {
 public:
-  ECM();
-  ~ECM();
+  PS();
+  ~PS();
 
   // To be deleted. Not to expose the model.
   // inline RBDLModelPtr RbdlModel() { return rbdlModelPtr_; }
@@ -63,17 +63,13 @@ private:
   void RegisterRigidBodysPose();
 
   void SetBodyParams();
-  // void CreateRBDLJoint(RBDLModelPtr rbdlModelPtr_, Vector3d& PA, Vector3d& CA, Vector3d& PP, Vector3d& CP, 
-  // const double offsetQ, Vector3d axis, unsigned int parentId, Vector3d& p_world_startingbody, Joint joint, 
-  // SpatialTransform	world_parentST, Body &body, std::string bodyName, Vector3d& p_world_endingbody, 
-  // unsigned int& newBodyId, SpatialTransform&	world_bodyST);
   
   void CreateRBDLModel();
   int QIndexFromJointName(const std::string jointName);
   bool ExecutePoseInAMBF();
 private:
   AMBFClientPtr ambfClientPtr_{nullptr};
-  std::string baselinkName_{"baselink"};
+  std::string baselinkName_{"world"};
   rigidBodyPtr baselinkHandler_{nullptr};
   std::vector<std::string> controlableJoints_;
   std::vector<std::string> baselinkChildren_;
@@ -83,16 +79,12 @@ private:
   // Format of the map yet to be decided
   AMBFParamMap ambfParamMap_;
   AMBFParamMap::iterator ambfParamMapItr_;
-  const double world_base_roll_{0.0};  // X
-  const double world_base_pitch_{0.0}; // Y
-  const double world_base_yaw_{0.0};   // Z
   RBDLModelPtr rbdlModelPtr_{nullptr};
   ConstraintSet cs_;
   bool bgStab_{true};
   SpatialTransform X_p_;
   SpatialTransform X_s_;
-  Body baselinkBody_, pitchendlinkBody_, maininsertionlinkBody_, toollinkBody_, yawlinkBody_, 
-    pitchbacklinkBody_, pitchbottomlinkBody_, pitchfrontlinkBody_, pitchtoplinkBody_, virtualBody_;
+  Body worldBody_, tangibleBody_, virtualBody_;
 
   VectorNd Q_;
   VectorNd QDot_;
@@ -101,8 +93,6 @@ private:
   std::map< std::string, unsigned int > rbdlmBodyMap_;
   std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr_;
 
-  SpatialTransform world_baselinkST, world_yawlinkST, world_pitchfrontlinkST, world_pitchbacklinkST, 
-	world_pitchbottomlinkST, world_pitchendlinkST, world_maininsertionlinkST, world_pitchtoplinkST,
-	world_toollinkST, world_eeST;
+  SpatialTransform world_l1ST, world_l2ST, world_l3ST, world_l4ST, world_l4ST_;
   VectorNd err = VectorNd::Zero(cs_.size());
 };

@@ -5,24 +5,7 @@ RBDLModelFromAutomation::RBDLModelFromAutomation()
 {
 
 	buildRBDLModelPtr_ = new BuildRBDLModel(AMBFTestPrep::ADFPath().c_str());
-	rbdlModelPtr_ = buildRBDLModelPtr_->RBDLModel();
 
-	Q_     = VectorNd::Constant ((size_t) rbdlModelPtr_->dof_count, 0.);
-	QDot_  = VectorNd::Constant ((size_t) rbdlModelPtr_->dof_count, 0.);
-	QDDot_ = VectorNd::Constant ((size_t) rbdlModelPtr_->dof_count, 0.);
-	Tau_   = VectorNd::Constant ((size_t) rbdlModelPtr_->dof_count, 0.);
-	rbdlmBodyMap_ = rbdlModelPtr_->mBodyNameMap;
-
-	// std::cout << "PrintAMBFfParamMap() from RBDLModelFromAutomation\n";
-	// ambfWrapperPtr_->PrintAMBFfParamMap();
-
-	const std::string modelName = buildRBDLModelPtr_->ModelName();
-	baseRigidBodyName_ = buildRBDLModelPtr_->BaseRigidBodyName();
-	
-	ambfWrapperPtr_ = AMBFTestPrep::getInstance()->getAMBFWrapperInstance();
-	ambfWrapperPtr_->ActivateAMBFHandlers(modelName.c_str(), baseRigidBodyName_.c_str());
-	ambfWrapperPtr_->RegisterHomePoseTransformation();
-	controlableJoints_ = ambfWrapperPtr_->ControlableJoints();
 }
 
 void RBDLModelFromAutomation::PrintModelHierarchy()

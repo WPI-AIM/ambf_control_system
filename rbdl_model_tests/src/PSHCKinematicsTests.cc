@@ -1,108 +1,91 @@
-#include "rbdl_model_tests/ParallelStructure.h"
+#include "rbdl_model_tests/PS.h"
+#include "rbdl_model_tests/rbdl_tests.h"
+PS* ps = nullptr;
 
-TEST_CASE_METHOD(ParallelStructure, __FILE__"_TestPSForwardKinematics", "") 
+TEST_CASE(__FILE__"_Initilize", "") 
 {
-  const std::string activationJointName = "l3-l4";
-  const float activationJointQdesired = M_PI_4;
+  ps = new PS();
+}
 
-  const int activationJointID = baseHandler->get_joint_idx_from_name(activationJointName.c_str());
+// TEST_CASE_METHOD(ps, __FILE__"_TestpsBodyHierarchy", "") 
+// {
+//   if(ps == nullptr) return;
+// }
 
-  ForwardDynamics(*rbdlModel, Q, QDot, Tau, QDDot);
-  Q.setZero();
+TEST_CASE(__FILE__"_TestHomePose", "") 
+{
+  if(ps == nullptr) return;
+  std::vector<t_w_nPtr> transformations = ps->HomePoseTransformation();
+  // for(t_w_nPtr t_w_nptr : transformations)
+  // {
+  //   std::cout << "body Name: " << t_w_nptr->bodyName << std::endl;
+    // std::cout << "t_w_nptr->r_w_n_ambf" << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
+    // std::cout << "t_w_nptr->r_w_n_rbdl" << std::endl << t_w_nptr->r_w_n_rbdl << std::endl;
+
+    // std::cout << "t_w_nptr->p_w_n_ambf" << std::endl << t_w_nptr->p_w_n_ambf << std::endl;
+    // std::cout << "t_w_nptr->p_w_n_rbdl" << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
+
+    // // CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));
+    // CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
+    // std::cout << "\n------------------------\n";
+  // }
+}
+
+TEST_CASE(__FILE__"_RandomPose", "") 
+{
+  if(ps == nullptr) return;
+  // std::vector<std::string> jointNames = ps->ControllableJointNames();
   
-  for(RBDL_AMBF_JOINT_MAP_itr = RBDL_AMBF_JOINT_MAP.begin();
-      RBDL_AMBF_JOINT_MAP_itr != RBDL_AMBF_JOINT_MAP.end();
-      RBDL_AMBF_JOINT_MAP_itr++)
-    {
-      std::string jointNameRBDL = RBDL_AMBF_JOINT_MAP_itr->first;
-      ActivationJoints bodyAMBF = RBDL_AMBF_JOINT_MAP_itr->second;
-      bodyAMBF.rigidBodyHandler = 
-        clientPtr->getRigidBody(bodyAMBF.bodyNameAMBF, true); 
-      RBDL_AMBF_JOINT_MAP[jointNameRBDL] = bodyAMBF;
-    }
 
-  usleep(1000000);
+  // ps->JointAngleWithName(jointNames.at(0), M_PI_4);
+  // ps->JointAngleWithName("world-l1", 0.0f);
+  float qDesired = 0.1f;
+  ps->JointAngleWithName("l1-l2", qDesired);
+  ps->JointAngleWithName("l2-l3", -qDesired);
+  ps->JointAngleWithName("l3-l4", qDesired);
+  ps->JointAngleWithName("l1-l4", qDesired);
+  // ps->JointAngleWithName("l1-l2", 0.3036194145679474);
+  // ps->JointAngleWithName("l2-l3", -0.33735570311546326);
+  // ps->JointAngleWithName("l3-l4", 0.37723666429519653);
+  // ps->JointAngleWithName("l1-l4", 0.3036194145679474);
 
-  std::map< std::string, unsigned int > mBodyNameMap = rbdlModel->mBodyNameMap;
-  std::map<std::string, unsigned int>::iterator mBodyNameMapItr;
+  // ps->JointAngleWithName("l1-l2", 0.3);
+  // ps->JointAngleWithName("l2-l3", -0.33735570311546326);
+  // ps->JointAngleWithName("l3-l4", 0.37723666429519653);
+  // ps->JointAngleWithName("l1-l4", 0.3036194145679474);
 
-  // Check to be a valid joint
-  if(baseHandler->is_joint_idx_valid(activationJointID))
+  // VectorNd QTarget = ps->TargetJointAngles();
+  // std::cout << "QTarget" << std::endl << QTarget << std::endl;
+
+  ps->ExecutePose();
+  // const std::string jointName = ;
+  // t_w_nPtr t_w_nptr = ps->twnFromModels<std::string>("world-baselink");
+  // CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
+
+
+  unsigned int qSize = ps->RBDLModelJointSize();
+  
+  for(unsigned int qId = 1; qId <= qSize; qId++)
   {
-    for(int i = 0; i < 5; i++)
-    {
-      baseHandler->set_joint_pos<std::string>(activationJointName, activationJointQdesired);
-      usleep(250000);
+    // const std::string jointName = "baselink-yawlink";
+    // int qId = 6;
+    t_w_nPtr t_w_nptr = ps->twnFromModels<unsigned int>(qId);
 
-      for(mBodyNameMapItr = mBodyNameMap.begin(); 
-          mBodyNameMapItr != mBodyNameMap.end(); 
-          mBodyNameMapItr++)
-      {
-        std::string jointNameRBDL = mBodyNameMapItr->first;
-        unsigned int jointIDRBDL = mBodyNameMapItr->second;
+    std::cout << "jointId: " << qId << ", bodyName: " << t_w_nptr->bodyName << std::endl;
+    // std::cout << "t_w_nptr->r_w_n_ambf: " << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
+    // std::cout << "t_w_nptr->r_w_n_rbdl: " << std::endl << t_w_nptr->r_w_n_rbdl << std::endl;
 
-        // printf("jointNameRBDL: %s, jointIDRBDL: %d\n", jointNameRBDL.c_str(), jointIDRBDL);
-        // Skip ROOT body and fixed joints
-        if(jointNameRBDL == "ROOT" || jointIDRBDL > Q.size()) continue;
-
-        RBDL_AMBF_JOINT_MAP_itr = RBDL_AMBF_JOINT_MAP.find(jointNameRBDL);
-        // Not a vaild AMBF joint
-        if(RBDL_AMBF_JOINT_MAP_itr == RBDL_AMBF_JOINT_MAP.end() && 
-        baseHandler->get_joint_idx_from_name(jointNameRBDL) == -1) continue;
-
-        float jointQdesired = baseHandler->get_joint_pos<std::string>(jointNameRBDL);        
-        int jointIndexRBDL = jointIDRBDL - 1;
-        Q[jointIndexRBDL] = jointQdesired;
-      }
-    }
+    std::cout << "t_w_nptr->p_w_n_ambf: " << std::endl << t_w_nptr->p_w_n_ambf << std::endl;
+    std::cout << "t_w_nptr->p_w_n_rbdl: " << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
+    
+    // CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));
+    CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
+    std::cout << "--------------------------\n";
   }
+}
 
-  for(mBodyNameMapItr = mBodyNameMap.begin(); 
-      mBodyNameMapItr != mBodyNameMap.end(); 
-      mBodyNameMapItr++)
-  {
-    std::string jointNameRBDL = mBodyNameMapItr->first;
-    unsigned int jointIDRBDL  = mBodyNameMapItr->second;
-    
-    // Skip ROOT body and fixed joints
-    if(jointNameRBDL == "ROOT" || jointIDRBDL > Q.size()) continue;
-
-    // Not a vaild AMBF joint
-    RBDL_AMBF_JOINT_MAP_itr = RBDL_AMBF_JOINT_MAP.find(jointNameRBDL);
-    if(RBDL_AMBF_JOINT_MAP_itr == RBDL_AMBF_JOINT_MAP.end() && 
-    baseHandler->get_joint_idx_from_name(jointNameRBDL) == -1) continue;
-
-    ActivationJoints bodyAMBF = RBDL_AMBF_JOINT_MAP.at(jointNameRBDL);
-    rigidBodyPtr rigidbodyAMBF = bodyAMBF.rigidBodyHandler;
-
-    const tf::Quaternion quat_w_n_tf_ambf = rigidbodyAMBF->get_rot();
-    const tf::Vector3 P_w_n_tf_ambf = rigidbodyAMBF->get_pos();
-    
-    const Quaternion quat_w_n_ambf = 
-      EigenUtilities::TFtoEigenQuaternion(quat_w_n_tf_ambf);
-      
-    const Matrix3d R_w_n_ambf = quat_w_n_ambf.toMatrix();
-    Eigen::VectorXd P_w_n_ambf = EigenUtilities::TFtoEigenVector(P_w_n_tf_ambf);
-
-    const Eigen::Matrix4d T_w_n_ambf = 
-      EigenUtilities::get_frame<Eigen::Matrix3d, 
-      Eigen::Vector3d, Eigen::Matrix4d>(R_w_n_ambf, P_w_n_ambf);
-    
-    const RigidBodyDynamics::Math::Vector3d P_0_n_rbdl = 
-      CalcBodyToBaseCoordinates(*rbdlModel, Q, jointIDRBDL, 
-        RigidBodyDynamics::Math::Vector3d(0., 0., 0.),true);
-
-    RigidBodyDynamics::Math::Vector4d P_w_n_rbdl_4d;
-    P_w_n_rbdl_4d.setOnes();
-    P_w_n_rbdl_4d(0) = P_0_n_rbdl(0);
-    P_w_n_rbdl_4d(1) = P_0_n_rbdl(1);
-    P_w_n_rbdl_4d(2) = P_0_n_rbdl(2);
-
-    P_w_n_rbdl_4d = T_0_w * (P_w_n_rbdl_4d);
-    RigidBodyDynamics::Math::Vector3d P_w_n_rbdl;
-    P_w_n_rbdl = P_w_n_rbdl_4d.block<3,1>(0,0);
-
-    CHECK_THAT(P_w_n_rbdl, AllCloseMatrix(P_w_n_ambf, TEST_PREC, TEST_PREC));
-  }  
-  
+TEST_CASE(__FILE__"_Cleanup", "") 
+{ 
+  if(ps == nullptr) return;
+  ps->CleanUp();
 }

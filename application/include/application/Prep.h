@@ -30,9 +30,9 @@ class ADF {
 public:      
   inline static const std::string filePath = 
 // "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/KUKA/kuka.yaml";
-// "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/ECM2/blender-ecm.yaml";
+"/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/ECM2/blender-ecm.yaml";
 // "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/PSM/blender-psm.yaml";
-"/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/MTM/blender-mtm.yaml";
+// "/mnt/OneTB/localcodebase/ambf_repos/ambf_models_with_inertia/MTM/blender-mtm.yaml";
 };
 
 class AMBFTestPrep

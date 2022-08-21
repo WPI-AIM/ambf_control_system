@@ -12,7 +12,7 @@ using namespace std;
 using namespace RigidBodyDynamics;
 using namespace RigidBodyDynamics::Math;
 
-const double TEST_PREC = 1.0e-2;
+// const double TEST_PREC = 1.0e-2;
 const double TEST_LAX = 1.0e-7;
 
 struct ECM {

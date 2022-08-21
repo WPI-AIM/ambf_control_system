@@ -102,7 +102,7 @@ private:
   std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr_;
 
   SpatialTransform world_baselinkST, world_yawlinkST, world_pitchfrontlinkST, world_pitchbacklinkST, 
-	world_pitchbottomlinkST, world_pitchendlinkST, world_maininsertionlinkST, world_pitchtoplinkST,
+	world_pitchbottomlinkST, world_pitchbottomlink2ST, world_pitchendlinkST, world_maininsertionlinkST, world_pitchtoplinkST,
 	world_toollinkST, world_eeST;
   VectorNd err = VectorNd::Zero(cs_.size());
 };
