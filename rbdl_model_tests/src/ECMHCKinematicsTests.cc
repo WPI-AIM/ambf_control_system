@@ -18,8 +18,8 @@ TEST_CASE(__FILE__"_TestHomePose", "")
   std::vector<t_w_nPtr> transformations = ecm->HomePoseTransformation();
   for(t_w_nPtr t_w_nptr : transformations)
   {
-    std::cout << "body Name: " << t_w_nptr->bodyName << std::endl;
-    std::cout << "t_w_nptr->r_w_n_ambf" << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
+    // std::cout << "body Name: " << t_w_nptr->bodyName << std::endl;
+    // std::cout << "t_w_nptr->r_w_n_ambf" << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
     // CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));
     CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
   }

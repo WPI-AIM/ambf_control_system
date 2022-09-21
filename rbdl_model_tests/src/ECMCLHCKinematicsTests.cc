@@ -16,17 +16,17 @@ TEST_CASE(__FILE__"_TestHomePose", "")
 {
   if(ecm == nullptr) return;
   std::vector<t_w_nPtr> transformations = ecm->HomePoseTransformation();
-  // for(t_w_nPtr t_w_nptr : transformations)
-  // {
-  //   std::cout << "body Name: " << t_w_nptr->bodyName << std::endl;
-  //   std::cout << "t_w_nptr->p_w_n_ambf" << std::endl << t_w_nptr->p_w_n_ambf << std::endl;
-  //   std::cout << "t_w_nptr->p_w_n_rbdl" << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
+  for(t_w_nPtr t_w_nptr : transformations)
+  {
+    std::cout << "body Name: " << t_w_nptr->bodyName << std::endl;
+    std::cout << "t_w_nptr->p_w_n_ambf" << std::endl << t_w_nptr->p_w_n_ambf << std::endl;
+    std::cout << "t_w_nptr->p_w_n_rbdl" << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
 
-  //   // std::cout << "t_w_nptr->r_w_n_ambf" << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
-  //   // CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));
-  //   CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
-  //   std::cout << "------------------------\n";
-  // }
+    // std::cout << "t_w_nptr->r_w_n_ambf" << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
+    // CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));
+    CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
+    std::cout << "------------------------\n";
+  }
 }
 
 TEST_CASE(__FILE__"_RandomPose", "") 
@@ -86,24 +86,24 @@ TEST_CASE(__FILE__"_RandomPose", "")
   // CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
 
 
-  // unsigned int qSize = ecm->RBDLModelJointSize();
+  unsigned int qSize = ecm->RBDLModelJointSize();
   
   // for(unsigned int qId = 1; qId <= qSize; qId++)
   // {
-  //   // const std::string jointName = "baselink-yawlink";
-  //   // int qId = 6;
-  //   t_w_nPtr t_w_nptr = ecm->twnFromModels<unsigned int>(qId);
+    // const std::string jointName = "baselink-yawlink";
+    // int qId = 6;
+    // t_w_nPtr t_w_nptr = ecm->twnFromModels<unsigned int>(qId);
 
-  //   // std::cout << "jointId: " << qId << ", bodyName: " << t_w_nptr->bodyName << std::endl;
-  //   // std::cout << "t_w_nptr->r_w_n_ambf: " << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
-  //   // std::cout << "t_w_nptr->r_w_n_rbdl: " << std::endl << t_w_nptr->r_w_n_rbdl << std::endl;
+    // std::cout << "jointId: " << qId << ", bodyName: " << t_w_nptr->bodyName << std::endl;
+    // std::cout << "t_w_nptr->r_w_n_ambf: " << std::endl << t_w_nptr->r_w_n_ambf << std::endl;
+    // std::cout << "t_w_nptr->r_w_n_rbdl: " << std::endl << t_w_nptr->r_w_n_rbdl << std::endl;
 
-  //   // std::cout << "t_w_nptr->p_w_n_ambf: " << std::endl << t_w_nptr->p_w_n_ambf << std::endl;
-  //   // std::cout << "t_w_nptr->p_w_n_rbdl: " << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
+    // std::cout << "t_w_nptr->p_w_n_ambf: " << std::endl << t_w_nptr->p_w_n_ambf << std::endl;
+    // std::cout << "t_w_nptr->p_w_n_rbdl: " << std::endl << t_w_nptr->p_w_n_rbdl << std::endl;
     
-  //   // CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));
-  //   CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
-  //   // std::cout << "--------------------------\n";
+    // CHECK_THAT (t_w_nptr->r_w_n_ambf, AllCloseMatrix(t_w_nptr->r_w_n_rbdl, TEST_PREC, TEST_PREC));
+    // CHECK_THAT (t_w_nptr->p_w_n_ambf, AllCloseVector(t_w_nptr->p_w_n_rbdl, TEST_PREC, TEST_PREC));
+    // std::cout << "--------------------------\n";
   // }
 }
 

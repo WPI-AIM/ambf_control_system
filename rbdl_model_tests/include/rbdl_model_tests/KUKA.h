@@ -1,30 +1,25 @@
 #include <unordered_map>
 #include <thread>
 
-#include "application/Utilities.h"
-#include "application/Prep.h"
-// #include "rbdl_model_tests/RBDLTestPrep.h"
 #include "rbdl_model_tests/AMBFParams.h"
+#include "ambf_client/ambf_client.h"
+#include <rbdl/rbdl.h>
+#include <rbdl/rbdl_math.h>
 
 using namespace RigidBodyDynamics;
 using namespace RigidBodyDynamics::Math;
+
+typedef Model* RBDLModelPtr;
 typedef AMBFParams* AMBFParamsPtr;
+typedef Client* AMBFClientPtr;
 typedef std::unordered_map<std::string, AMBFParamsPtr> AMBFParamMap;
 typedef std::pair<std::string, AMBFParamsPtr> AMBFParamPair;
-
 
 //const double TEST_PREC = 1.0e-12;
 const double TEST_LAX {1.0e-7};
 const useconds_t sleepTime {250000};
-
-struct JointValues
-{
-  std::string parent;
-  float qActual;
-};
-typedef JointValues* JointValuesPtr;
-typedef std::unordered_map<std::string, JointValuesPtr> JointValuesMap;
-typedef std::pair<std::string, JointValuesPtr> JointValuesPair;
+using namespace RigidBodyDynamics;
+using namespace RigidBodyDynamics::Math;
 
 struct T_W_N
 {
@@ -51,7 +46,7 @@ public:
 
   void CleanUp();
 private:
-  void ConnectToAMBF();
+  bool ConnectToAMBF();
   void RegisterBodyToWorldTransformation(const std::string parentBody);
   void SetAMBFParams();
   void MapJoints(const std::string& parentBody, rigidBodyPtr rigidBodyHandler);
@@ -93,8 +88,8 @@ private:
   // the corresponding AMBF joint.
   // std::unordered_map<std::string, std::string> ambfJointToParentMap_;
   // std::unordered_map<std::string, std::string>::iterator ambfJointToParentMapItr_;
-  JointValuesMap jointValuesMap_;
-  JointValuesMap::iterator jointValuesMapItr_;
+  // JointValuesMap jointValuesMap_;
+  // JointValuesMap::iterator jointValuesMapItr_;
 
   Model* rbdlModel_{nullptr};
 

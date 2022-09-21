@@ -63,7 +63,7 @@ struct ECM {
   const double pitchtoplink_pitchendlinkOffsetQ      = 0.0;
 	const double toollink_eeOffsetQ      							 = 0.0;
 
-	Vector3d baselink_yawlinkPA 							= { -0.0002, -1.0000, 00.0000 };
+	Vector3d baselink_yawlinkPA 							= { -0.0000, -1.0000, 00.0000 };
 	Vector3d baselink_yawlinkCA 							= { 00.0000, 00.0000, -1.0000 };
 	Vector3d baselink_yawlinkPP 							= { 00.0000, 00.0000, 00.0000 };
 	Vector3d baselink_yawlinkCP 							= { 00.0001, 00.0000, 00.5369 };
@@ -107,7 +107,7 @@ struct ECM {
 	Vector3d pitchendlink_maininsertionlinkPA = {     0.0,     1.0,    0.0 };
 	Vector3d pitchendlink_maininsertionlinkCA = {     1.0,     0.0,    0.0 };
 	Vector3d pitchendlink_maininsertionlinkPP = {  0.1031, -0.0961, 0.0001 };
-	Vector3d pitchendlink_maininsertionlinkCP = { -0.0108,  -0.062, 0.0002 };
+	Vector3d pitchendlink_maininsertionlinkCP = { -0.0108,  -0.062, 0.00002 };
 
 	Vector3d maininsertionlink_toollinkPA 	  = {     1.0,     0.0,    0.0 };
 	Vector3d maininsertionlink_toollinkCA 	  = {     0.0,     0.0,   -1.0 };
@@ -274,13 +274,18 @@ struct ECM {
 	// std::cout << "pitchendlink_maininsertionlinkRotOffset.rotation()"	<< std::endl << pitchendlink_maininsertionlinkRotOffset.rotation() << std::endl;
 	// std::cout << "maininsertionlink_toollinkRotOffset.rotation()" 			<< std::endl << maininsertionlink_toollinkRotOffset.rotation() 		<< std::endl;
 	
-	// std::cout << "world_baselinkST" 			 					<< std::endl << world_baselinkST 								<< std::endl;
-	// std::cout << "baselink_yawlinkST" 		 					<< std::endl << baselink_yawlinkST 							<< std::endl;
-	// std::cout << "yawlink_pitchbacklinkST" 					<< std::endl << yawlink_pitchbacklinkST 				<< std::endl;
-	// std::cout << "pitchbacklink_pitchbottomlinkST" 	<< std::endl << pitchbacklink_pitchbottomlinkST << std::endl;
-	// std::cout << "pitchbottomlink_pitchendlinkST" 	<< std::endl << pitchbottomlink_pitchendlinkST 	<< std::endl;
-	// std::cout << "pitchendlink_maininsertionlinkST" << std::endl << pitchendlink_maininsertionlinkST << std::endl;
-	// std::cout << "maininsertionlink_toollinkST" 		<< std::endl << maininsertionlink_toollinkST 		<< std::endl;
+  baselink_yawlinkST.E               = Matrix3d(-1,  0,  0, 0,  0, 1, 0,  1, 0);
+  yawlink_pitchbacklinkST.E          = Matrix3d( 0,  0,  1, 0, -1, 0, 1,  0, 0);
+  pitchendlink_maininsertionlinkST.E = Matrix3d( 0, -1,  0, 1,  0, 0, 0,  0, 1);
+  maininsertionlink_toollinkST.E     = Matrix3d( 0,  0, -1, 1,  0, 0, 0, -1, 0);
+
+	std::cout << "world_baselinkST" 			 					<< std::endl << world_baselinkST 								<< std::endl;
+	std::cout << "baselink_yawlinkST" 		 					<< std::endl << baselink_yawlinkST 							<< std::endl;
+	std::cout << "yawlink_pitchbacklinkST" 					<< std::endl << yawlink_pitchbacklinkST 				<< std::endl;
+	std::cout << "pitchbacklink_pitchbottomlinkST" 	<< std::endl << pitchbacklink_pitchbottomlinkST << std::endl;
+	std::cout << "pitchbottomlink_pitchendlinkST" 	<< std::endl << pitchbottomlink_pitchendlinkST 	<< std::endl;
+	std::cout << "pitchendlink_maininsertionlinkST" << std::endl << pitchendlink_maininsertionlinkST << std::endl;
+	std::cout << "maininsertionlink_toollinkST" 		<< std::endl << maininsertionlink_toollinkST 		<< std::endl;
 
 	world_yawlinkST = world_baselinkST * baselink_yawlinkST;
 	world_pitchbacklinkST = world_yawlinkST * yawlink_pitchbacklinkST;
@@ -295,26 +300,63 @@ struct ECM {
 	world_maininsertionlinkST = world_pitchendlinkST * pitchendlink_maininsertionlinkST;
 	world_toollinkST = world_maininsertionlinkST * maininsertionlink_toollinkST;
 
-	Vector3d baselink_yawlinkJ = world_baselinkST.E * baselink_yawlinkPA;
-	
-	Vector3d yawlink_pitchbacklinkJ = world_yawlinkST.E * yawlink_pitchbacklinkPA;
-	Vector3d pitchbacklink_pitchbottomlinkJ = world_pitchbacklinkST.E * pitchbacklink_pitchbottomlinkPA;
-	Vector3d pitchbottomlink_pitchendlinkJ = world_pitchbottomlinkST.E * pitchbottomlink_pitchendlinkPA;
-	
-	Vector3d yawlink_pitchfrontlinkJ = world_yawlinkST.E * yawlink_pitchfrontlinkPA;
-	Vector3d pitchfrontlink_pitchtoplinkJ = world_pitchfrontlinkST.E * pitchfrontlink_pitchtoplinkPA;
-	Vector3d pitchtoplink_pitchendlinkJ = world_pitchtoplinkST.E * pitchtoplink_pitchendlinkPA;
-	
-	Vector3d pitchfrontlink_pitchbottomlinkJ = world_pitchfrontlinkST.E * pitchfrontlink_pitchbottomlinkPA;
+  world_pitchendlinkST.E      = Matrix3d( 0,  0, -1,  1,  0, 0,  0, -1, 0);
+  world_pitchfrontlinkST.E    = Matrix3d( 0,  0, -1,  1,  0, 0,  0, -1, 0);
+  world_pitchbottomlink2ST.E  = Matrix3d( 1,  0,  0,  0,  0, 1,  0, -1, 0);
+  world_pitchtoplinkST.E      = Matrix3d( 0,  0, -1,  1,  0, 0,  0, -1, 0);
+  world_maininsertionlinkST.E = Matrix3d( 0,  0, -1,  0, -1, 0, -1,  0, 0);
+  world_toollinkST.E          = Matrix3d( 0,  1,  0, -1,  0, 0,  0,  0, 1);
 
-	CHECK_THAT (yawlink_pitchbacklinkJ, 
-		AllCloseVector(yawlink_pitchfrontlinkJ, TEST_PREC, TEST_PREC));
-	CHECK_THAT (pitchbacklink_pitchbottomlinkJ, 
-		AllCloseVector(pitchfrontlink_pitchtoplinkJ, TEST_PREC, TEST_PREC));
-	CHECK_THAT (pitchbottomlink_pitchendlinkJ, 
-		AllCloseVector(pitchtoplink_pitchendlinkJ, TEST_PREC, TEST_PREC));
 
-	std::cout << "pitchfrontlink_pitchbottomlinkJ" << std::endl << pitchfrontlink_pitchbottomlinkJ << std::endl;
+  std::cout << "world_yawlinkST" << std::endl << world_yawlinkST << std::endl;
+  std::cout << "world_pitchbacklinkST" << std::endl << world_pitchbacklinkST << std::endl;
+  std::cout << "world_pitchbottomlinkST" << std::endl << world_pitchbottomlinkST << std::endl;
+  std::cout << "world_pitchendlinkST" << std::endl << world_pitchendlinkST << std::endl;
+
+  std::cout << "world_pitchfrontlinkST" << std::endl << world_pitchfrontlinkST << std::endl;
+  std::cout << "world_pitchbottomlink2ST" << std::endl << world_pitchbottomlink2ST << std::endl;
+  std::cout << "world_pitchtoplinkST" << std::endl << world_pitchtoplinkST << std::endl;
+  std::cout << "world_pitchendlinkST" << std::endl << world_pitchendlinkST << std::endl;
+  
+  std::cout << "world_maininsertionlinkST" << std::endl << world_maininsertionlinkST << std::endl;
+  std::cout << "world_toollinkST"          << std::endl << world_toollinkST          << std::endl;
+  ////////////////
+	Vector3d baselink_yawlinkJAxis = world_baselinkST.E * baselink_yawlinkPA;
+  
+	Vector3d yawlink_pitchbacklinkJAxis = world_yawlinkST.E * yawlink_pitchbacklinkPA;
+	Vector3d pitchbacklink_pitchbottomlinkJAxis = world_pitchbacklinkST.E * pitchbacklink_pitchbottomlinkPA;
+	Vector3d pitchbottomlink_pitchendlinkJAxis = world_pitchbottomlinkST.E * pitchbottomlink_pitchendlinkPA;
+	
+	Vector3d yawlink_pitchfrontlinkJAxis = world_yawlinkST.E * yawlink_pitchfrontlinkPA;
+	Vector3d pitchfrontlink_pitchtoplinkJAxis = world_pitchfrontlinkST.E * pitchfrontlink_pitchtoplinkPA;
+	Vector3d pitchtoplink_pitchendlinkJAxis = world_pitchtoplinkST.E * pitchtoplink_pitchendlinkPA;
+	
+	Vector3d pitchfrontlink_pitchbottomlinkJAxis = world_pitchfrontlinkST.E * pitchfrontlink_pitchbottomlinkPA;
+  Vector3d pitchendlink_maininsertionlinkJAxis = world_pitchendlinkST.E * pitchendlink_maininsertionlinkPA;
+  Vector3d maininsertionlink_toollinkJAxis = world_maininsertionlinkST.E * maininsertionlink_toollinkPA;
+  
+  std::cout << "baselink_yawlinkJAxis: "               << baselink_yawlinkJAxis.transpose()	<< std::endl;
+  std::cout << "yawlink_pitchbacklinkJAxis: "          << yawlink_pitchbacklinkJAxis.transpose()	<< std::endl;
+  std::cout << "pitchbacklink_pitchbottomlinkJAxis: "  << pitchbacklink_pitchbottomlinkJAxis.transpose()	<< std::endl;
+  std::cout << "pitchbottomlink_pitchendlinkJAxis: "   << pitchbottomlink_pitchendlinkJAxis.transpose()	<< std::endl;
+
+  std::cout << "yawlink_pitchfrontlinkJAxis: "         << yawlink_pitchfrontlinkJAxis.transpose()	<< std::endl;
+  std::cout << "pitchfrontlink_pitchtoplinkJAxis: "    << pitchfrontlink_pitchtoplinkJAxis.transpose()	<< std::endl;
+  std::cout << "pitchtoplink_pitchendlinkJAxis: "      << pitchtoplink_pitchendlinkJAxis.transpose() << std::endl;
+  
+  std::cout << "pitchfrontlink_pitchbottomlinkJAxis: " << pitchfrontlink_pitchbottomlinkJAxis.transpose()	<< std::endl;
+  std::cout << "pitchendlink_maininsertionlinkJAxis: " << pitchendlink_maininsertionlinkJAxis.transpose()	<< std::endl;
+  std::cout << "maininsertionlink_toollinkJAxis: "     << maininsertionlink_toollinkJAxis.transpose()	<< std::endl;
+
+  ///////////////////
+	// CHECK_THAT (yawlink_pitchbacklinkJ, 
+	// 	AllCloseVector(yawlink_pitchfrontlinkJ, TEST_PREC, TEST_PREC));
+	// CHECK_THAT (pitchbacklink_pitchbottomlinkJ, 
+	// 	AllCloseVector(pitchfrontlink_pitchtoplinkJ, TEST_PREC, TEST_PREC));
+	// CHECK_THAT (pitchbottomlink_pitchendlinkJ, 
+	// 	AllCloseVector(pitchtoplink_pitchendlinkJ, TEST_PREC, TEST_PREC));
+
+	// std::cout << "pitchfrontlink_pitchbottomlinkJ" << std::endl << pitchfrontlink_pitchbottomlinkJ << std::endl;
 
 	// std::cout << "world_baselinkST" 				 << std::endl << world_baselinkST 				 << std::endl;
 	// std::cout << "world_yawlinkST" 		 	 		 << std::endl << world_yawlinkST 					 << std::endl;
@@ -350,47 +392,100 @@ struct ECM {
 	world_baselinkId = rbdlModelPtr_-> 
 		AddBody(0, Xtrans(world_baselinkST.r), joint_base, baselinkBody_, "world-baselink");
 
-	Joint joint_yaw = Joint(SpatialVector (0., -1., 0., 0., 0., 0.));
+	// Joint joint_yaw = Joint(SpatialVector (0., -1., 0., 0., 0., 0.));
+  Joint baselink_yawlinkJ = Joint(SpatialVector ( 
+    baselink_yawlinkJAxis(0), 
+    baselink_yawlinkJAxis(1), 
+    baselink_yawlinkJAxis(2),
+    0., 0., 0.));
 	baselink_yawlinkId = rbdlModelPtr_->
 		AddBody(world_baselinkId, Xtrans(p_baselink_yawlink_world), 
-		joint_yaw, yawlinkBody_, "baselink-yawlink");
+		baselink_yawlinkJ, yawlinkBody_, "baselink-yawlink");
 	
+  Joint yawlink_pitchbacklinkJ = Joint(SpatialVector ( 
+    yawlink_pitchbacklinkJAxis(0), 
+    yawlink_pitchbacklinkJAxis(1), 
+    yawlink_pitchbacklinkJAxis(2),
+    0., 0., 0.));
 	yawlink_pitchbacklinkId = rbdlModelPtr_->
 		AddBody(baselink_yawlinkId, Xtrans(p_yawlink_pitchbacklink_world), 
-		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbacklinkBody_, "yawlink-pitchbacklink");
+		// Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbacklinkBody_, "yawlink-pitchbacklink");
+    yawlink_pitchbacklinkJ, pitchbacklinkBody_, "yawlink-pitchbacklink");
 
+  Joint pitchbacklink_pitchbottomlinkJ = Joint(SpatialVector (
+    pitchbacklink_pitchbottomlinkJAxis(0), 
+    pitchbacklink_pitchbottomlinkJAxis(1), 
+    pitchbacklink_pitchbottomlinkJAxis(2),
+    0., 0., 0.));
 	pitchbacklink_pitchbottomlinkId = rbdlModelPtr_->
 		AddBody(yawlink_pitchbacklinkId, Xtrans(p_pitchbacklink_pitchbottomlink_world), 
-		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbottomlinkBody_, "pitchbacklink-pitchbottomlink");
+		// Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbottomlinkBody_, "pitchbacklink-pitchbottomlink");
+    pitchbacklink_pitchbottomlinkJ, pitchbottomlinkBody_, "pitchbacklink-pitchbottomlink");
 
+  Joint pitchbottomlink_pitchendlinkJ = Joint(SpatialVector (
+    pitchbottomlink_pitchendlinkJAxis(0), 
+    pitchbottomlink_pitchendlinkJAxis(1), 
+    pitchbottomlink_pitchendlinkJAxis(2), 
+    0., 0., 0.));
 	pitchbottomlink_pitchendlinkId = rbdlModelPtr_->
 		AddBody(pitchbacklink_pitchbottomlinkId, Xtrans(p_pitchbottomlink_pitchendlink_world), 
-		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchendlinkBody_, "pitchbottomlink-pitchendlink");
+		// Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchendlinkBody_, "pitchbottomlink-pitchendlink");
+    pitchbottomlink_pitchendlinkJ, pitchendlinkBody_, "pitchbottomlink-pitchendlink");
 	
+  Joint yawlink_pitchfrontlinkJ = Joint(SpatialVector (
+    yawlink_pitchfrontlinkJAxis(0), 
+    yawlink_pitchfrontlinkJAxis(1), 
+    yawlink_pitchfrontlinkJAxis(2),
+    0., 0., 0.));
 	yawlink_pitchfrontlinkId = rbdlModelPtr_->
 		AddBody(baselink_yawlinkId, Xtrans(p_yawlink_pitchfrontlink_world), 
-		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchfrontlinkBody_, "yawlink-pitchfrontlink");
+		// Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchfrontlinkBody_, "yawlink-pitchfrontlink");
+    yawlink_pitchfrontlinkJ, pitchfrontlinkBody_, "yawlink-pitchfrontlink");
 
 	// pitchfrontlink_pitchbottomlinkId = rbdlModelPtr_->
 	// 	AddBody(yawlink_pitchfrontlinkId, Xtrans(p_pitchfrontlink_pitchbottomlink_world), 
 	// 	Joint(SpatialVector (0., 0., 0., 0., 0., 0.)), virtualBody_, "pitchfrontlink-pitchbottomlink");
 
+  Joint pitchfrontlink_pitchtoplinkJ = Joint(SpatialVector (
+    pitchfrontlink_pitchtoplinkJAxis(0), 
+    pitchfrontlink_pitchtoplinkJAxis(1), 
+    pitchfrontlink_pitchtoplinkJAxis(2),
+    0., 0., 0.));
 	pitchfrontlink_pitchtoplinkId = rbdlModelPtr_->
 		AddBody(yawlink_pitchfrontlinkId, Xtrans(p_pitchfrontlink_pitchtoplink_world), 
-		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchtoplinkBody_, 
+		// Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchtoplinkBody_, 
+    pitchfrontlink_pitchtoplinkJ, pitchtoplinkBody_, 
 		"pitchfrontlink-pitchtoplink");
 
+  Joint pitchtoplink_pitchendlinkJ = Joint(SpatialVector (
+    pitchtoplink_pitchendlinkJAxis(0), 
+    pitchtoplink_pitchendlinkJAxis(1), 
+    pitchtoplink_pitchendlinkJAxis(2),
+    0., 0., 0.));
 	pitchtoplink_pitchendlinkId = rbdlModelPtr_->
 		AddBody(pitchfrontlink_pitchtoplinkId, Xtrans(p_pitchtoplink_pitchendlink_world), 
-		Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), virtualBody_, "pitchtoplink-pitchendlink");
+		// Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), virtualBody_, "pitchtoplink-pitchendlink");
+    pitchtoplink_pitchendlinkJ, virtualBody_, "pitchtoplink-pitchendlink");
 
+  Joint pitchendlink_maininsertionlinkJ = Joint(SpatialVector ( 
+    0., 0., 0., 
+    pitchendlink_maininsertionlinkJAxis(0), 
+    pitchendlink_maininsertionlinkJAxis(1), 
+    pitchendlink_maininsertionlinkJAxis(2)));
 	pitchendlink_maininsertionlinkId = rbdlModelPtr_->
 		AddBody(pitchbottomlink_pitchendlinkId, Xtrans(p_pitchendlink_maininsertionlink_world), 
-		Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody_, "pitchendlink-maininsertionlink");
+		// Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody_, "pitchendlink-maininsertionlink");
+    pitchendlink_maininsertionlinkJ, pitchendlinkBody_, "pitchendlink-maininsertionlink");
 
+  Joint maininsertionlink_toollinkJ = Joint(SpatialVector (
+    maininsertionlink_toollinkJAxis(0), 
+    maininsertionlink_toollinkJAxis(1), 
+    maininsertionlink_toollinkJAxis(2),
+    0., 0., 0.));
 	maininsertionlink_toollinkId = rbdlModelPtr_->
 		AddBody(pitchendlink_maininsertionlinkId, Xtrans(p_maininsertionlink_toollink_world), 
-		Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody_, "maininsertionlink-toollink");
+		// Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody_, "maininsertionlink-toollink");
+    maininsertionlink_toollinkJ, pitchendlinkBody_, "maininsertionlink-toollink");
 	// --------------------------------------------------------------------//
 	// unsigned int userDefinedId = 7;
 	// cs_.AddLoopConstraint(yawlink_pitchfrontlinkId, pitchbacklink_pitchbottomlink_v_Id, X_p_, X_s_, 
@@ -455,7 +550,6 @@ struct ECM {
   std::map<std::string, unsigned int>::iterator rbdlmBodyMapItr_;
 };
 
-
 /*
 TEST_CASE_METHOD ( ECM, __FILE__"_HomePose", "") 
 {
@@ -473,8 +567,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_HomePose", "")
 
   Vector3d p_w_pitchbacklink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
     rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"), Vector3d(0., 0., 0.), true);
-  // CHECK_THAT (Vector3d(0.5, -0.764604, -0.605786), 
-  CHECK_THAT (Vector3d(0.5, -0.764604, -0.6088), 
+	CHECK_THAT (Vector3d(0.5,   -0.764619,   -0.608807), 
     AllCloseVector(p_w_pitchbacklink, TEST_PREC, TEST_PREC));
 
   Vector3d p_w_pitchbottomlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
@@ -494,7 +587,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_HomePose", "")
 
   Vector3d p_w_pitchtoplink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
     rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"), Vector3d(0., 0., 0.), true);
-  CHECK_THAT (Vector3d(0.499406, -0.836449, -0.274822), 
+  CHECK_THAT (Vector3d(0.499403, -0.836886, -0.274964), 
     AllCloseVector(p_w_pitchtoplink, TEST_PREC, TEST_PREC));
 
   p_w_pitchendlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
@@ -504,18 +597,20 @@ TEST_CASE_METHOD ( ECM, __FILE__"_HomePose", "")
 
   Vector3d p_w_maininsertionlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
     rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"), Vector3d(0., 0., 0.), true);
-  // CHECK_THAT (Vector3d(0.500025, -0.449857, -0.228209), 
   CHECK_THAT (Vector3d(0.500025, -0.449857, -0.226898), 
     AllCloseVector(p_w_maininsertionlink, TEST_PREC, TEST_PREC));
 
   Vector3d p_w_toollink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
     rbdlModelPtr_->GetBodyId("maininsertionlink-toollink"), Vector3d(0., 0., 0.), true);
   CHECK_THAT (Vector3d(0.500025, -0.387959, -0.227233), 
+	// CHECK_THAT (Vector3d(0.500219,   -0.388462,   -0.229241), 
     AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
 }
 */
 
 
+
+/*
 TEST_CASE_METHOD ( ECM, __FILE__"YawlinkFK", "") 
 {
   Q_.setZero();
@@ -531,10 +626,10 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkFK", "")
   // Q_[rbdlModelPtr_->GetBodyId("maininsertionlink-toollink") - 1]      = 0.9; // 9
 
   Q_[rbdlModelPtr_->GetBodyId("baselink-yawlink") - 1]                = 0; // 0
-  Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink") - 1]           = 1.143741488456726; // 1
-  Q_[rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink") - 1]   = -1.0471999645233154; // 2
+  Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink") - 1]           = 0.; // 1
+  // Q_[rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink") - 1]   = -0.4190663993358612; // 2
   // Q_[rbdlModelPtr_->GetBodyId("pitchbottomlink-pitchendlink") - 1]    = 1.0532910823822021; // 3
-  Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink") - 1]          = 1.15951; // 4
+  // Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink") - 1]          = 0.25388258695602417; // 4
   // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchbottomlink") - 1]  = -1.0478633642196655; // 5
   // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink") - 1]     = -1.04469895362854; // 6
   // Q_[rbdlModelPtr_->GetBodyId("pitchtoplink-pitchendlink") - 1]       = 1.0501266717910767; // 7
@@ -565,8 +660,97 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkFK", "")
 	// yawlink-pitchbacklink
   Vector3d p_w_pitchbottomlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
     rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink"), Vector3d(0., 0., 0.), true);
-  // CHECK_THAT (Vector3d(0.499486,   -0.528961,   -0.368644), 
-	// CHECK_THAT (Vector3d(0.499503,   -0.538921,   -0.437111), 
+	CHECK_THAT (Vector3d(0.499559,   -0.831125,   -0.314401), 
+    AllCloseVector(p_w_pitchbottomlink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_pitchendlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("pitchbottomlink-pitchendlink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.500104, -0.490944, -0.31224), 
+  //   AllCloseVector(p_w_pitchendlink, TEST_PREC, TEST_PREC));
+
+	// No link can change this
+  // Vector3d p_w_pitchfrontlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.5, -0.727978, -0.59897), 
+  //   AllCloseVector(p_w_pitchfrontlink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_pitchtoplink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.499442,   -0.474463,   -0.370333), 
+  //   AllCloseVector(p_w_pitchtoplink, TEST_PREC, TEST_PREC));
+  // CHECK_THAT (Vector3d(0.499442, -0.474463, -0.370333), 
+  //   AllCloseVector(p_w_pitchtoplink, TEST_PREC, TEST_PREC));
+
+  // p_w_pitchendlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("pitchtoplink-pitchendlink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.499902, -0.490902, -0.312198), 
+  //   AllCloseVector(p_w_pitchendlink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_maininsertionlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"), Vector3d(0., 0., 0.), true);
+  // // CHECK_THAT (Vector3d(0.500025, -0.449857, -0.228209), 
+  // CHECK_THAT (Vector3d(0.500025, -0.449857, -0.226898), 
+  //   AllCloseVector(p_w_maininsertionlink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_toollink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("maininsertionlink-toollink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.500195,  -0.0656258,   -0.421017), 
+  //   AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
+}
+*/
+
+/*
+
+TEST_CASE_METHOD ( ECM, __FILE__"YawlinkFK", "") 
+{
+  Q_.setZero();
+  // Q_[rbdlModelPtr_->GetBodyId("baselink-yawlink") - 1]                = 0; // 0
+  // Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink") - 1]           = 0.1; // 1
+  // Q_[rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink") - 1]   = 0.2; // 2
+  // Q_[rbdlModelPtr_->GetBodyId("pitchbottomlink-pitchendlink") - 1]    = 0.3; // 3
+  // Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink") - 1]          = 0.4; // 4
+  // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchbottomlink") - 1]  = 0.5; // 5
+  // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink") - 1]     = 0.6; // 6
+  // Q_[rbdlModelPtr_->GetBodyId("pitchtoplink-pitchendlink") - 1]       = 0.7; // 7
+  // Q_[rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink") - 1]  = 0.8; // 8
+  // Q_[rbdlModelPtr_->GetBodyId("maininsertionlink-toollink") - 1]      = 0.9; // 9
+
+  Q_[rbdlModelPtr_->GetBodyId("baselink-yawlink") - 1]                = 0; // 0
+  Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink") - 1]           = 0.5032803416252136; // 1
+  // Q_[rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink") - 1]   = -1.0471999645233154; // 2
+  // Q_[rbdlModelPtr_->GetBodyId("pitchbottomlink-pitchendlink") - 1]    = 1.0532910823822021; // 3
+  // Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink") - 1]          = 1.15951; // 4
+  // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchbottomlink") - 1]  = -1.0478633642196655; // 5
+  // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink") - 1]     = -1.04469895362854; // 6
+  // Q_[rbdlModelPtr_->GetBodyId("pitchtoplink-pitchendlink") - 1]       = 1.0501266717910767; // 7
+  // Q_[rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink") - 1]  = 0.8; // 8
+  // Q_[rbdlModelPtr_->GetBodyId("maininsertionlink-toollink") - 1]      = 0.9; // 9
+  std::cout << std::endl << Q_ << std::endl;
+
+	// No link can change this
+  Vector3d p_w_baselink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+    rbdlModelPtr_->GetBodyId("world-baselink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.4999, -0.3901, -0.599), 
+    AllCloseVector(p_w_baselink, TEST_PREC, TEST_PREC));
+
+
+	// No link can change this
+  Vector3d p_w_yawlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+    rbdlModelPtr_->GetBodyId("baselink-yawlink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.49987, -0.927, -0.598924), 
+    AllCloseVector(p_w_yawlink, TEST_PREC, TEST_PREC));
+
+	// No link can change this
+  Vector3d p_w_pitchbacklink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+    rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.5, -0.764604, -0.605786), 
+  CHECK_THAT (Vector3d(0.5, -0.764493, -0.608647), 
+    AllCloseVector(p_w_pitchbacklink, TEST_PREC, TEST_PREC));
+
+	// yawlink-pitchbacklink
+  Vector3d p_w_pitchbottomlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+    rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink"), Vector3d(0., 0., 0.), true);
+	// CHECK_THAT (Vector3d(0.499997,   -0.764536,   -0.608716), 
   //   AllCloseVector(p_w_pitchbottomlink, TEST_PREC, TEST_PREC));
 
   // Vector3d p_w_pitchendlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
@@ -580,10 +764,97 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkFK", "")
   // CHECK_THAT (Vector3d(0.5, -0.727978, -0.59897), 
   //   AllCloseVector(p_w_pitchfrontlink, TEST_PREC, TEST_PREC));
 
-  Vector3d p_w_pitchtoplink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
-    rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"), Vector3d(0., 0., 0.), true);
-  CHECK_THAT (Vector3d(0.499442,   -0.474463,   -0.370333), 
-    AllCloseVector(p_w_pitchtoplink, TEST_PREC, TEST_PREC));
+  // Vector3d p_w_pitchtoplink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.499442,   -0.474463,   -0.370333), 
+  //   AllCloseVector(p_w_pitchtoplink, TEST_PREC, TEST_PREC));
+  // CHECK_THAT (Vector3d(0.499442, -0.474463, -0.370333), 
+  //   AllCloseVector(p_w_pitchtoplink, TEST_PREC, TEST_PREC));
+
+  // p_w_pitchendlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("pitchtoplink-pitchendlink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.499902, -0.490902, -0.312198), 
+  //   AllCloseVector(p_w_pitchendlink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_maininsertionlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"), Vector3d(0., 0., 0.), true);
+  // // CHECK_THAT (Vector3d(0.500025, -0.449857, -0.228209), 
+  // CHECK_THAT (Vector3d(0.500025, -0.449857, -0.226898), 
+  //   AllCloseVector(p_w_maininsertionlink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_toollink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("maininsertionlink-toollink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.500195,  -0.0656258,   -0.421017), 
+  //   AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
+}
+*/
+
+
+TEST_CASE_METHOD ( ECM, __FILE__"YawlinkFK", "") 
+{
+  Q_.setZero();
+  // Q_[rbdlModelPtr_->GetBodyId("baselink-yawlink") - 1]                = 0; // 0
+  // Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink") - 1]           = 0.1; // 1
+  // Q_[rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink") - 1]   = 0.2; // 2
+  // Q_[rbdlModelPtr_->GetBodyId("pitchbottomlink-pitchendlink") - 1]    = 0.3; // 3
+  // Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink") - 1]          = 0.4; // 4
+  // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchbottomlink") - 1]  = 0.5; // 5
+  // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink") - 1]     = 0.6; // 6
+  // Q_[rbdlModelPtr_->GetBodyId("pitchtoplink-pitchendlink") - 1]       = 0.7; // 7
+  // Q_[rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink") - 1]  = 0.8; // 8
+  // Q_[rbdlModelPtr_->GetBodyId("maininsertionlink-toollink") - 1]      = 0.9; // 9
+
+  Q_[rbdlModelPtr_->GetBodyId("baselink-yawlink") - 1]                = 0; // 0
+  Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink") - 1]           = 0.5003815293312073; // 1
+  Q_[rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink") - 1]   = -0.49938082695007324; // 2
+  // Q_[rbdlModelPtr_->GetBodyId("pitchbottomlink-pitchendlink") - 1]    = 1.0532910823822021; // 3
+  // Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink") - 1]          = 1.15951; // 4
+  // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchbottomlink") - 1]  = -1.0478633642196655; // 5
+  // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink") - 1]     = -1.04469895362854; // 6
+  // Q_[rbdlModelPtr_->GetBodyId("pitchtoplink-pitchendlink") - 1]       = 1.0501266717910767; // 7
+  // Q_[rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink") - 1]  = 0.8; // 8
+  // Q_[rbdlModelPtr_->GetBodyId("maininsertionlink-toollink") - 1]      = 0.9; // 9
+  std::cout << std::endl << Q_ << std::endl;
+
+	// No link can change this
+  Vector3d p_w_baselink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+    rbdlModelPtr_->GetBodyId("world-baselink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.4999, -0.3901, -0.599), 
+    AllCloseVector(p_w_baselink, TEST_PREC, TEST_PREC));
+
+	// No link can change this
+  Vector3d p_w_yawlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+    rbdlModelPtr_->GetBodyId("baselink-yawlink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.49987, -0.927, -0.598924), 
+    AllCloseVector(p_w_yawlink, TEST_PREC, TEST_PREC));
+
+	// No link can change this
+  Vector3d p_w_pitchbacklink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+    rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.499999,   -0.764536,   -0.608716), 
+    AllCloseVector(p_w_pitchbacklink, TEST_PREC, TEST_PREC));
+
+	// yawlink-pitchbacklink
+  Vector3d p_w_pitchbottomlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+    rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink"), Vector3d(0., 0., 0.), true);
+	CHECK_THAT (Vector3d(0.499444,   -0.680836,   -0.298169), 
+    AllCloseVector(p_w_pitchbottomlink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_pitchendlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("pitchbottomlink-pitchendlink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.500104, -0.490944, -0.31224), 
+  //   AllCloseVector(p_w_pitchendlink, TEST_PREC, TEST_PREC));
+
+	// No link can change this
+  // Vector3d p_w_pitchfrontlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.5, -0.727978, -0.59897), 
+  //   AllCloseVector(p_w_pitchfrontlink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_pitchtoplink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.499442,   -0.474463,   -0.370333), 
+  //   AllCloseVector(p_w_pitchtoplink, TEST_PREC, TEST_PREC));
   // CHECK_THAT (Vector3d(0.499442, -0.474463, -0.370333), 
   //   AllCloseVector(p_w_pitchtoplink, TEST_PREC, TEST_PREC));
 
@@ -605,6 +876,190 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkFK", "")
 }
 
 
+/*
+TEST_CASE_METHOD ( ECM, __FILE__"YawlinkIK", "") 
+{
+  Q_.setZero();
+
+  Q_[rbdlModelPtr_->GetBodyId("baselink-yawlink") - 1]                = 0; // 0
+  Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink") - 1]           = 0.5032803416252136; // 1
+  Q_[rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink") - 1]   = -0.5001809597015381; // 2
+  // // Q_[rbdlModelPtr_->GetBodyId("pitchbottomlink-pitchendlink") - 1]    = 0.3; // 3
+  // Q_[rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink") - 1]          = 1.05457; // 4
+  // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchbottomlink") - 1]  = 0.5; // 5
+  // Q_[rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink") - 1]     = 0.6; // 6
+  // Q_[rbdlModelPtr_->GetBodyId("pitchtoplink-pitchendlink") - 1]       = 0.7; // 7
+  Q_[rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink") - 1]  = 0.0; // 8
+  Q_[rbdlModelPtr_->GetBodyId("maininsertionlink-toollink") - 1]      = 0.; // 9
+  std::cout << std::endl << Q_ << std::endl;
+
+  // Vector3d p_w_baselink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("world-baselink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.4999, -0.3901, -0.599), 
+  //   AllCloseVector(p_w_baselink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_yawlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("baselink-yawlink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.49987, -0.927, -0.598924), 
+  //   AllCloseVector(p_w_yawlink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_pitchbacklink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"), Vector3d(0., 0., 0.), true);
+  // // CHECK_THAT (Vector3d(0.5, -0.764604, -0.605786), 
+  // CHECK_THAT (Vector3d(0.5, -0.764493, -0.608647), 
+  //   AllCloseVector(p_w_pitchbacklink, TEST_PREC, TEST_PREC));
+
+  // // Vector3d p_w_pitchbottomlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  // //   rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink"), Vector3d(0., 0., 0.), true);
+  // // CHECK_THAT (Vector3d(0.5, -0.528961, -0.368644), 
+  // //   AllCloseVector(p_w_pitchbottomlink, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_pitchfrontlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+  //   rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (Vector3d(0.5, -0.728002, -0.599003), 
+  //   AllCloseVector(p_w_pitchfrontlink, TEST_PREC, TEST_PREC));
+
+
+  UpdateKinematicsCustom (*rbdlModelPtr_, &Q_, NULL, NULL);
+
+  Matrix3d r_w_baselink = 
+    CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, 
+			rbdlModelPtr_->GetBodyId("baselink-yawlink"), true);
+
+  Matrix3d r_w_yawlink = 
+    CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, 
+			rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"), true);
+
+  Matrix3d r_w_pitchendlink = 
+    CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, 
+			rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"), true);
+
+	// Matrix3d r_w_pitchendlink = 
+  //   CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, 
+	// 		rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"), true);
+	
+	Matrix3d r_w_toollink = 
+    CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, 
+			rbdlModelPtr_->GetBodyId("maininsertionlink-toollink"), true);
+
+
+	Vector3d p_w_baselink      = Vector3d(  0.4999,     -0.3901,      -0.599);
+	Vector3d p_w_pitchbacklink = Vector3d(0.499999,   -0.764536,   -0.608716);
+  Vector3d p_w_pitchbottomlink = Vector3d(0.499435,   -0.679858,    -0.29831);
+
+	Vector3d p_w_pitchtoplink  = Vector3d(0.499325,   -0.666444,   -0.262765);
+	Vector3d p_w_toollink      = Vector3d(0.500146,   -0.209318,   -0.276304);
+
+  InverseKinematicsConstraintSet cs;
+
+	// Constraints for baselink
+  cs.AddOrientationConstraint (
+    rbdlModelPtr_->GetBodyId("baselink-yawlink"),
+    r_w_baselink,
+		1.0f
+  );
+
+  cs.AddPointConstraint (
+		rbdlModelPtr_->GetBodyId("world-baselink"), 
+    Vector3d (0., 0., 0.), p_w_baselink,
+		1.0f
+  );
+
+  // Constraints for yawlink
+  cs.AddOrientationConstraint (
+    rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"),
+    r_w_yawlink,
+		1.0f
+  );
+  
+  // Constraints for pitchbacklink
+  cs.AddOrientationConstraint (
+    rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"),
+    r_w_yawlink,
+		1.0f
+  );
+
+  cs.AddPointConstraint (
+		rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"), 
+    Vector3d (0., 0., 0.), p_w_pitchbacklink,
+		1.0f);
+  
+  // cs.AddPointConstraint (
+	// 	rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink"), 
+  //   Vector3d (0., 0., 0.), p_w_pitchbottomlink,
+	// 	1.0f);
+
+  // Constraints for pitchendlink
+  // cs.AddOrientationConstraint (
+  //   rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"),
+  //   r_w_pitchendlink,
+	// 	1.0f
+  // );
+
+  // Constraints for pitchtoplink
+	// cs.AddPointConstraint (
+	// 	rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"), 
+  //   Vector3d (0., 0., 0.), p_w_pitchtoplink,
+	// 	1.0f);
+
+	// Constraints for toollink
+  // cs.AddOrientationConstraint (
+  //   rbdlModelPtr_->GetBodyId("maininsertionlink-toollink"),
+  //   r_w_toollink,
+	// 	1.0f
+  // );
+  // cs.AddPointConstraint (
+	// 	rbdlModelPtr_->GetBodyId("maininsertionlink-toollink"), 
+  //   Vector3d (0., 0., 0.), p_w_toollink,
+	// 	1.0f
+  // );
+  cs.step_tol = 1e-2;
+  
+  // q.setZero();
+
+  VectorNd Qres (Q_);
+
+  bool result = InverseKinematics (*rbdlModelPtr_, Q_, cs, Qres);
+
+  CHECK (result);
+  // CHECK_THAT ( 0.0, IsClose(cs.error_norm, cs.step_tol, cs.step_tol));
+  std::cout << "Qres" << std::endl << Qres << std::endl;
+
+  UpdateKinematicsCustom (*rbdlModelPtr_, &Qres, NULL, NULL);
+
+  Matrix3d r_w_baselinkCal = CalcBodyWorldOrientation(*rbdlModelPtr_, Qres, 
+		rbdlModelPtr_->GetBodyId("baselink-yawlink"), true);
+  Vector3d p_w_baselinkCal = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Qres, 
+    rbdlModelPtr_->GetBodyId("world-baselink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (r_w_baselink, 
+    AllCloseMatrix(r_w_baselinkCal, TEST_PREC, TEST_PREC));  
+  CHECK_THAT (p_w_baselink, 
+    AllCloseVector(p_w_baselinkCal, TEST_PREC, TEST_PREC));
+
+  // Matrix3d r_w_yawlinkCal = CalcBodyWorldOrientation(*rbdlModelPtr_, Qres, 
+	// 	rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"), true);
+  // CHECK_THAT (r_w_yawlink, 
+  //   AllCloseMatrix(r_w_yawlinkCal, TEST_PREC, TEST_PREC));
+  
+  Vector3d p_w_pitchbacklinkCal = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Qres, 
+    rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (p_w_pitchbacklink, 
+    AllCloseVector(p_w_pitchbacklinkCal, TEST_PREC, TEST_PREC));
+
+  // Matrix3d r_w_pitchendlinkCal = CalcBodyWorldOrientation(*rbdlModelPtr_, Qres, 
+	// 	rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"), true);
+  // CHECK_THAT (r_w_pitchendlink, 
+  //   AllCloseMatrix(r_w_pitchendlinkCal, TEST_PREC, TEST_PREC));
+
+  // Vector3d p_w_pitchtoplinkCal = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Qres, 
+  //   rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"), Vector3d(0., 0., 0.), true);
+  // CHECK_THAT (p_w_pitchtoplink, 
+  //   AllCloseVector(p_w_pitchtoplinkCal, TEST_PREC, TEST_PREC));
+}
+*/
+
+
+/*
 TEST_CASE_METHOD ( ECM, __FILE__"YawlinkIK", "") 
 {
   Q_.setZero();
@@ -658,9 +1113,9 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkIK", "")
 
   Matrix3d r_w_yawlink = 
     CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, rbdlModelPtr_->GetBodyId("baselink-yawlink"), true);
-  // Vector3d p_w_yawlink = 
-  //   CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, rbdlModelPtr_->GetBodyId("baselink-yawlink"), 
-  //     Vector3d (0., 0., 0.), true);
+  Vector3d p_w_yawlink = 
+    CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, rbdlModelPtr_->GetBodyId("baselink-yawlink"), 
+      Vector3d (0., 0., 0.), true);
 
   Matrix3d r_w_pitchbacklink = 
     CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"), 
@@ -672,9 +1127,9 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkIK", "")
   Matrix3d r_w_pitchfrontlink = 
     CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink"), 
       true);
-  // Vector3d p_w_pitchfrontlink = 
-  //   CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink"), 
-  //     Vector3d (0., 0., 0.), true);
+  Vector3d p_w_pitchfrontlink = 
+    CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink"), 
+      Vector3d (0., 0., 0.), true);
 
 	Matrix3d r_w_pitchtoplink = 
     CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"), 
@@ -684,9 +1139,9 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkIK", "")
   Matrix3d r_w_maininsertionlink; r_w_maininsertionlink.setIdentity();
     // CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, 
 		// 	rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"), true);
-  // Vector3d p_w_maininsertionlink = 
-  //   CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
-	// 		rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"), Vector3d (0., 0., 0.), true);
+  Vector3d p_w_maininsertionlink = 
+    CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
+			rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"), Vector3d (0., 0., 0.), true);
 
 	Matrix3d r_w_toollink = 
     CalcBodyWorldOrientation(*rbdlModelPtr_, Q_, 
@@ -694,7 +1149,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkIK", "")
 
 	Vector3d p_w_baselink = Vector3d(0.4999,     -0.3901,      -0.599);
 	Vector3d p_w_pitchbacklink = Vector3d(0.499993,   -0.764493,   -0.608647);
-  // Vector3d p_w_pitchbottomlink = Vector3d (0.499487, -0.528961, -0.368644);
+  Vector3d p_w_pitchbottomlink = Vector3d (0.499487, -0.528961, -0.368644);
   // Vector3d p_w_pitchendlink = Vector3d (0.500076, -0.188766, -0.371571);
 	Vector3d p_w_pitchtoplink = Vector3d(0.499382,     -0.4989,   -0.345218);
 	Vector3d p_w_toollink = Vector3d(0.500195,  -0.0656258,   -0.421017);
@@ -706,12 +1161,12 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkIK", "")
     p_w_baselink,
     r_w_baselink
   );
-  // cs.AddFullConstraint (
-  //   rbdlModelPtr_->GetBodyId("baselink-yawlink"),
-  //   Vector3d (0., 0., 0.),
-  //   p_w_yawlink,
-  //   r_w_yawlink
-  // );
+  cs.AddFullConstraint (
+    rbdlModelPtr_->GetBodyId("baselink-yawlink"),
+    Vector3d (0., 0., 0.),
+    p_w_yawlink,
+    r_w_yawlink
+  );
   cs.AddFullConstraint (
     rbdlModelPtr_->GetBodyId("yawlink-pitchbacklink"),
     Vector3d (0., 0., 0.),
@@ -719,25 +1174,25 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkIK", "")
     r_w_pitchbacklink
   );
 
-	// cs.AddFullConstraint (
-  //   rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink"),
-  //   Vector3d (0., 0., 0.),
-  //   p_w_pitchfrontlink,
-  //   r_w_pitchfrontlink
-  // );
-	// cs.AddFullConstraint (
-  //   rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"),
-  //   Vector3d (0., 0., 0.),
-  //   p_w_pitchtoplink,
-  //   r_w_pitchtoplink
-  // );
+	cs.AddFullConstraint (
+    rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink"),
+    Vector3d (0., 0., 0.),
+    p_w_pitchfrontlink,
+    r_w_pitchfrontlink
+  );
+	cs.AddFullConstraint (
+    rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"),
+    Vector3d (0., 0., 0.),
+    p_w_pitchtoplink,
+    r_w_pitchtoplink
+  );
 
-	// cs.AddFullConstraint (
-  //   rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"),
-  //   Vector3d (0., 0., 0.),
-  //   p_w_maininsertionlink,
-  //   r_w_maininsertionlink
-  // );
+	cs.AddFullConstraint (
+    rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"),
+    Vector3d (0., 0., 0.),
+    p_w_maininsertionlink,
+    r_w_maininsertionlink
+  );
 
 	cs.AddFullConstraint (
     rbdlModelPtr_->GetBodyId("maininsertionlink-toollink"),
@@ -745,12 +1200,12 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkIK", "")
     p_w_toollink,
     r_w_toollink
   );
-  // cs.AddPointConstraint (rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink"), 
-  //   Vector3d (0., 0., 0.), p_w_pitchbottomlink);
+  cs.AddPointConstraint (rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink"), 
+    Vector3d (0., 0., 0.), p_w_pitchbottomlink);
   cs.AddPointConstraint (rbdlModelPtr_->GetBodyId("pitchfrontlink-pitchtoplink"), 
     Vector3d (0., 0., 0.), p_w_pitchtoplink);
-	// cs.AddPointConstraint (rbdlModelPtr_->GetBodyId("maininsertionlink-toollink"), 
-  //   Vector3d (0., 0., 0.), p_w_toollink);
+	cs.AddPointConstraint (rbdlModelPtr_->GetBodyId("maininsertionlink-toollink"), 
+    Vector3d (0., 0., 0.), p_w_toollink);
 
   cs.step_tol = 1e-2;
 
@@ -786,3 +1241,4 @@ TEST_CASE_METHOD ( ECM, __FILE__"YawlinkIK", "")
   CHECK_THAT (Vector3d(0.500152,  -0.0658301,   -0.422452), 
     AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
 }
+*/

@@ -101,45 +101,45 @@ set (RBDL_MODEL_TESTS_HDR_FILES
     include/${PROJECT_NAME}/rbdl_tests.h
     )
 
-# ################START################
-# #Executible kuka_hc_tests
+################START################
+#Executible kuka_hc_tests
 
-# set (KUKA_RBDL_MODEL_TESTS_HDR_FILES_HC
-#     include/${PROJECT_NAME}/AMBFParams.h
-#     include/${PROJECT_NAME}/KUKA.h
-#     )
+set (KUKA_RBDL_MODEL_TESTS_HDR_FILES_HC
+    include/${PROJECT_NAME}/AMBFParams.h
+    include/${PROJECT_NAME}/KUKA.h
+    )
 
-# set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES_HC
-#     # src/ECMHCDynamicsTests.cc
-#     src/KukaHCKinematicsTests.cc
-#     # src/KUKABodyTests.cc
-#     src/AMBFParams.cpp
-#     src/KUKA.cpp
-#     src/EigenUtilities.cpp
-#     src/RBDLTestPrep.cc
-#     src/main.cc
-#     )
+set(KUKA_RBDL_MODEL_TESTS_SOURCE_FILES_HC
+    # src/ECMHCDynamicsTests.cc
+    src/KukaHCKinematicsTests.cc
+    # src/KUKABodyTests.cc
+    src/AMBFParams.cpp
+    src/KUKA.cpp
+    src/EigenUtilities.cpp
+    # src/RBDLTestPrep.cc
+    src/main.cc
+    )
 
-# add_executable (kuka_tests_hc
-# ${RBDL_MODEL_TESTS_HDR_FILES} 
-# ${KUKA_RBDL_MODEL_TESTS_HDR_FILES_HC} 
-# ${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES_HC})
-# target_link_libraries (kuka_tests_hc
-#     ${catkin_LIBRARIES} 
-#     ${Eigen_LIBRARIES} 
-#     ${AMBF_CLIENT_LIBRARY} 
-#     ${RBDL_MODEL_LIBRARY} 
-#     ${Boost_LIBRARIES} 
-#     ${UNITTEST++_LIBRARY}
-#     ${RBDL_LIBRARY}
-#     pthread
-#     )
+add_executable (kuka_tests_hc
+${RBDL_MODEL_TESTS_HDR_FILES} 
+${KUKA_RBDL_MODEL_TESTS_HDR_FILES_HC} 
+${KUKA_RBDL_MODEL_TESTS_SOURCE_FILES_HC})
+target_link_libraries (kuka_tests_hc
+    ${catkin_LIBRARIES} 
+    ${Eigen_LIBRARIES} 
+    ${AMBF_CLIENT_LIBRARY} 
+    ${RBDL_MODEL_LIBRARY} 
+    ${Boost_LIBRARIES} 
+    ${UNITTEST++_LIBRARY}
+    ${RBDL_LIBRARY}
+    pthread
+    )
 
-# set_target_properties(kuka_tests_hc PROPERTIES
-#     CXX_STANDARD 17
-#     CXX_EXTENSIONS OFF
-#     )
-# ################END################
+set_target_properties(kuka_tests_hc PROPERTIES
+    CXX_STANDARD 17
+    CXX_EXTENSIONS OFF
+    )
+################END################
 
 # ################START################
 # #Executible kuka_tests
@@ -187,43 +187,43 @@ set (RBDL_MODEL_TESTS_HDR_FILES
 ################START################
 #Executible ecm_hc_tests
 
-set (PS_RBDL_MODEL_TESTS_HDR_FILES
-  include/${PROJECT_NAME}/AMBFParams.h
-  include/${PROJECT_NAME}/PS.h
-  include/${PROJECT_NAME}/EigenUtilities.h
-  )
+# set (PS_RBDL_MODEL_TESTS_HDR_FILES
+#   include/${PROJECT_NAME}/AMBFParams.h
+#   include/${PROJECT_NAME}/PS.h
+#   include/${PROJECT_NAME}/EigenUtilities.h
+#   )
 
-set(PS_RBDL_MODEL_TESTS_SOURCE_FILES
-  src/PSHCKinematicsTests.cc
-  src/AMBFParams.cpp
-  src/PS.cpp
-  src/EigenUtilities.cpp
-  src/main.cc
-  )
+# set(PS_RBDL_MODEL_TESTS_SOURCE_FILES
+#   src/PSHCKinematicsTests.cc
+#   src/AMBFParams.cpp
+#   src/PS.cpp
+#   src/EigenUtilities.cpp
+#   src/main.cc
+#   )
 
-add_executable (ps_tests_hc
-${RBDL_MODEL_TESTS_HDR_FILES} 
-${PS_RBDL_MODEL_TESTS_HDR_FILES} 
-${PS_RBDL_MODEL_TESTS_SOURCE_FILES})
+# add_executable (ps_tests_hc
+# ${RBDL_MODEL_TESTS_HDR_FILES} 
+# ${PS_RBDL_MODEL_TESTS_HDR_FILES} 
+# ${PS_RBDL_MODEL_TESTS_SOURCE_FILES})
 
-target_link_libraries (ps_tests_hc
-  ${catkin_LIBRARIES} 
-  ${Eigen_LIBRARIES} 
-  ${AMBF_CLIENT_LIBRARY} 
-  # ${APPLICATION_LIBRARY} 
-  ${RBDL_LIBRARY}
-  ${RBDL_MODEL_LIBRARY} 
-  # ${YAML_CPP_LIBRARIES}
-  ${Boost_LIBRARIES} 
-  ${UNITTEST++_LIBRARY}
-  pthread
-  )
+# target_link_libraries (ps_tests_hc
+#   ${catkin_LIBRARIES} 
+#   ${Eigen_LIBRARIES} 
+#   ${AMBF_CLIENT_LIBRARY} 
+#   # ${APPLICATION_LIBRARY} 
+#   ${RBDL_LIBRARY}
+#   ${RBDL_MODEL_LIBRARY} 
+#   # ${YAML_CPP_LIBRARIES}
+#   ${Boost_LIBRARIES} 
+#   ${UNITTEST++_LIBRARY}
+#   pthread
+#   )
 
-set_target_properties(ps_tests_hc PROPERTIES
-    CXX_STANDARD 17
-    CXX_EXTENSIONS OFF
-    )
-################END################
+# set_target_properties(ps_tests_hc PROPERTIES
+#     CXX_STANDARD 17
+#     CXX_EXTENSIONS OFF
+#     )
+# ################END################
 
 ################START################
 #Executible ecm_hc_tests
@@ -378,44 +378,44 @@ set_target_properties(ecmrbdlcl PROPERTIES
     )
 ################END################
 
-################START################
-#Executible model from automation test cases
+# ################START################
+# #Executible model from automation test cases
 
-set (RBDL_MODEL_FROM_AUTOMATION_TESTS_HDR_FILES
-    # include/${PROJECT_NAME}/AMBFParams.h
-    include/${PROJECT_NAME}/ModelFromParser/RBDLModelFromAutomation.h
-    include/${PROJECT_NAME}/ModelFromParser/TestCaseStruct.h
-    )
+# set (RBDL_MODEL_FROM_AUTOMATION_TESTS_HDR_FILES
+#     # include/${PROJECT_NAME}/AMBFParams.h
+#     include/${PROJECT_NAME}/ModelFromParser/RBDLModelFromAutomation.h
+#     include/${PROJECT_NAME}/ModelFromParser/TestCaseStruct.h
+#     )
 
-set(RBDL_MODEL_FROM_AUTOMATION_TESTS_SOURCE_FILES
-    src/ModelFromParser/RBDLModelTestCases.cc
-    src/ModelFromParser/RBDLModelFromAutomation.cpp
-    src/main.cc
-    )
+# set(RBDL_MODEL_FROM_AUTOMATION_TESTS_SOURCE_FILES
+#     src/ModelFromParser/RBDLModelTestCases.cc
+#     src/ModelFromParser/RBDLModelFromAutomation.cpp
+#     src/main.cc
+#     )
 
-add_executable (rbdl_model_from_automation_tests
-${RBDL_MODEL_TESTS_HDR_FILES} 
-${RBDL_MODEL_FROM_AUTOMATION_TESTS_HDR_FILES} 
-${RBDL_MODEL_FROM_AUTOMATION_TESTS_SOURCE_FILES})
+# add_executable (rbdl_model_from_automation_tests
+# ${RBDL_MODEL_TESTS_HDR_FILES} 
+# ${RBDL_MODEL_FROM_AUTOMATION_TESTS_HDR_FILES} 
+# ${RBDL_MODEL_FROM_AUTOMATION_TESTS_SOURCE_FILES})
 
-target_link_libraries (rbdl_model_from_automation_tests
-    ${catkin_LIBRARIES} 
-    ${Eigen_LIBRARIES} 
-    ${AMBF_CLIENT_LIBRARY} 
-    ${APPLICATION_LIBRARY} 
-    ${RBDL_LIBRARY}
-    ${RBDL_MODEL_LIBRARY} 
-    ${YAML_CPP_LIBRARIES}
-    ${Boost_LIBRARIES} 
-    ${UNITTEST++_LIBRARY}
-    pthread
-    )
+# target_link_libraries (rbdl_model_from_automation_tests
+#     ${catkin_LIBRARIES} 
+#     ${Eigen_LIBRARIES} 
+#     ${AMBF_CLIENT_LIBRARY} 
+#     ${APPLICATION_LIBRARY} 
+#     ${RBDL_LIBRARY}
+#     ${RBDL_MODEL_LIBRARY} 
+#     ${YAML_CPP_LIBRARIES}
+#     ${Boost_LIBRARIES} 
+#     ${UNITTEST++_LIBRARY}
+#     pthread
+#     )
 
-set_target_properties(rbdl_model_from_automation_tests PROPERTIES
-    CXX_STANDARD 17
-    CXX_EXTENSIONS OFF
-    )
-################END################
+# set_target_properties(rbdl_model_from_automation_tests PROPERTIES
+#     CXX_STANDARD 17
+#     CXX_EXTENSIONS OFF
+#     )
+# ################END################
 
 ################START################
 # Test for validating World to body rotations to 

@@ -1,7 +1,38 @@
-// KUKA All Working except that the body has to be shiftted one level to parent
-
 #include "rbdl_model_tests/KUKA.h"
-// #include "rbdl_model_tests/EigenUtilities.h"
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+#include <algorithm>
+
+KUKA::KUKA() 
+{
+	try
+	{
+		if(!ConnectToAMBF()) throw "AMBF Inactive Exception";
+	}
+	catch(const char* e)
+	{
+		std::exit(EXIT_FAILURE); 		
+	}
+	
+	SetAMBFParams();
+	SetBodyParams();
+	CreateRBDLModel();
+}
+
+bool KUKA::ConnectToAMBF()
+{
+	ambfClientPtr_ = new Client();
+	
+	if(!ambfClientPtr_->connect()) return false;
+	usleep(1000000);
+
+	return true;
+}
+
+
 
 
 KUKA::KUKA() 
