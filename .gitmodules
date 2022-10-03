@@ -1,0 +1,3 @@
+[submodule "external/rbdl"]
+	path = external/rbdl
+	url = https://github.com/ORB-HD/rbdl-orb.git
