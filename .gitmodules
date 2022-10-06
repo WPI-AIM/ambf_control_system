@@ -1,7 +1,11 @@
 [submodule "external/rbdl"]
 	path = external/rbdl
 	url = https://github.com/ORB-HD/rbdl-orb.git
+[submodule "external/Catch2"]
+	path = external/Catch2
+	url = https://github.com/catchorg/Catch2.git
+	branch = v2.x
 [submodule "external/eigen"]
 	path = external/eigen
-	url = https://github.com/libigl/eigen.git
+	url = https://gitlab.com/libeigen/eigen.git
 	branch = 3.4
