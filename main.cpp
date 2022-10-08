@@ -1,5 +1,5 @@
 #include "PCH/pch.h"
-
+#include "ambf_client/ambf_client.h"
 
 int main()
 {
@@ -12,5 +12,7 @@ int main()
   RigidBodyDynamics::Math::Vector3d v;
   v.setIdentity();
   std::cout << v << std::endl;
+
+  Client client("ecm_ik_test"); 
   return 0;
 }
