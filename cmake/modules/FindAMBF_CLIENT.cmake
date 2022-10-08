@@ -5,20 +5,17 @@ find_path(ROS_INCLUDE_DIR
 
 find_path(AMBF_CLIENT_INCLUDE_DIR
 		NAMES ambf_client/ambf_client.h
-		HINTS /mnt/OneTB/localcodebase/ambf_repos/ambf/ambf_ros_modules/ambf_client/include
+		HINTS ../ambf/ambf_ros_modules/ambf_client/include
   )
 
 find_path(AMBF_MSGS_INCLUDE_DIR
 	NAMES ambf_msgs/ActuatorState.h
-	HINTS /mnt/OneTB/localcodebase/ambf_repos/ambf/build/devel/include
+	HINTS ../ambf/build/devel/include
 )
-
-
-
 
 find_library(AMBF_CLIENT_LIBRARY
 	NAMES libambf_client_cpp.so
-	HINTS /mnt/OneTB/localcodebase/ambf_repos/ambf/build/devel/lib
+	HINTS ../ambf/build/devel/lib
 )
 
 

@@ -13,6 +13,7 @@ int main()
   v.setIdentity();
   std::cout << v << std::endl;
 
-  Client client("ecm_ik_test"); 
+  Client client("ecm");
+  client.cleanUp(); 
   return 0;
 }
