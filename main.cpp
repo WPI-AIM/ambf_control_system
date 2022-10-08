@@ -1,8 +1,5 @@
-#include <stdio.h>
-#include <rbdl/Body.h>
-#include <Eigen/Dense>
-#include <iostream>
-#include "catch2/catch.hpp"
+#include "PCH/pch.h"
+
 
 int main()
 {

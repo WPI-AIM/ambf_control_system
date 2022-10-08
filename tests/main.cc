@@ -1,11 +1,11 @@
 #define CATCH_CONFIG_RUNNER
-#include "catch2/catch.hpp"
+// #include "catch2/catch.hpp"
 
-#include <iostream>
-#include <string>
+// #include <iostream>
+// #include <string>
 
-#include <rbdl/rbdl.h>
-
+// #include <rbdl/rbdl.h>
+#include "PCH/pch.h"
 int main (int argc, char *argv[])
 {
   rbdl_check_api_version (RBDL_API_VERSION);
@@ -18,6 +18,5 @@ int main (int argc, char *argv[])
       return 0;
     }
   }
-
   return Catch::Session().run(argc, argv);
 }
