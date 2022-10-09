@@ -1,0 +1,2 @@
+#define ambf_control_system_VERSION_MAJOR @ambf_control_system_VERSION_MAJOR@
+#define ambf_control_system_VERSION_MINOR @ambf_control_system_VERSION_MINOR@

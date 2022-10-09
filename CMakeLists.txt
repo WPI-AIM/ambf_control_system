@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(ambf_control_system VERSION 2.0.0)
+project(ambf_control_system VERSION 2.0)
+message("CMAKE_PROJECT_NAME.h.in: " ${CMAKE_PROJECT_NAME}.h.in)
+
+configure_file(${CMAKE_PROJECT_NAME}.h.in ${CMAKE_PROJECT_NAME}.h)
+
 
 add_subdirectory(external/eigen)
 add_subdirectory(external/Catch2)
@@ -10,7 +14,6 @@ find_package(CATCH2 REQUIRED)
 find_package(RBDL REQUIRED)
 find_package(AMBF_CLIENT REQUIRED)
 
-message("ambf_client_DIR" ${ambf_client_DIR})
 
 SET(PCH_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/PCH/include)
 
@@ -34,8 +37,8 @@ main.cpp)
 
 target_precompile_headers(${PROJECT_NAME}_app PRIVATE ${PCH_INCLUDE_DIRS}/PCH/pch.h)
 
-
-
+message("PROJECT_BINARY_DIR: " ${PROJECT_BINARY_DIR})
+target_include_directories(${PROJECT_NAME}_app PUBLIC ${PROJECT_BINARY_DIR})
 target_link_directories(${PROJECT_NAME}_app 
   PRIVATE ${RBDL_DIR}
   PRIVATE ${AMBF_CLIENT_LIBRARIES}
