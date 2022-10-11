@@ -46,8 +46,10 @@ _deps
 *.out
 *.app
 
+out
+out/*
 out/build/*
-
+out/bin/*
 # Ignore all build folders
 [Bb][Uu][Ii][Ll][Dd]/*
 .vscode

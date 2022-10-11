@@ -1,3 +1,3 @@
 #! /bin/bash
 
-../out/bin/ambf_control_system_app
+../out/bin/Sandbox_app

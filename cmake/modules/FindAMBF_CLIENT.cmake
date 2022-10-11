@@ -16,6 +16,8 @@ find_path(AMBF_MSGS_INCLUDE_DIR
 find_library(AMBF_CLIENT_LIBRARY
 	NAMES libambf_client_cpp.so
 	HINTS ../ambf/build/devel/lib
+	NO_DEFAULT_PATH
+	REQUIRED
 )
 
 
