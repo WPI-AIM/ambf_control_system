@@ -1,14 +1,14 @@
-[submodule "external/rbdl"]
-	path = external/rbdl
+[submodule "Sway/vendor/rbdl"]
+	path = Sway/vendor/rbdl
 	url = https://github.com/ORB-HD/rbdl-orb.git
-[submodule "external/Catch2"]
-	path = external/Catch2
+[submodule "Sway/vendor/Catch2"]
+	path = Sway/vendor/Catch2
 	url = https://github.com/catchorg/Catch2.git
 	branch = v2.x
-[submodule "external/eigen"]
-	path = external/eigen
+[submodule "Sway/vendor/eigen"]
+	path = Sway/vendor/eigen
 	url = https://gitlab.com/libeigen/eigen.git
 	branch = 3.4
-[submodule "external/spdlog"]
-	path = external/spdlog
+[submodule "Sway/vendor/spdlog"]
+	path = Sway/vendor/spdlog
 	url = https://github.com/gabime/spdlog.git
