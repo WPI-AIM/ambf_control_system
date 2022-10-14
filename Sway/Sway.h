@@ -1,3 +1,5 @@
-#include "include/Sway/Application.h"
+#pragma once
 
-#include "Sway/EntryPoint.h"
+#include "include/Sway/Application.h"
+#include "include/Sway/Log.h"
+#include "include/Sway/EntryPoint.h"

@@ -1,7 +1,8 @@
-#include "Sway/Core.h"
+#pragma once
 
-namespace Sway
-{
+// #include "Sway/Core.h"
+
+namespace Sway {
   class Application
   {
   public:
