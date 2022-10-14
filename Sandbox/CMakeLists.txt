@@ -6,7 +6,9 @@ src/SandboxApp.cpp)
 
 target_include_directories(${PROJECT_NAME}_app 
 PRIVATE ${Sway_SOURCE_DIR}
-PRIVATE ${SPDLOG_INCLUDE_DIRS})
+PRIVATE ${SPDLOG_INCLUDE_DIRS}
+PRIVATE ${PCH_INCLUDE_DIRS}
+)
 
 target_link_libraries(${PROJECT_NAME}_app 
 PRIVATE ${Sway_BINARY_DIR}/libSway.a
