@@ -2,11 +2,28 @@ project(Sway VERSION 2.0)
 cmake_minimum_required(VERSION 3.0.0)
 
 add_subdirectory(vendor/spdlog)
+add_subdirectory(vendor/eigen)
+add_subdirectory(vendor/Catch2)
+# add_subdirectory(vendor/rbdl)
 
-set(SPDLOG_INCLUDE_DIRS ${spdlog_SOURCE_DIR}/include PARENT_SCOPE)
-SET(PCH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/PCH/include PARENT_SCOPE)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/PCH/include)
+set(PCH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/PCH/include PARENT_SCOPE)
+# set(Eigen3_SOURCE_DIRS ${Eigen3_SOURCE_DIR} PARENT_SCOPE)
+
+find_package(spdlog REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(Catch2 REQUIRED)
+# find_package(RBDL REQUIRED)
+
+include_directories(
+  include
+  ${spdlog_INCLUDE_DIRS}
+  ${Eigen3_INCLUDE_DIRS}
+  ${Catch2_INCLUDE_DIRS}
+  # ${RBDL_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_SOURCE_DIR}/PCH/include
+  )
 
 add_library(${PROJECT_NAME} STATIC
   src/Application.cpp 
@@ -14,11 +31,6 @@ add_library(${PROJECT_NAME} STATIC
 )
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/PCH/include/PCH/pch.h)
-
-target_include_directories(${PROJECT_NAME}
-  PRIVATE ${spdlog_SOURCE_DIR}/include
-  PRIVATE include
-)
 
 target_link_libraries(${PROJECT_NAME}
   PRIVATE ${spdlog_BINARY_DIR}/libspdlog.a

@@ -1,0 +1,26 @@
+{
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/Sway/vendor/eigen/*",
+        "${workspaceFolder}/Sway/vendor/Catch2/single_include/*",
+        "${workspaceFolder}/Sway/vendor/rbdl/include/*",
+        "${workspaceFolder}/Sway/PCH/include/*",
+        "${workspaceFolder}/Sway/include/*",
+        "${workspaceFolder}/Tests/include/*",
+        "${workspaceFolder}/../ambf/ambf_ros_modules/ambf_client/include/*",
+        "${workspaceFolder}/../ambf/build/devel/include/*",
+        "/opt/ros/noetic/include/*"
+      ],
+      "defines": [],
+      "compilerPath": "/usr/lib/ccache/clang",
+      "cStandard": "c17",
+      "cppStandard": "c++20",
+      "intelliSenseMode": "linux-clang-x64",
+      "configurationProvider": "ms-vscode.makefile-tools"
+    }
+  ],
+  "version": 4
+}

@@ -52,4 +52,4 @@ out/build/*
 out/bin/*
 # Ignore all build folders
 [Bb][Uu][Ii][Ll][Dd]/*
-.vscode
+# .vscode
