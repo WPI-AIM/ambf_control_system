@@ -2,12 +2,12 @@
  * RBDL - Rigid Body Dynamics Library
  * Copyright (c) 2016-2018 Matthew Millard <millard.matthew@gmail.com>
  */
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 
 #include <iostream>
 
-#include "Fixtures.h"
-#include "Human36Fixture.h"
+#include "ReferenceTests/Fixtures.h"
+#include "ReferenceTests/Human36Fixture.h"
 #include "rbdl/rbdl_mathutils.h"
 #include "rbdl/Logging.h"
 

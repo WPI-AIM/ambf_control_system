@@ -47,6 +47,7 @@
     "typeinfo": "cpp",
     "utility": "cpp",
     "*.cmake": "cpp",
-    "dense": "cpp"
+    "dense": "cpp",
+    "iostream": "cpp"
   }
 }

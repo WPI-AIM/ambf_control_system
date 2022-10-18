@@ -3,72 +3,71 @@ project(Tests VERSION 2.0)
 
 set(TESTS_HRD_DIR
   include
-)
+  ${Sway_SOURCE_DIR}
+  ${spdlog_INCLUDE_DIRS_PS}
+  ${PCH_INCLUDE_DIRS}
+  ${Catch2_INCLUDE_DIRS_PS}
+  ${Eigen3_INCLUDE_DIRS_PS}
+  ${RBDL_CONFIG_INCLUDE_DIRS_PS}
+  ${RBDL_INCLUDE_DIRS_PS}
+  )
 
 SET ( TESTS_SOURCE_FILES
   src/main.cc
-  # MathTests.cc
-  # ErrorTests.cc
-  # SpatialAlgebraTests.cc
-  # MultiDofTests.cc
-  # KinematicsTests.cc
-  # BodyTests.cc
-  # ModelTests.cc
-  # FloatingBaseTests.cc
-  # CalcVelocitiesTests.cc
-  # CalcAccelerationsTests.cc
-  # DynamicsTests.cc
-  # InverseDynamicsTests.cc
-  # CompositeRigidBodyTests.cc
-  # ImpulsesTests.cc
-  # TwolegModelTests.cc
-  # ContactsTests.cc
-  # UtilsTests.cc
-  # SparseFactorizationTests.cc
-  # CustomJointSingleBodyTests.cc
-  # CustomJointMultiBodyTests.cc
-  # CustomConstraintsTests.cc
-  # InverseKinematicsTests.cc
-  # LoopConstraintsTests.cc
-  # ScrewJointTests.cc
-  # ForwardDynamicsConstraintsExternalForces.cc
-  # InverseDynamicsWithConstraintsTests.cc  
   )
 
-set(ReferenceTests ReferenceTests_app)
-ADD_EXECUTABLE ( ${ReferenceTests} ${TESTS_SOURCE_FILES} )
 
-target_include_directories(${ReferenceTests}
-# PRIVATE ${TESTS_HRD_DIR} 
-PRIVATE ${Sway_SOURCE_DIR}
-PRIVATE ${spdlog_INCLUDE_DIRS_PS}
-PRIVATE ${PCH_INCLUDE_DIRS}
-PRIVATE ${Catch2_INCLUDE_DIRS_PS}
-# PRIVATE ${RBDL_INCLUDE_DIRS_PS}
+SET ( ReferenceTests_SOURCE_FILES
+  ReferenceTests/src/BodyTests.cc
+  ReferenceTests/src/MathTests.cc
+  ReferenceTests/src/ErrorTests.cc
+  ReferenceTests/src/SpatialAlgebraTests.cc
+  ReferenceTests/src/MultiDofTests.cc
+  ReferenceTests/src/KinematicsTests.cc
+  ReferenceTests/src/BodyTests.cc
+  ReferenceTests/src/ModelTests.cc
+  ReferenceTests/src/FloatingBaseTests.cc
+  ReferenceTests/src/CalcVelocitiesTests.cc
+  ReferenceTests/src/CalcAccelerationsTests.cc
+  ReferenceTests/src/DynamicsTests.cc
+  ReferenceTests/src/InverseDynamicsTests.cc
+  ReferenceTests/src/CompositeRigidBodyTests.cc
+  ReferenceTests/src/ImpulsesTests.cc
+  ReferenceTests/src/TwolegModelTests.cc
+  ReferenceTests/src/ContactsTests.cc
+  ReferenceTests/src/UtilsTests.cc
+  ReferenceTests/src/SparseFactorizationTests.cc
+  ReferenceTests/src/CustomJointSingleBodyTests.cc
+  ReferenceTests/src/CustomJointMultiBodyTests.cc
+  ReferenceTests/src/CustomConstraintsTests.cc
+  ReferenceTests/src/InverseKinematicsTests.cc
+  ReferenceTests/src/LoopConstraintsTests.cc
+  ReferenceTests/src/ScrewJointTests.cc
+  ReferenceTests/src/ForwardDynamicsConstraintsExternalForces.cc
+  ReferenceTests/src/InverseDynamicsWithConstraintsTests.cc  
 )
 
-target_link_libraries(${ReferenceTests} 
+set(ReferenceTestsApp ReferenceTests_app)
+ADD_EXECUTABLE ( ${ReferenceTestsApp} 
+  ${TESTS_SOURCE_FILES} 
+  ${ReferenceTests_SOURCE_FILES}
+  )
+
+target_include_directories(${ReferenceTestsApp}
+PRIVATE ${TESTS_HRD_DIR} 
+PRIVATE ReferenceTests/include
+)
+
+
+target_link_libraries(${ReferenceTestsApp} 
 PRIVATE Catch2::Catch2
 PRIVATE ${Sway_BINARY_DIR}/libSway.a
-PRIVATE ${spdlog_BINARY_DIR}/libspdlog.a)
-# PRIVATE ${RBDL_BINARY_DIR}/librbdl.so)
-# target_link_directories(rbdl_tests 
-# PRIVATE ${RBDL_DIR}
-# )
-
-# SET (RBDL_LIBRARY rbdl)
-# IF (RBDL_BUILD_STATIC)
-#   SET (RBDL_LIBRARY rbdl-static)
-# ENDIF (RBDL_BUILD_STATIC)
-
-# TARGET_LINK_LIBRARIES ( rbdl_tests
-  # PRIVATE Catch2::Catch2
-  # PRIVATE ${RBDL_LIBRARY}
-  # PRIVATE rbdl
-  # )
+PRIVATE ${spdlog_BINARY_DIR}/libspdlog.a
+PRIVATE ${RBDL_BINARY_DIR}/librbdl.so
+)
 
 
-set_target_properties(${ReferenceTests} PROPERTIES
+set_target_properties(${ReferenceTestsApp} PROPERTIES
 CXX_STANDARD 20
 CXX_STANDARD_REQUIRED YES
 )

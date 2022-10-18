@@ -49,6 +49,7 @@ _deps
 out
 out/*
 out/build/*
+out/make_dir/*
 out/bin/*
 # Ignore all build folders
 [Bb][Uu][Ii][Ll][Dd]/*

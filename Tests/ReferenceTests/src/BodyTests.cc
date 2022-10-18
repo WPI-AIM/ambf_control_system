@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 #include "rbdl/rbdl_mathutils.h"
 #include "rbdl/Body.h"
 

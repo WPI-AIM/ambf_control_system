@@ -7,6 +7,8 @@
         "${workspaceFolder}/Sway/vendor/eigen/*",
         "${workspaceFolder}/Sway/vendor/Catch2/single_include/*",
         "${workspaceFolder}/Sway/vendor/rbdl/include/*",
+        "${workspaceFolder}/out/make_dir/rbdl_build/include/*",
+        "${workspaceFolder}/Tests/ReferenceTests/include/*",
         "${workspaceFolder}/Sway/PCH/include/*",
         "${workspaceFolder}/Sway/include/*",
         "${workspaceFolder}/Tests/include/*",

@@ -1,11 +1,11 @@
 #include "rbdl/rbdl.h"
-#include "PendulumModels.h"
+#include "ReferenceTests/PendulumModels.h"
 
 #include <chrono>
 #include <thread>
 #include <iostream>
 
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 
 using namespace std;
 using namespace RigidBodyDynamics;

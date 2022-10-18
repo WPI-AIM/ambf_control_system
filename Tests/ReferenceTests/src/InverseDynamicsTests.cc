@@ -5,7 +5,7 @@
 #include "rbdl/Model.h"
 #include "rbdl/Dynamics.h"
 
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 
 using namespace std;
 using namespace RigidBodyDynamics;

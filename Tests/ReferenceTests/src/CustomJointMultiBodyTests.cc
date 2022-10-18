@@ -5,8 +5,8 @@
 
 #include <iostream>
 
-#include "Fixtures.h"
-#include "Human36Fixture.h"
+#include "ReferenceTests/Fixtures.h"
+#include "ReferenceTests/Human36Fixture.h"
 #include "rbdl/rbdl_mathutils.h"
 #include "rbdl/Logging.h"
 
@@ -16,7 +16,7 @@
 #include "rbdl/Constraints.h"
 #include <vector>
 
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 
 using namespace std;
 using namespace RigidBodyDynamics;

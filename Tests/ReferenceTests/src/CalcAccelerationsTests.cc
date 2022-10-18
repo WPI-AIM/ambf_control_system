@@ -5,9 +5,9 @@
 #include "rbdl/Model.h"
 #include "rbdl/Kinematics.h"
 
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 
-#include "Fixtures.h"
+#include "ReferenceTests/Fixtures.h"
 
 using namespace std;
 using namespace RigidBodyDynamics;

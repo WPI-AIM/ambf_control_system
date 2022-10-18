@@ -3,7 +3,7 @@
 #include <iostream>
 #include <exception>
 
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 
 using namespace RigidBodyDynamics::Errors;
 

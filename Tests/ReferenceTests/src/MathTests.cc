@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 
 const double TEST_PREC = 1.0e-14;
 

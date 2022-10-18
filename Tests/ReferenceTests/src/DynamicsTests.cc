@@ -8,9 +8,9 @@
 #include "rbdl/Dynamics.h"
 #include "rbdl/Constraints.h"
 
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 
-#include "Fixtures.h"
+#include "ReferenceTests/Fixtures.h"
 
 using namespace std;
 using namespace RigidBodyDynamics;

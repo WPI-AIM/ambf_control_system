@@ -4,24 +4,24 @@ cmake_minimum_required(VERSION 3.0.0)
 add_subdirectory(vendor/spdlog)
 add_subdirectory(vendor/eigen)
 add_subdirectory(vendor/Catch2)
-# add_subdirectory(vendor/rbdl)
+add_subdirectory(vendor/rbdl)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
 set(PCH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/PCH/include PARENT_SCOPE)
-# set(Eigen3_SOURCE_DIRS ${Eigen3_SOURCE_DIR} PARENT_SCOPE)
 
 find_package(spdlog REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Catch2 REQUIRED)
-# find_package(RBDL REQUIRED)
+find_package(RBDL REQUIRED)
 
 include_directories(
   include
   ${spdlog_INCLUDE_DIRS}
   ${Eigen3_INCLUDE_DIRS}
   ${Catch2_INCLUDE_DIRS}
-  # ${RBDL_INCLUDE_DIRS}
+  ${RBDL_CONFIG_INCLUDE_DIRS}
+  ${RBDL_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/PCH/include
   )
 

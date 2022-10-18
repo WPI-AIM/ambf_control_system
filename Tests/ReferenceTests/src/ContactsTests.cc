@@ -7,10 +7,10 @@
 #include "rbdl/Dynamics.h"
 #include "rbdl/Kinematics.h"
 
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 
-#include "Fixtures.h"
-#include "Human36Fixture.h"
+#include "ReferenceTests/Fixtures.h"
+#include "ReferenceTests/Human36Fixture.h"
 
 using namespace std;
 using namespace RigidBodyDynamics;

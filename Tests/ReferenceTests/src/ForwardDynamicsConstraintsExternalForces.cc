@@ -1,8 +1,8 @@
 #include "rbdl/rbdl.h"
 #include <cassert>
-#include "rbdl_tests.h"
+#include "Tests/rbdl_tests.h"
 
-#include "PendulumModels.h"
+#include "ReferenceTests/PendulumModels.h"
 
 using namespace std;
 using namespace RigidBodyDynamics;
