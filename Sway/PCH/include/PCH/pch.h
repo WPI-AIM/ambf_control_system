@@ -18,4 +18,4 @@
 #include <rbdl/rbdl_config.h>
 #include <rbdl/rbdl.h>
 
-// #include "ambf_client/ambf_client.h"
+#include "ambf_client/ambf_client.h"

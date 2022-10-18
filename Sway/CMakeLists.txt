@@ -14,6 +14,7 @@ find_package(spdlog REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Catch2 REQUIRED)
 find_package(RBDL REQUIRED)
+find_package(AMBF_CLIENT REQUIRED)
 
 include_directories(
   include
@@ -22,6 +23,9 @@ include_directories(
   ${Catch2_INCLUDE_DIRS}
   ${RBDL_CONFIG_INCLUDE_DIRS}
   ${RBDL_INCLUDE_DIRS}
+  ${ROS_INCLUDE_DIRS}
+  ${AMBF_CLIENT_INCLUDE_DIRS}
+  ${AMBF_MSGS_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/PCH/include
   )
 
@@ -34,6 +38,7 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/PC
 
 target_link_libraries(${PROJECT_NAME}
   PRIVATE ${spdlog_BINARY_DIR}/libspdlog.a
+  PRIVATE ${AMBF_CLIENT_LIBRARIES}
 )
 
 include(Sway.h)
