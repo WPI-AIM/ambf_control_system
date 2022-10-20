@@ -1,19 +1,6 @@
-#include <iostream>
-
-#include "rbdl/rbdl_mathutils.h"
-#include "rbdl/rbdl_utils.h"
-#include "rbdl/Logging.h"
-
-#include "rbdl/Model.h"
-#include "rbdl/Kinematics.h"
-
 #include "Tests/rbdl_tests.h"
-
 #include "ReferenceTests/Human36Fixture.h"
-
 using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
 
 const double TEST_PREC = 1.0e-12;
 

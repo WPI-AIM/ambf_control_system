@@ -1,19 +1,10 @@
-#include "rbdl/rbdl.h"
-#include "rbdl/Constraint.h"
-#include "rbdl/Constraints.h"
-#include <cassert>
-
 #include "Tests/rbdl_tests.h"
-
 #include "ReferenceTests/PendulumModels.h"
 
+const double TEST_PREC = 1.0e-14;
+const double TEST_LAX = 1.0e-5;
+
 using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
-
-const double TEST_PREC = 1.0e-11;
-
-
 class PinJointCustomConstraint : public RigidBodyDynamics::Constraint
 {
 

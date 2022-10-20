@@ -1,14 +1,10 @@
-#include <iostream>
-
 #include "Tests/rbdl_tests.h"
-#include "rbdl/rbdl_mathutils.h"
-#include "rbdl/Body.h"
-
 using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
 
 const double TEST_PREC = 1.0e-14;
+const double TEST_LAX = 1.0e-5;
+
+// const double TEST_PREC = 1.0e-14;
 
 /* Tests whether the spatial inertia matches the one specified by its
  * parameters

@@ -1,12 +1,8 @@
-#include "rbdl/rbdl.h"
-#include <cassert>
 #include "Tests/rbdl_tests.h"
 
 #include "ReferenceTests/PendulumModels.h"
 
 using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
 
 const double TEST_PREC = 1.0e-11;
 

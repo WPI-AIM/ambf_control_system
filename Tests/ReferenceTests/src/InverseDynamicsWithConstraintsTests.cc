@@ -1,16 +1,7 @@
-#include "rbdl/rbdl.h"
 #include "ReferenceTests/PendulumModels.h"
 
-#include <chrono>
-#include <thread>
-#include <iostream>
-
 #include "Tests/rbdl_tests.h"
-
 using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
-
 const double TEST_PREC = 1.0e-11;
 
 const bool flag_printTimingData = false;

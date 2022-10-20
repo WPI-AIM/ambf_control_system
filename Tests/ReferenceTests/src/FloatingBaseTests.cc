@@ -1,19 +1,9 @@
-#include <iostream>
-
-#include "rbdl/rbdl_mathutils.h"
-#include "rbdl/Logging.h"
-
-#include "rbdl/Model.h"
-#include "rbdl/Kinematics.h"
-#include "rbdl/Dynamics.h"
-
 #include "Tests/rbdl_tests.h"
 
 using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
 
 const double TEST_PREC = 1.0e-14;
+const double TEST_LAX = 1.0e-5;
 
 struct FloatingBaseFixture {
   FloatingBaseFixture () {

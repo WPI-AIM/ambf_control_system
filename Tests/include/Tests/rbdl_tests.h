@@ -1,10 +1,12 @@
 #ifndef RBDL_RBDL_TESTS_H
 #define RBDL_RBDL_TESTS_H
 
-#include <cmath>
+#include "PCH/pch.h"
 
-#include "catch2/catch.hpp"
-#include "rbdl/rbdl_math.h"
+using namespace RigidBodyDynamics;
+using namespace RigidBodyDynamics::Math;
+using namespace RigidBodyDynamics::Errors;
+
 
 template <typename T>
 struct IsCloseMatcher : Catch::MatcherBase<T> {

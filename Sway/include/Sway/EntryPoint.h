@@ -1,4 +1,7 @@
 #pragma once
+#include "PCH/pch.h"
+#include "include/Sway/Application.h"
+#include "include/Sway/Log.h"
 
 extern Sway::Application* Sway::CreateApplication();
 

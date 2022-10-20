@@ -1,17 +1,9 @@
-#include <iostream>
-#include <iomanip>
-
-#include "rbdl/Body.h"
-#include "rbdl/rbdl_math.h"
-#include "rbdl/rbdl_mathutils.h"
-
 #include "Tests/rbdl_tests.h"
 
 using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
 
 const double TEST_PREC = 1.0e-14;
+const double TEST_LAX = 1.0e-5;
 
 SpatialMatrix spatial_adjoint(const SpatialMatrix &m) {
   SpatialMatrix res (m);

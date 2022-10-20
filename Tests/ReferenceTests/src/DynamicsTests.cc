@@ -1,22 +1,10 @@
-#include <iostream>
-#include <limits>
-
-#include "rbdl/Logging.h"
-
-#include "rbdl/Model.h"
-#include "rbdl/Kinematics.h"
-#include "rbdl/Dynamics.h"
-#include "rbdl/Constraints.h"
-
 #include "Tests/rbdl_tests.h"
-
 #include "ReferenceTests/Fixtures.h"
 
 using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
 
 const double TEST_PREC = 1.0e-13;
+const double TEST_LAX = 1.0e-5;
 
 struct DynamicsFixture {
   DynamicsFixture () {

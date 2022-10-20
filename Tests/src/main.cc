@@ -13,8 +13,8 @@ int main (int argc, char *argv[])
     }
   }
 
-  Client client("ecm");
-  client.cleanUp(); 
+  // Client client("ecm");
+  // client.cleanUp(); 
   
   return Catch::Session().run(argc, argv);
 }

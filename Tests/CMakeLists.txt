@@ -21,6 +21,16 @@ SET ( TESTS_SOURCE_FILES
   )
 
 
+set(TESTS_LINK_LIBRARIES
+  PRIVATE Catch2::Catch2
+  PRIVATE ${Sway_BINARY_DIR}/libSway.a
+  # PRIVATE ${spdlog_BINARY_DIR}/libspdlog.a
+  PRIVATE ${BOOST_LIBRARY_LIBRARY_PS}
+  PRIVATE ${RBDL_BINARY_DIR}/librbdl.so
+  # PRIVATE ${AMBF_CLIENT_LIBRARIES_PS}
+  )
+
+#####Beginning of Reference Test App#############
 SET ( ReferenceTests_SOURCE_FILES
   ReferenceTests/src/BodyTests.cc
   ReferenceTests/src/MathTests.cc
@@ -62,17 +72,40 @@ PRIVATE ${TESTS_HRD_DIR}
 PRIVATE ReferenceTests/include
 )
 
-
 target_link_libraries(${ReferenceTestsApp} 
-PRIVATE Catch2::Catch2
-PRIVATE ${Sway_BINARY_DIR}/libSway.a
-PRIVATE ${spdlog_BINARY_DIR}/libspdlog.a
-PRIVATE ${RBDL_BINARY_DIR}/librbdl.so
-PRIVATE ${AMBF_CLIENT_LIBRARIES_PS}
+  ${TESTS_LINK_LIBRARIES}
 )
-
 
 set_target_properties(${ReferenceTestsApp} PROPERTIES
 CXX_STANDARD 20
 CXX_STANDARD_REQUIRED YES
 )
+
+#####End of Reference Test App#############
+
+#####Beginning of KUKA Test App#############
+SET ( KUKATests_SOURCE_FILES
+  KUKATests/src/KinematicsTests.cc
+)
+
+set(KUKATestsApp KUKATests_app)
+ADD_EXECUTABLE ( ${KUKATestsApp} 
+  ${TESTS_SOURCE_FILES} 
+  ${KUKATests_SOURCE_FILES}
+  )
+
+target_include_directories(${KUKATestsApp}
+PRIVATE ${TESTS_HRD_DIR} 
+PRIVATE KUKATests/include
+)
+
+target_link_libraries(${KUKATestsApp} 
+  ${TESTS_LINK_LIBRARIES}
+)
+
+set_target_properties(${KUKATestsApp} PROPERTIES
+CXX_STANDARD 20
+CXX_STANDARD_REQUIRED YES
+)
+
+#####End of KUKA Test App#############

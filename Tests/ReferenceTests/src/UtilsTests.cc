@@ -1,21 +1,9 @@
-#include <iostream>
-
 #include "ReferenceTests/Fixtures.h"
 #include "ReferenceTests/Human36Fixture.h"
-#include "rbdl/rbdl_mathutils.h"
-#include "rbdl/rbdl_utils.h"
-#include "rbdl/Logging.h"
-
-#include "rbdl/Model.h"
-#include "rbdl/Kinematics.h"
-#include "rbdl/Dynamics.h"
 
 #include "Tests/rbdl_tests.h"
 
 using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
-
 TEST_CASE_METHOD(FloatingBase12DoF,
                  __FILE__"_TestKineticEnergy", "") {
   VectorNd q = VectorNd::Zero(model->q_size);

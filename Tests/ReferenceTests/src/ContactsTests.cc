@@ -1,23 +1,8 @@
-#include <iostream>
-
-#include "rbdl/Logging.h"
-
-#include "rbdl/Model.h"
-#include "rbdl/Constraints.h"
-#include "rbdl/Dynamics.h"
-#include "rbdl/Kinematics.h"
-
 #include "Tests/rbdl_tests.h"
-
 #include "ReferenceTests/Fixtures.h"
 #include "ReferenceTests/Human36Fixture.h"
 
-using namespace std;
-using namespace RigidBodyDynamics;
-using namespace RigidBodyDynamics::Math;
-
 const double TEST_PREC = 1.0e-11;
-
 struct FixedBase6DoF9DoF {
   FixedBase6DoF9DoF () {
     ClearLogOutput();

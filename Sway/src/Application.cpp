@@ -1,5 +1,4 @@
 #include "Sway/Application.h"
-// #include "include/Sway/Application.h"
 namespace Sway
 {
   Application::Application()

@@ -3,14 +3,11 @@
 #include "rbdl/rbdl_mathutils.h"
 
 #include <iostream>
-
 #include "Tests/rbdl_tests.h"
-
 const double TEST_PREC = 1.0e-14;
+const double TEST_LAX = 1.0e-5;
 
 using namespace std;
-using namespace RigidBodyDynamics::Math;
-
 struct MathFixture {
 };
 

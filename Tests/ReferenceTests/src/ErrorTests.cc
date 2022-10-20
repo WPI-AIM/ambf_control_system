@@ -1,11 +1,6 @@
-#include "rbdl/Logging.h"
-#include "rbdl/rbdl_errors.h"
-#include <iostream>
-#include <exception>
-
 #include "Tests/rbdl_tests.h"
-
-using namespace RigidBodyDynamics::Errors;
+const double TEST_PREC = 1.0e-14;
+const double TEST_LAX = 1.0e-5;
 
 // Test if each error type can be catched by Base Class
 TEST_CASE ( __FILE__"_BaseClassCatch", "" )
