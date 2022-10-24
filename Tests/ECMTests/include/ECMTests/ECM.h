@@ -326,9 +326,9 @@ struct ECM
     //   AddBody(pitchbottomlink_pitchendlinkId, Xtrans(p_pitchendlink_maininsertionlink_world), 
     //   Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody, "pitchendlink-maininsertionlink");
     // Parent To be modified
-    pitchendlink_maininsertionlinkId = model->
-      AddBody(pitchtoplink_pitchendlinkId, Xtrans(p_pitchendlink_maininsertionlink_world), 
-      Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody, "pitchendlink-maininsertionlink");
+    // pitchendlink_maininsertionlinkId = model->
+    //   AddBody(pitchtoplink_pitchendlinkId, Xtrans(p_pitchendlink_maininsertionlink_world), 
+    //   Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody, "pitchendlink-maininsertionlink");
 
 
       // pitchendlink_maininsertionlinkJ, pitchendlinkBody, "pitchendlink-maininsertionlink");
@@ -338,9 +338,9 @@ struct ECM
     //   maininsertionlink_toollinkJAxis(1), 
     //   maininsertionlink_toollinkJAxis(2),
     //   0., 0., 0.));
-    maininsertionlink_toollinkId = model->
-      AddBody(pitchendlink_maininsertionlinkId, Xtrans(p_maininsertionlink_toollink_world), 
-      Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody, "maininsertionlink-toollink");
+    // maininsertionlink_toollinkId = model->
+    //   AddBody(pitchendlink_maininsertionlinkId, Xtrans(p_maininsertionlink_toollink_world), 
+    //   Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody, "maininsertionlink-toollink");
       // maininsertionlink_toollinkJ, pitchendlinkBody, "maininsertionlink-toollink");
     //--------------------------------------------------------------------//
     Q = VectorNd::Constant ((size_t) model->dof_count, 0.);
