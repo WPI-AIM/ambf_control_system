@@ -13,7 +13,7 @@ set(PCH_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/PCH/include PARENT_SCOPE)
 find_package(spdlog REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Catch2 REQUIRED)
-find_package(Dependent_Packages REQUIRED)
+# find_package(Dependent_Packages REQUIRED)
 find_package(RBDL REQUIRED)
 find_package(AMBF_CLIENT REQUIRED)
 

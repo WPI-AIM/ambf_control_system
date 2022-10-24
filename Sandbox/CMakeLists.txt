@@ -21,7 +21,7 @@ target_include_directories(${PROJECT_NAME}_app
 target_link_libraries(${PROJECT_NAME}_app 
   PRIVATE ${Sway_BINARY_DIR}/libSway.a
   PRIVATE ${spdlog_BINARY_DIR}/libspdlog.a
-  PRIVATE ${BOOST_LIBRARY_LIBRARY_PS}
+  # PRIVATE ${BOOST_LIBRARY_LIBRARY_PS}
   PRIVATE ${RBDL_BINARY_DIR}/librbdl.so
   PRIVATE ${AMBF_CLIENT_LIBRARIES_PS}
 )

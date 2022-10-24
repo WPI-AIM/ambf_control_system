@@ -25,7 +25,7 @@ set(TESTS_LINK_LIBRARIES
   PRIVATE Catch2::Catch2
   PRIVATE ${Sway_BINARY_DIR}/libSway.a
   # PRIVATE ${spdlog_BINARY_DIR}/libspdlog.a
-  PRIVATE ${BOOST_LIBRARY_LIBRARY_PS}
+  # PRIVATE ${BOOST_LIBRARY_LIBRARY_PS}
   PRIVATE ${RBDL_BINARY_DIR}/librbdl.so
   # PRIVATE ${AMBF_CLIENT_LIBRARIES_PS}
   )
@@ -85,7 +85,7 @@ CXX_STANDARD_REQUIRED YES
 
 #####Beginning of KUKA Test App#############
 SET ( KUKATests_SOURCE_FILES
-  KUKATests/src/KinematicsTests.cc
+  KUKATests/src/KUKAKinematicsTests.cc
 )
 
 set(KUKATestsApp KUKATests_app)
@@ -109,3 +109,29 @@ CXX_STANDARD_REQUIRED YES
 )
 
 #####End of KUKA Test App#############
+
+#####Beginning of ECM Test App#############
+SET ( ECMTests_SOURCE_FILES
+  ECMTests/src/ECMKinematicsTests.cc
+)
+
+set(ECMTestsApp ECMTests_app)
+ADD_EXECUTABLE ( ${ECMTestsApp} 
+  ${TESTS_SOURCE_FILES} 
+  ${ECMTests_SOURCE_FILES}
+  )
+
+target_include_directories(${ECMTestsApp}
+PRIVATE ${TESTS_HRD_DIR} 
+PRIVATE ECMTests/include
+)
+
+target_link_libraries(${ECMTestsApp} 
+  ${TESTS_LINK_LIBRARIES}
+)
+
+set_target_properties(${ECMTestsApp} PROPERTIES
+CXX_STANDARD 20
+CXX_STANDARD_REQUIRED YES
+)
+#####End of ECM Test App#############
