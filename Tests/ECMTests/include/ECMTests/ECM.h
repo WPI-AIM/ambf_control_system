@@ -188,18 +188,18 @@ struct ECM
     world_toollinkST.E          = Matrix3d( 0,  1,  0, -1,  0, 0,  0,  0, 1);
 
 
-    std::cout << "world_yawlinkST"          << std::endl << world_yawlinkST            << std::endl;
-    std::cout << "world_pitchbacklinkST"    << std::endl << world_pitchbacklinkST      << std::endl;
-    std::cout << "world_pitchbottomlinkST"  << std::endl << world_pitchbottomlinkST    << std::endl;
-    std::cout << "world_pitchendlinkST"     << std::endl << world_pitchendlinkST       << std::endl;
+    // std::cout << "world_yawlinkST"          << std::endl << world_yawlinkST            << std::endl;
+    // std::cout << "world_pitchbacklinkST"    << std::endl << world_pitchbacklinkST      << std::endl;
+    // std::cout << "world_pitchbottomlinkST"  << std::endl << world_pitchbottomlinkST    << std::endl;
+    // std::cout << "world_pitchendlinkST"     << std::endl << world_pitchendlinkST       << std::endl;
 
-    std::cout << "world_pitchfrontlinkST"    << std::endl << world_pitchfrontlinkST    << std::endl;
-    // std::cout << "world_pitchbottomlink2ST" << std::endl << world_pitchbottomlink2ST << std::endl;
-    std::cout << "world_pitchtoplinkST"      << std::endl << world_pitchtoplinkST      << std::endl;
-    std::cout << "world_pitchendlinkST"      << std::endl << world_pitchendlinkST      << std::endl;
+    // std::cout << "world_pitchfrontlinkST"    << std::endl << world_pitchfrontlinkST    << std::endl;
+    // // std::cout << "world_pitchbottomlink2ST" << std::endl << world_pitchbottomlink2ST << std::endl;
+    // std::cout << "world_pitchtoplinkST"      << std::endl << world_pitchtoplinkST      << std::endl;
+    // std::cout << "world_pitchendlinkST"      << std::endl << world_pitchendlinkST      << std::endl;
     
-    std::cout << "world_maininsertionlinkST" << std::endl << world_maininsertionlinkST << std::endl;
-    std::cout << "world_toollinkST"          << std::endl << world_toollinkST          << std::endl;
+    // std::cout << "world_maininsertionlinkST" << std::endl << world_maininsertionlinkST << std::endl;
+    // std::cout << "world_toollinkST"          << std::endl << world_toollinkST          << std::endl;
     //--------------------------------------------------------------------//
     const Vector3d p_baselink_yawlink_world 
       = world_baselinkST.E * baselink_yawlinkST.r;
@@ -257,9 +257,9 @@ struct ECM
     //   yawlink_pitchbacklinkJAxis(1), 
     //   yawlink_pitchbacklinkJAxis(2),
     //   0., 0., 0.));
-    // yawlink_pitchbacklinkId = model->
-    //   AddBody(baselink_yawlinkId, Xtrans(p_yawlink_pitchbacklink_world), 
-    //   Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbacklinkBody, "yawlink-pitchbacklink");
+    yawlink_pitchbacklinkId = model->
+      AddBody(baselink_yawlinkId, Xtrans(p_yawlink_pitchbacklink_world), 
+      Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbacklinkBody, "yawlink-pitchbacklink");
       // yawlink_pitchbacklinkJ, pitchbacklinkBody, "yawlink-pitchbacklink");
 
     // Joint pitchbacklink_pitchbottomlinkJ = Joint(SpatialVector (
@@ -267,19 +267,19 @@ struct ECM
     //   pitchbacklink_pitchbottomlinkJAxis(1), 
     //   pitchbacklink_pitchbottomlinkJAxis(2),
     //   0., 0., 0.));
-    // pitchbacklink_pitchbottomlinkId = model->
-    //   AddBody(yawlink_pitchbacklinkId, Xtrans(p_pitchbacklink_pitchbottomlink_world), 
-    //   Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbottomlinkBody, "pitchbacklink-pitchbottomlink");
+    pitchbacklink_pitchbottomlinkId = model->
+      AddBody(yawlink_pitchbacklinkId, Xtrans(p_pitchbacklink_pitchbottomlink_world), 
       // pitchbacklink_pitchbottomlinkJ, pitchbottomlinkBody, "pitchbacklink-pitchbottomlink");
+      Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbottomlinkBody, "pitchbacklink-pitchbottomlink");
 
     // Joint pitchbottomlink_pitchendlinkJ = Joint(SpatialVector (
     //   pitchbottomlink_pitchendlinkJAxis(0), 
     //   pitchbottomlink_pitchendlinkJAxis(1), 
     //   pitchbottomlink_pitchendlinkJAxis(2), 
     //   0., 0., 0.));
-    // pitchbottomlink_pitchendlinkId = model->
-    //   AddBody(pitchbacklink_pitchbottomlinkId, Xtrans(p_pitchbottomlink_pitchendlink_world), 
-    //   Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchendlinkBody, "pitchbottomlink-pitchendlink");
+    pitchbottomlink_pitchendlinkId = model->
+      AddBody(pitchbacklink_pitchbottomlinkId, Xtrans(p_pitchbottomlink_pitchendlink_world), 
+      Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchendlinkBody, "pitchbottomlink-pitchendlink");
       // pitchbottomlink_pitchendlinkJ, pitchendlinkBody, "pitchbottomlink-pitchendlink");
     
     // Joint yawlink_pitchfrontlinkJ = Joint(SpatialVector (
@@ -292,9 +292,10 @@ struct ECM
       Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchfrontlinkBody, "yawlink-pitchfrontlink");
       // yawlink_pitchfrontlinkJ, pitchfrontlinkBody, "yawlink-pitchfrontlink");
 
-    // pitchfrontlink_pitchbottomlinkId = rbdlModelPtr_->
-    // 	AddBody(yawlink_pitchfrontlinkId, Xtrans(p_pitchfrontlink_pitchbottomlink_world), 
-    // 	Joint(SpatialVector (0., 0., 0., 0., 0., 0.)), virtualBody_, "pitchfrontlink-pitchbottomlink");
+    // This has to be added
+    pitchfrontlink_pitchbottomlinkId = model->
+    	AddBody(yawlink_pitchfrontlinkId, Xtrans(p_pitchfrontlink_pitchbottomlink_world), 
+    	Joint(SpatialVector (0., 0., 0., 0., 0., 0.)), virtualBody, "pitchfrontlink-pitchbottomlink");
 
     // Joint pitchfrontlink_pitchtoplinkJ = Joint(SpatialVector (
     //   pitchfrontlink_pitchtoplinkJAxis(0), 
@@ -322,15 +323,9 @@ struct ECM
     //   pitchendlink_maininsertionlinkJAxis(0), 
     //   pitchendlink_maininsertionlinkJAxis(1), 
     //   pitchendlink_maininsertionlinkJAxis(2)));
-    // pitchendlink_maininsertionlinkId = model->
-    //   AddBody(pitchbottomlink_pitchendlinkId, Xtrans(p_pitchendlink_maininsertionlink_world), 
-    //   Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody, "pitchendlink-maininsertionlink");
-    // Parent To be modified
-    // pitchendlink_maininsertionlinkId = model->
-    //   AddBody(pitchtoplink_pitchendlinkId, Xtrans(p_pitchendlink_maininsertionlink_world), 
-    //   Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody, "pitchendlink-maininsertionlink");
-
-
+    pitchendlink_maininsertionlinkId = model->
+      AddBody(pitchbottomlink_pitchendlinkId, Xtrans(p_pitchendlink_maininsertionlink_world), 
+      Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody, "pitchendlink-maininsertionlink");
       // pitchendlink_maininsertionlinkJ, pitchendlinkBody, "pitchendlink-maininsertionlink");
 
     // Joint maininsertionlink_toollinkJ = Joint(SpatialVector (
@@ -338,9 +333,9 @@ struct ECM
     //   maininsertionlink_toollinkJAxis(1), 
     //   maininsertionlink_toollinkJAxis(2),
     //   0., 0., 0.));
-    // maininsertionlink_toollinkId = model->
-    //   AddBody(pitchendlink_maininsertionlinkId, Xtrans(p_maininsertionlink_toollink_world), 
-    //   Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody, "maininsertionlink-toollink");
+    maininsertionlink_toollinkId = model->
+      AddBody(pitchendlink_maininsertionlinkId, Xtrans(p_maininsertionlink_toollink_world), 
+      Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody, "maininsertionlink-toollink");
       // maininsertionlink_toollinkJ, pitchendlinkBody, "maininsertionlink-toollink");
     //--------------------------------------------------------------------//
     Q = VectorNd::Constant ((size_t) model->dof_count, 0.);
@@ -370,19 +365,19 @@ struct ECM
     rbdlBodyMap = model->mBodyNameMap;
 
     ClearLogOutput();
-    for(rbdlBodyMapItr = rbdlBodyMap.begin(); 
-        rbdlBodyMapItr != rbdlBodyMap.end(); 
-        rbdlBodyMapItr++)
-    {
-      std::string bodyName = rbdlBodyMapItr->first;
-      unsigned int bodyId = rbdlBodyMapItr->second;
+    // for(rbdlBodyMapItr = rbdlBodyMap.begin(); 
+    //     rbdlBodyMapItr != rbdlBodyMap.end(); 
+    //     rbdlBodyMapItr++)
+    // {
+    //   std::string bodyName = rbdlBodyMapItr->first;
+    //   unsigned int bodyId = rbdlBodyMapItr->second;
 
-      std::string parentName = model->GetBodyName(model->GetParentBodyId(bodyId));
-      bool isFixedBody = model->IsFixedBodyId(bodyId);
-      std::cout << parentName << ", " << bodyName    << ", " 
-                << bodyId     << ", " << isFixedBody << std::endl;
-      // std::cout << --bodyId << ", " << bodyName << std::endl;
-    }
+    //   std::string parentName = model->GetBodyName(model->GetParentBodyId(bodyId));
+    //   bool isFixedBody = model->IsFixedBodyId(bodyId);
+    //   // std::cout << parentName << ", " << bodyName    << ", " 
+    //   //           << bodyId     << ", " << isFixedBody << std::endl;
+    //   std::cout << --bodyId << ", " << bodyName << std::endl;
+    // }
   }
   
   ~ECM()

@@ -1,23 +1,21 @@
 #include "ECMTests/ECM.h"
+
 /*
 // All Test cases passes
 TEST_CASE_METHOD ( ECM, __FILE__"_HomePose", "") 
 {
-//          baselink-pitchendlink 0.0
-
-//               baselink-yawlink -3.657404886325821e-05
-
-//          yawlink-pitchbacklink -0.0013614902272820473
-//  pitchbacklink-pitchbottomlink 0.0008688201778568327
-
-// pitchendlink-maininsertionlink 0.0012765447609126568
-//     maininsertionlink-toollink -1.931602309923619e-05
-
-//         yawlink-pitchfrontlink -0.004370488226413727
-//    pitchfrontlink-pitchtoplink 0.002932438626885414
-
-//   pitchbottomlink-pitchendlink -0.000857531966175884
-//      pitchtoplink-pitchendlink 8.787875412963331e-05
+// 4294967295, ROOT
+// 2147483646, world-baselink
+// 0, baselink-yawlink
+// 1, yawlink-pitchbacklink
+// 2, pitchbacklink-pitchbottomlink
+// 3, pitchbottomlink-pitchendlink
+// 4, yawlink-pitchfrontlink
+// 5, pitchfrontlink-pitchbottomlink
+// 6, pitchfrontlink-pitchtoplink
+// 7, pitchtoplink-pitchendlink
+// 8, pitchendlink-maininsertionlink
+// 9, maininsertionlink-toollink
 
 
   Q.setZero();
@@ -65,22 +63,29 @@ TEST_CASE_METHOD ( ECM, __FILE__"_HomePose", "")
 // All Test cases passes
 TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V0", "") 
 {
-//          baselink-pitchendlink 0.0
-//               baselink-yawlink 1.5745776891708374
-//          yawlink-pitchbacklink 2.5686116714496166e-05
-//  pitchbacklink-pitchbottomlink -0.000324003747664392
-// pitchendlink-maininsertionlink 0.09998920559883118
-//     maininsertionlink-toollink -0.029354527592658997
-//         yawlink-pitchfrontlink -0.0028719049878418446
-//    pitchfrontlink-pitchtoplink 0.0016521965153515339
-//   pitchbottomlink-pitchendlink 0.0004958789213560522
-//      pitchtoplink-pitchendlink 0.0014138610567897558
+  // 0               baselink-yawlink 1.5745776891708374
+  // 1          yawlink-pitchbacklink 2.5686116714496166e-05
+  // 2  pitchbacklink-pitchbottomlink -0.000324003747664392
+  // 3   pitchbottomlink-pitchendlink 0.0004958789213560522
+  // 4         yawlink-pitchfrontlink -0.0028719049878418446
+  // 5 pitchfrontlink-pitchbottomlink 0.002573436824604869
+  // 6    pitchfrontlink-pitchtoplink 0.0016521965153515339
+  // 7      pitchtoplink-pitchendlink 0.0014138610567897558
+  // 8 pitchendlink-maininsertionlink 0.09998920559883118
+  // 9     maininsertionlink-toollink -0.029354527592658997
 
   Q.setZero();
   Q[0] = 1.5745776891708374;
-  Q[1] = -0.0009518474689684808;
-  Q[7] = 0.09998920559883118;
-  Q[8] = -0.029354527592658997;
+  Q[1] = 2.5686116714496166e-05;
+  Q[2] = -0.000324003747664392;
+  Q[3] = 0.0004958789213560522;
+  Q[4] = -0.0028719049878418446;
+  Q[5] = 0.002573436824604869;
+  Q[6] = 0.0016521965153515339;
+  Q[7] = 0.0014138610567897558;
+  Q[8] = 0.09998920559883118;
+  Q[9] = -0.029354527592658997;
+
   // std::cout << "Q" << std::endl << Q << std::endl;
 
   Vector3d p_w_baselink = CalcBodyToBaseCoordinates(*model, Q, 
@@ -134,20 +139,29 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V0", "")
 // All Test cases passes
 TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V1", "") 
 {
-//            baselink-pitchendlink 0.0
-//               baselink-yawlink 0.7880660891532898
-//          yawlink-pitchbacklink -0.0009518474689684808
-//  pitchbacklink-pitchbottomlink 0.0007073471788316965
-// pitchendlink-maininsertionlink 0.10089550912380219
-//     maininsertionlink-toollink -0.020769545808434486
-//         yawlink-pitchfrontlink -0.003932825289666653
-//    pitchfrontlink-pitchtoplink 0.002760454313829541
-//   pitchbottomlink-pitchendlink -0.0006491024396382272
-//      pitchtoplink-pitchendlink 0.0002771636936813593
-
   Q.setZero();
+
+  // 0               baselink-yawlink 0.7880660891532898
+  // 1          yawlink-pitchbacklink -0.0009518474689684808
+  // 2  pitchbacklink-pitchbottomlink 0.0007073471788316965
+  // 3   pitchbottomlink-pitchendlink -0.0006491024396382272
+  // 4         yawlink-pitchfrontlink -0.003932825289666653
+  // 5 pitchfrontlink-pitchbottomlink 0.0036882569547742605
+  // 6    pitchfrontlink-pitchtoplink 0.002760454313829541
+  // 7      pitchtoplink-pitchendlink 0.0002771636936813593
+  // 8 pitchendlink-maininsertionlink 0.10089550912380219
+  // 9     maininsertionlink-toollink -0.020769545808434486
+
   Q[0] = 0.7880660891532898;
-  Q[7] = 0.10089550912380219;
+  Q[1] = -0.0009518474689684808;
+  Q[2] = 0.0007073471788316965;
+  Q[3] = -0.0006491024396382272;
+  Q[4] = -0.003932825289666653;
+  Q[5] = 0.0036882569547742605;
+  Q[6] = 0.002760454313829541;
+  Q[7] = 0.0002771636936813593;
+  Q[8] = 0.10089550912380219;
+  Q[9] = -0.020769545808434486;
   std::cout << "Q" << std::endl << Q << std::endl;
 
   Vector3d p_w_baselink = CalcBodyToBaseCoordinates(*model, Q, 
@@ -196,19 +210,42 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V1", "")
 }
 */
 
-/*
+
 TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V2", "") 
 {
-  //               baselink-yawlink 0.7880651950836182
-  //          yawlink-pitchbacklink -0.0009477213025093079
-  // pitchendlink-maininsertionlink 0.10089556127786636
-  //     maininsertionlink-toollink 0.7641677856445312
-
   Q.setZero();
-  Q[0] = 0.7880660891532898;
+  // //               baselink-yawlink 0.7880651950836182
+  // //          yawlink-pitchbacklink -0.0009477213025093079
+  // // pitchendlink-maininsertionlink 0.10089556127786636
+  // //     maininsertionlink-toollink 0.7641677856445312
+
+  // Q[0] = 0.7880660891532898;
+  // Q[1] = -0.0009477213025093079;
+  // Q[7] = 0.10089556127786636;
+  // Q[8] = 0.7641677856445312;
+
+  // 0,               baselink-yawlink, 0.7880651950836182
+  // 1,          yawlink-pitchbacklink, -0.0009477213025093079
+  // 2,  pitchbacklink-pitchbottomlink, 0.000703148078173399
+  // 3,   pitchbottomlink-pitchendlink, -0.0006443223683163524
+  // 4,         yawlink-pitchfrontlink, -0.003928348887711763
+  // 5, pitchfrontlink-pitchbottomlink, 0.003683707909658551
+  // 6,    pitchfrontlink-pitchtoplink, 0.0027559399604797363
+  // 7,      pitchtoplink-pitchendlink, 0.0002819084911607206
+  // 8, pitchendlink-maininsertionlink, 0.10089556127786636
+  // 9,     maininsertionlink-toollink, 0.7641677856445312
+
+
+  Q[0] = 0.7880651950836182;
   Q[1] = -0.0009477213025093079;
-  Q[7] = 0.10089556127786636;
-  Q[8] = 0.7641677856445312;
+  Q[2] = 0.000703148078173399;
+  Q[3] = -0.0006443223683163524;
+  Q[4] = -0.003928348887711763;
+  Q[5] = 0.003683707909658551;
+  Q[6] = 0.0027559399604797363;
+  Q[7] = 0.0002819084911607206;
+  Q[8] = 0.10089556127786636;
+  Q[9] = 0.7641677856445312;
 
   // std::cout << "Q" << std::endl << Q << std::endl;
 
@@ -217,42 +254,42 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V2", "")
   CHECK_THAT (Vector3d(0.5, -0.4, -0.6), 
     AllCloseVector(p_w_baselink, TEST_PREC, TEST_PREC));
     
-  // Vector3d p_w_yawlink = CalcBodyToBaseCoordinates(*model, Q, 
-  //   model->GetBodyId("baselink-yawlink"), Vector3d(0., 0., 0.), true);
-  // CHECK_THAT (Vector3d(0.49987, -0.927, -0.598924), 
-  //   AllCloseVector(p_w_yawlink, TEST_PREC, TEST_PREC));
+  Vector3d p_w_yawlink = CalcBodyToBaseCoordinates(*model, Q, 
+    model->GetBodyId("baselink-yawlink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.500006,   -0.936899,   -0.600001), 
+    AllCloseVector(p_w_yawlink, TEST_PREC, TEST_PREC));
 
   Vector3d p_w_pitchbacklink = CalcBodyToBaseCoordinates(*model, Q, 
     model->GetBodyId("yawlink-pitchbacklink"), Vector3d(0., 0., 0.), true);
 	CHECK_THAT (Vector3d(0.50004,   -0.774488,   -0.600063), 
     AllCloseVector(p_w_pitchbacklink, TEST_PREC, TEST_PREC));
 
-  // Vector3d p_w_pitchbottomlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
-  //   rbdlModelPtr_->GetBodyId("pitchbacklink-pitchbottomlink"), Vector3d(0., 0., 0.), true);
-  // CHECK_THAT (Vector3d(0.5, -0.831042, -0.312319), 
-  //   AllCloseVector(p_w_pitchbottomlink, TEST_PREC, TEST_PREC));
-  // Vector3d p_w_pitchendlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
-  //   rbdlModelPtr_->GetBodyId("pitchbottomlink-pitchendlink"), Vector3d(0., 0., 0.), true);
-  // CHECK_THAT (Vector3d(0.500104, -0.490944, -0.31224), 
-  //   AllCloseVector(p_w_pitchendlink, TEST_PREC, TEST_PREC));
-  // Vector3d p_w_pitchfrontlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
-  //   rbdlModelPtr_->GetBodyId("yawlink-pitchfrontlink"), Vector3d(0., 0., 0.), true);
-  // CHECK_THAT (Vector3d(0.5, -0.728002, -0.599003), 
-  //   AllCloseVector(p_w_pitchfrontlink, TEST_PREC, TEST_PREC));
+  Vector3d p_w_pitchbottomlink = CalcBodyToBaseCoordinates(*model, Q, 
+    model->GetBodyId("pitchbacklink-pitchbottomlink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.296746,   -0.841163,   -0.398033), 
+    AllCloseVector(p_w_pitchbottomlink, TEST_PREC, TEST_PREC));
+  Vector3d p_w_pitchendlink = CalcBodyToBaseCoordinates(*model, Q, 
+    model->GetBodyId("pitchbottomlink-pitchendlink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.296503,   -0.501043,   -0.398198), 
+    AllCloseVector(p_w_pitchendlink, TEST_PREC, TEST_PREC));
+  Vector3d p_w_pitchfrontlink = CalcBodyToBaseCoordinates(*model, Q, 
+    model->GetBodyId("yawlink-pitchfrontlink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.499974,   -0.736908,   -0.599998), 
+    AllCloseVector(p_w_pitchfrontlink, TEST_PREC, TEST_PREC));
   
   Vector3d p_w_pitchtoplink = CalcBodyToBaseCoordinates(*model, Q, 
     model->GetBodyId("pitchfrontlink-pitchtoplink"), Vector3d(0., 0., 0.), true);
   CHECK_THAT (Vector3d(0.270381,   -0.846579,    -0.37171), 
     AllCloseVector(p_w_pitchtoplink, TEST_PREC, TEST_PREC));
 
-  // p_w_pitchendlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
-  //   rbdlModelPtr_->GetBodyId("pitchtoplink-pitchendlink"), Vector3d(0., 0., 0.), true);
-  // CHECK_THAT (Vector3d(0.499902, -0.490902, -0.312198), 
-  //   AllCloseVector(p_w_pitchendlink, TEST_PREC, TEST_PREC));
-  // Vector3d p_w_maininsertionlink = CalcBodyToBaseCoordinates(*rbdlModelPtr_, Q_, 
-  //   rbdlModelPtr_->GetBodyId("pitchendlink-maininsertionlink"), Vector3d(0., 0., 0.), true);
-  // CHECK_THAT (Vector3d(0.500025, -0.449857, -0.226898), 
-  //   AllCloseVector(p_w_maininsertionlink, TEST_PREC, TEST_PREC));
+  p_w_pitchendlink = CalcBodyToBaseCoordinates(*model, Q, 
+    model->GetBodyId("pitchtoplink-pitchendlink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.296503,   -0.501043,   -0.398198), 
+    AllCloseVector(p_w_pitchendlink, TEST_PREC, TEST_PREC));
+  Vector3d p_w_maininsertionlink = CalcBodyToBaseCoordinates(*model, Q, 
+    model->GetBodyId("pitchendlink-maininsertionlink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.307534,   -0.459927,   -0.409179), 
+    AllCloseVector(p_w_maininsertionlink, TEST_PREC, TEST_PREC));
 
   Vector3d p_w_toollink = CalcBodyToBaseCoordinates(*model, Q, 
     model->GetBodyId("maininsertionlink-toollink"), Vector3d(0., 0., 0.), true);
@@ -260,7 +297,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V2", "")
     AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
 }
 
-
+/*
 TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V3", "") 
 {
 //               baselink-yawlink 9.513680561212823e-05 - 0
@@ -413,7 +450,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V4", "")
 }
 */
 
-
+/*
 TEST_CASE_METHOD ( ECM, __FILE__"_IK_RandomPose_V4", "") 
 {
 // 4294967295, ROOT
@@ -522,3 +559,4 @@ TEST_CASE_METHOD ( ECM, __FILE__"_IK_RandomPose_V4", "")
   // CHECK_THAT (Vector3d(0.499935,   -0.134677,     -0.3419), 
   //   AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
 }
+*/
