@@ -173,11 +173,11 @@ for i in range(15):
 		# maininsertionlink_joint_angles  = get_all_joint_pos_wrapper(maininsertionlink_handler)
 		toollink_joint_angles  					= get_all_joint_pos_wrapper(toollink_handler)
 
-	set_joint_pos_wrapper(baselink_handler, 		 				  "baselink-yawlink", math.pi / 4.0)
-	set_joint_pos_wrapper(baselink_handler, 				 "yawlink-pitchbacklink", 0.0) #math.pi / 4.0)
+	set_joint_pos_wrapper(baselink_handler, 		 				  "baselink-yawlink", 0) #math.pi / 4.0)
+	set_joint_pos_wrapper(baselink_handler, 				 "yawlink-pitchbacklink", 0) #math.pi / 4.0)
 	# set_joint_pos_wrapper(baselink_handler, 				 "yawlink-pitchfrontlink", math.pi / 4.0)
-	set_joint_pos_wrapper(baselink_handler, "pitchendlink-maininsertionlink", 0.1)
-	set_joint_pos_wrapper(baselink_handler, 		"maininsertionlink-toollink", math.pi / 4.0)
+	set_joint_pos_wrapper(baselink_handler, "pitchendlink-maininsertionlink", 0) #0.1)
+	set_joint_pos_wrapper(baselink_handler, 		"maininsertionlink-toollink", 0) #math.pi / 4.0)
 
 joint_name_angles = {}
 

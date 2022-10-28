@@ -297,34 +297,35 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V2", "")
     AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
 }
 
-/*
+// Failing test cases with yawlink-pitchbacklink none zero
 TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V3", "") 
 {
-//               baselink-yawlink 9.513680561212823e-05 - 0
-//          yawlink-pitchbacklink 0.791019082069397     - 1
-//  pitchbacklink-pitchbottomlink -0.7852027416229248   - 2
-//   pitchbottomlink-pitchendlink 0.7890188694000244    - 3
-//         yawlink-pitchfrontlink 0.7893757224082947    - 4
-//    pitchfrontlink-pitchtoplink -0.7822339534759521   - 5
-//      pitchtoplink-pitchendlink 0.7876935005187988    - 6
-// pitchendlink-maininsertionlink 0.0009716766071505845 - 7
-//     maininsertionlink-toollink 0.000289801973849535  - 8
-//          baselink-pitchendlink 0.0
-
-
-
   Q.setZero();
-  Q[0] = 0.0;
+
+  // 0,               baselink-yawlink, 9.513680561212823e-05
+  // 1,          yawlink-pitchbacklink, 0.791019082069397
+  // 2,  pitchbacklink-pitchbottomlink, -0.7852027416229248
+  // 3,   pitchbottomlink-pitchendlink, 0.7890188694000244
+  // 4,         yawlink-pitchfrontlink, 0.7893757224082947
+  // 5, pitchfrontlink-pitchbottomlink, -0.7835593223571777
+  // 6,    pitchfrontlink-pitchtoplink, -0.7822339534759521
+  // 7,      pitchtoplink-pitchendlink, 0.7876935005187988
+  // 8, pitchendlink-maininsertionlink, 0.0009716766071505845
+  // 9,     maininsertionlink-toollink, 0.000289801973849535
+
+
+  Q[0] = 9.513680561212823e-05;
   Q[1] = 0.791019082069397;
   Q[2] = -0.7852027416229248;
   Q[3] = 0.7890188694000244;
   Q[4] = 0.7893757224082947;
-  Q[5] = -0.7822339534759521;
-  Q[6] = 0.7876935005187988;
-  Q[7] = 0.0;
-  Q[8] = 0.0;
+  Q[5] = -0.7835593223571777;
+  Q[6] = -0.7822339534759521;
+  Q[7] = 0.7876935005187988;
+  Q[8] = 0.0009716766071505845;
+  Q[9] = 0.000289801973849535;
 
-  // std::cout << "Q" << std::endl << Q << std::endl;
+  std::cout << "Q" << std::endl << Q << std::endl;
 
   Vector3d p_w_baselink = CalcBodyToBaseCoordinates(*model, Q, 
     model->GetBodyId("world-baselink"), Vector3d(0., 0., 0.), true);
@@ -369,7 +370,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V3", "")
   CHECK_THAT (Vector3d(0.499971,   -0.134195,   -0.342508), 
     AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
 }
-*/
+
 
 /*
 // Remove pitchbottomlink - test cases fails at pitchendlink

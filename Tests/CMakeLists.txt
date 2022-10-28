@@ -135,3 +135,29 @@ CXX_STANDARD 20
 CXX_STANDARD_REQUIRED YES
 )
 #####End of ECM Test App#############
+
+#####Beginning of ECM Test App#############
+SET ( ECMTests_SOURCE_FILES
+  ECMTests/src/ECMMannualCalculations.cc
+)
+
+set(ECMManualCalculationsTests ECMManualCalculationsTests_app)
+ADD_EXECUTABLE ( ${ECMManualCalculationsTests} 
+  ${TESTS_SOURCE_FILES} 
+  ${ECMTests_SOURCE_FILES}
+  )
+
+target_include_directories(${ECMManualCalculationsTests}
+PRIVATE ${TESTS_HRD_DIR} 
+PRIVATE ECMTests/include
+)
+
+target_link_libraries(${ECMManualCalculationsTests} 
+  ${TESTS_LINK_LIBRARIES}
+)
+
+set_target_properties(${ECMManualCalculationsTests} PROPERTIES
+CXX_STANDARD 20
+CXX_STANDARD_REQUIRED YES
+)
+#####End of ECM Test App#############
