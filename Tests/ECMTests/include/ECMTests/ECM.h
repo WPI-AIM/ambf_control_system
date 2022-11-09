@@ -295,7 +295,7 @@ struct ECM
     // This has to be added
     pitchfrontlink_pitchbottomlinkId = model->
     	AddBody(yawlink_pitchfrontlinkId, Xtrans(p_pitchfrontlink_pitchbottomlink_world), 
-    	Joint(SpatialVector (0., 0., 0., 0., 0., 0.)), virtualBody, "pitchfrontlink-pitchbottomlink");
+    	Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), virtualBody, "pitchfrontlink-pitchbottomlink");
 
     // Joint pitchfrontlink_pitchtoplinkJ = Joint(SpatialVector (
     //   pitchfrontlink_pitchtoplinkJAxis(0), 
