@@ -41,7 +41,7 @@ TEST_CASE_METHOD (ECM, __FILE__"_CheckRotation", "")
 */
 
 /*
-TEST_CASE_METHOD ( ECM, __FILE__"_HomePose", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"manual_HomePose", "") 
 {
 // 4294967295, ROOT
 // 2147483646, world-baselink
@@ -125,7 +125,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_HomePose", "")
 */
 
 /*
-TEST_CASE_METHOD ( ECM, __FILE__"__RandomPose_V0", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"manual_base_yaw_piby2_needtobefixed", "") 
 {
   // 0,               baselink-yawlink, 1.5751442909240723
   // 1,          yawlink-pitchbacklink, 2.6517625883570872e-05
@@ -344,9 +344,9 @@ TEST_CASE_METHOD ( ECM, __FILE__"__RandomPose_V0", "")
 }
 */
 
-/*
 
-TEST_CASE_METHOD ( ECM, __FILE__"__RandomPose_V0_1", "") 
+/*
+TEST_CASE_METHOD ( ECM, __FILE__"manual_base_yaw_piby2__main_tool_piby2", "") 
 {
 // 0,               baselink-yawlink, 1.5745775699615479
 // 1,          yawlink-pitchbacklink, 2.5622757675591856e-05
@@ -366,17 +366,17 @@ TEST_CASE_METHOD ( ECM, __FILE__"__RandomPose_V0_1", "")
 
 
   //--------------------world-base--------------------//
-  // {
-  //   W_world_baselinkST_cal.E = Matrix3dIdentity;
-  //   W_world_baselinkST_cal.r = W_world_baselinkST.r;
+  {
+    W_world_baselinkST_cal.E = Matrix3dIdentity;
+    W_world_baselinkST_cal.r = W_world_baselinkST.r;
 
-  //   // Matrix3d r_w_baselink = world_baselinkST.E;
-  //   // Vector3d p_w_baselink = world_baselinkST.r;
-  //   CHECK_THAT (Matrix3dIdentity, 
-  //     AllCloseMatrix(W_world_baselinkST_cal.E, TEST_PREC, TEST_PREC));
-  //   CHECK_THAT (Vector3d(0.5, -0.4, -0.6), 
-  //     AllCloseVector(W_world_baselinkST_cal.r, TEST_PREC, TEST_PREC));
-  // }
+    // Matrix3d r_w_baselink = world_baselinkST.E;
+    // Vector3d p_w_baselink = world_baselinkST.r;
+    CHECK_THAT (Matrix3dIdentity, 
+      AllCloseMatrix(W_world_baselinkST_cal.E, TEST_PREC, TEST_PREC));
+    CHECK_THAT (Vector3d(0.5, -0.4, -0.6), 
+      AllCloseVector(W_world_baselinkST_cal.r, TEST_PREC, TEST_PREC));
+  }
   //--------------------baselink-yawlink--------------------//
   {
     // Rotate by pi/2
@@ -390,28 +390,13 @@ TEST_CASE_METHOD ( ECM, __FILE__"__RandomPose_V0_1", "")
       baselink_yawlinkRot;
 
 
-    std::cout << "baselink_yawlinkJAxis: " << std::endl 
-              <<  baselink_yawlinkJAxis << std::endl;
-
-    std::cout << "W_r_baselink_yawlink.rotation(): " << std::endl 
-              <<  W_r_baselink_yawlink.rotation() << std::endl;
-
-    std::cout << "W_world_baselinkST_cal.E: " << std::endl 
-              <<  W_world_baselinkST_cal.E << std::endl;
-
-    std::cout << "baselink_yawlinkRotOffset: " << std::endl 
-              <<  baselink_yawlinkRotOffset << std::endl;
-
-    std::cout << "baselink_yawlinkRot: " << std::endl 
-              <<  baselink_yawlinkRot << std::endl;
-
     CHECK_THAT (
       Matrix3d(
         0, -1,  0, 
         0,  0,  1, 
        -1,  0,  0), 
       AllCloseMatrix(W_world_yawlinkST_cal.E, TEST_PREC, TEST_PREC));
-    std::cout << "#-----------------------------------\n";
+    // std::cout << "#-----------------------------------\n";
   }
   //--------------------yawlink-pitchbacklink--------------------//
   {
@@ -541,10 +526,6 @@ TEST_CASE_METHOD ( ECM, __FILE__"__RandomPose_V0_1", "")
   //--------------------pitchendlink_maininsertionlink--------------------//
   {
     // Prismatic joint
-
-    // Eigen::Affine3d W_r_maininsertionlink_toollink(
-    //     Eigen::AngleAxisd(0, R_W_P_C_Axis(R_W_P_C_AxisEnum::pitchendlink_maininsertionlink)));
-
     W_world_maininsertionlinkST_cal.E = 
       // W_r_maininsertionlink_toollink.rotation() *
       W_world_pitchendlinkST_cal.E *
@@ -575,35 +556,19 @@ TEST_CASE_METHOD ( ECM, __FILE__"__RandomPose_V0_1", "")
     //   W_world_maininsertionlinkST_cal.E * 
     //   B_maininsertionlink_toollinkST.E;
 
-    std::cout << "maininsertionlink_toollinkJAxis: " << std::endl 
-              <<  maininsertionlink_toollinkJAxis << std::endl;
-
-    std::cout << "W_r_maininsertionlink_toollink.rotation(): " << std::endl 
-              <<  W_r_maininsertionlink_toollink.rotation() << std::endl;
-
-    std::cout << "W_world_maininsertionlinkST_cal.E: " << std::endl 
-              <<  W_world_maininsertionlinkST_cal.E << std::endl;
-
-    std::cout << "maininsertionlink_toollinkRotOffset: " << std::endl 
-              <<  maininsertionlink_toollinkRotOffset << std::endl;
-
-    std::cout << "maininsertionlink_toollinkRot: " << std::endl 
-              <<  maininsertionlink_toollinkRot << std::endl;
-
-    CHECK_THAT (
-      Matrix3d(
-        0,  0, -1, 
-        0, -1,  0, 
-       -1,  0,  0), 
-      AllCloseMatrix(W_world_toollinkST_cal.E, TEST_PREC, TEST_PREC));
-    std::cout << "#-----------------------------------\n";
+    // CHECK_THAT (
+    //   Matrix3d(
+    //     0,  0, -1, 
+    //     0, -1,  0, 
+    //    -1,  0,  0), 
+    //   AllCloseMatrix(W_world_toollinkST_cal.E, TEST_PREC, TEST_PREC));
+    // std::cout << "#-----------------------------------\n";
   }  
 }
-
 */
 
 /*
-TEST_CASE_METHOD ( ECM, __FILE__"_All_Controllable_Body_Rotate_PI_2", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"_manual_All_Controllable_Body_Rotate_PI_2", "") 
 {
 // 0,               baselink-yawlink, 1.5711669921875
 // 1,          yawlink-pitchbacklink, 1.5707159042358398
@@ -849,7 +814,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_All_Controllable_Body_Rotate_PI_2", "")
 */
 
 /*
-TEST_CASE_METHOD ( ECM, __FILE__"_All_Controllable_Body_Rotate_PI_4_AMBF_Reference", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"_manual_All_Controllable_Body_Rotate_PI_4_AMBF_Reference", "") 
 {
 // 0,               baselink-yawlink, 0.7877469062805176
 // 1,          yawlink-pitchbacklink, 0.788750946521759
@@ -1113,7 +1078,8 @@ TEST_CASE_METHOD ( ECM, __FILE__"_All_Controllable_Body_Rotate_PI_4_AMBF_Referen
 }
 */
 
-TEST_CASE_METHOD ( ECM, __FILE__"_All_Controllable_Body_Rotate_PI_4_RBDL_Reference", "") 
+/*
+TEST_CASE_METHOD ( ECM, __FILE__"_manual_All_Controllable_Body_Rotate_PI_4_RBDL_Reference", "") 
 {
 // 0,               baselink-yawlink, 0.7877469062805176
 // 1,          yawlink-pitchbacklink, 0.788750946521759
@@ -1373,3 +1339,4 @@ TEST_CASE_METHOD ( ECM, __FILE__"_All_Controllable_Body_Rotate_PI_4_RBDL_Referen
       AllCloseVector(T_W_world_toollink_cal.r, TEST_PREC, TEST_PREC));
   }  
 }
+*/

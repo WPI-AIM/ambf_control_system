@@ -2,7 +2,7 @@
 
 /*
 // All Test cases passes
-TEST_CASE_METHOD ( ECM, __FILE__"_HomePose", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_HomePose", "") 
 {
 // 4294967295, ROOT
 // 2147483646, world-baselink
@@ -61,7 +61,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_HomePose", "")
 
 /*
 // All Test cases passes
-TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V0", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_base_yaw_piby2__end_main_zeropointone", "") 
 {
   // 0               baselink-yawlink 1.5745776891708374
   // 1          yawlink-pitchbacklink 2.5686116714496166e-05
@@ -132,12 +132,12 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V0", "")
   CHECK_THAT (Vector3d(0.228999,   -0.397638,    -0.60199), 
     AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
 }
-*/
 
+*/
 
 /*
 // All Test cases passes
-TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V1", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_base_yaw_piby4__end_main_zeropointone", "") 
 {
   Q.setZero();
 
@@ -212,7 +212,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V1", "")
 
 
 /*
-TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V2", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_base_yaw_piby4__end_main_zeropointone__main_tool_piby4", "") 
 {
   Q.setZero();
   // //               baselink-yawlink 0.7880651950836182
@@ -301,7 +301,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V2", "")
 
 /*
 // Failing test cases with yawlink-pitchbacklink none zero
-TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V3", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_yaw_pitchback_piby4", "") 
 {
   Q.setZero();
 
@@ -377,7 +377,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V3", "")
 
 /*
 // Remove pitchbottomlink - test cases fails at pitchendlink
-TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V4", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_yaw_pitchfrontlink_piby4_openloop", "") 
 {
 // 4294967295, ROOT
 // 0, baselink-yawlink
@@ -455,7 +455,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_RandomPose_V4", "")
 */
 
 /*
-TEST_CASE_METHOD ( ECM, __FILE__"_IK_RandomPose_V4", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_IK_RandomPose_V4", "") 
 {
 // 4294967295, ROOT
 // 0, baselink-yawlink
@@ -566,7 +566,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_IK_RandomPose_V4", "")
 */
 
 /*
-TEST_CASE_METHOD ( ECM, __FILE__"_All_Controllable_Rotate_PI_4", "") 
+TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_All_Controllable_Rotate_PI_4", "") 
 {
 // 0,               baselink-yawlink, 1.5711669921875
 // 1,          yawlink-pitchbacklink, 1.5707159042358398
