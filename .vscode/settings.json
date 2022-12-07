@@ -6,6 +6,14 @@
     "string_view": "cpp",
     "initializer_list": "cpp",
     "utility": "cpp",
-    "iostream": "cpp"
-  }
+    "iostream": "cpp",
+    "dense": "cpp",
+    "cholesky": "cpp",
+    "core": "cpp",
+    "geometry": "cpp",
+    "svd": "cpp",
+    "macros.h": "c",
+    "ostream": "cpp"
+  },
+  "C_Cpp.errorSquiggles": "enabled"
 }

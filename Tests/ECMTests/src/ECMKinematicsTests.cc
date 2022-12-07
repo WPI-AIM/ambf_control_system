@@ -299,7 +299,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_base_yaw_piby4__end_main_zeropointo
 }
 */
 
-/*
+
 // Failing test cases with yawlink-pitchbacklink none zero
 TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_yaw_pitchback_piby4", "") 
 {
@@ -373,7 +373,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_yaw_pitchback_piby4", "")
   CHECK_THAT (Vector3d(0.499971,   -0.134195,   -0.342508), 
     AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
 }
-*/
+
 
 /*
 // Remove pitchbottomlink - test cases fails at pitchendlink

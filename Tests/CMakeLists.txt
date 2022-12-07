@@ -161,3 +161,29 @@ CXX_STANDARD 20
 CXX_STANDARD_REQUIRED YES
 )
 #####End of ECM Test App#############
+
+#####Beginning of ECM Test App#############
+SET ( ECM2Tests_SOURCE_FILES
+  ECMTests/src/ECM2.cc
+)
+
+set(ECM2 ECM2_app)
+ADD_EXECUTABLE ( ${ECM2} 
+  ${TESTS_SOURCE_FILES} 
+  ${ECM2Tests_SOURCE_FILES}
+  )
+
+target_include_directories(${ECM2}
+PRIVATE ${TESTS_HRD_DIR} 
+PRIVATE ECMTests/include
+)
+
+target_link_libraries(${ECM2} 
+  ${TESTS_LINK_LIBRARIES}
+)
+
+set_target_properties(${ECM2} PROPERTIES
+CXX_STANDARD 20
+CXX_STANDARD_REQUIRED YES
+)
+#####End of ECM Test App#############
