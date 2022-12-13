@@ -338,10 +338,10 @@ struct ECM
       Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody, "maininsertionlink-toollink");
       // maininsertionlink_toollinkJ, pitchendlinkBody, "maininsertionlink-toollink");
     //--------------------------------------------------------------------//
-    Q = VectorNd::Constant ((size_t) model->dof_count, 0.);
-    QDot = VectorNd::Constant ((size_t) model->dof_count, 0.);
-    QDDot = VectorNd::Constant ((size_t) model->dof_count, 0.);
-    Tau = VectorNd::Constant ((size_t) model->dof_count, 0.);
+    Q     = VectorNd::Constant ((std::size_t) model->dof_count, 0.);
+    QDot  = VectorNd::Constant ((std::size_t) model->dof_count, 0.);
+    QDDot = VectorNd::Constant ((std::size_t) model->dof_count, 0.);
+    Tau   = VectorNd::Constant ((std::size_t) model->dof_count, 0.);
 
     /*
     Q Index

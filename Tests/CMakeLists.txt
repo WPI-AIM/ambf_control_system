@@ -164,7 +164,7 @@ CXX_STANDARD_REQUIRED YES
 
 #####Beginning of ECM Test App#############
 SET ( ECM2Tests_SOURCE_FILES
-  ECMTests/src/ECM2.cc
+  ECMTests/src/ECM2KinematicsTests.cc
 )
 
 set(ECM2 ECM2_app)
