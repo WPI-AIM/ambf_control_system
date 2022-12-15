@@ -1,6 +1,5 @@
 #include "ECMTests/ECM.h"
 
-/*
 // All Test cases passes
 TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_HomePose", "") 
 {
@@ -52,12 +51,15 @@ TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_HomePose", "")
     model->GetBodyId("pitchfrontlink-pitchtoplink"), Vector3d(0., 0., 0.), true);
   CHECK_THAT (Vector3d(0.499951, -0.846723, -0.276256), 
     AllCloseVector(p_w_pitchtoplink, TEST_PREC, TEST_PREC));
+    Vector3d p_w_maininsertionlink = CalcBodyToBaseCoordinates(*model, Q, 
+    model->GetBodyId("pitchendlink-maininsertionlink"), Vector3d(0., 0., 0.), true);
+  CHECK_THAT (Vector3d(0.499918,   -0.460183,    -0.22929), 
+    AllCloseVector(p_w_maininsertionlink, TEST_PREC, TEST_PREC));
   Vector3d p_w_toollink = CalcBodyToBaseCoordinates(*model, Q, 
     model->GetBodyId("maininsertionlink-toollink"), Vector3d(0., 0., 0.), true);
   CHECK_THAT (Vector3d(0.49993, -0.398184, -0.230241), 
     AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
 }
-*/
 
 /*
 // All Test cases passes
@@ -299,7 +301,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_base_yaw_piby4__end_main_zeropointo
 }
 */
 
-
+/*
 // Failing test cases with yawlink-pitchbacklink none zero
 TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_yaw_pitchback_piby4", "") 
 {
@@ -373,7 +375,7 @@ TEST_CASE_METHOD ( ECM, __FILE__"_AMBFvsRBDL_yaw_pitchback_piby4", "")
   CHECK_THAT (Vector3d(0.499971,   -0.134195,   -0.342508), 
     AllCloseVector(p_w_toollink, TEST_PREC, TEST_PREC));
 }
-
+*/
 
 /*
 // Remove pitchbottomlink - test cases fails at pitchendlink

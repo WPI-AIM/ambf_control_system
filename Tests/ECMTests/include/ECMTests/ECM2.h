@@ -379,8 +379,9 @@ struct ECM2
     const Eigen::Quaterniond Q_W_baselink_yawlinkFC = Q_W_baselink_yawlinkFP * Q_B_baselink_yawlinkFC;
 
     const Vector3d v_W_baselink_yawlink = 
-      Q_W_baselink_yawlinkFP * v_baselink_yawlinkPP - 
-      Q_W_baselink_yawlinkFC * v_baselink_yawlinkCP;
+      Q_W_baselink_yawlinkFP.inverse() * v_baselink_yawlinkPP - 
+      Q_W_baselink_yawlinkFC.inverse() * v_baselink_yawlinkCP;
+
     const Eigen::Quaterniond Q_W_world_yawlink = 
       Q_W_world_baselink * Q_B_baselink_yawlinkFP * Q_B_baselink_yawlinkFC;
     CHECK_THAT (
@@ -391,9 +392,14 @@ struct ECM2
     //--------------------------//
     const Eigen::Quaterniond Q_W_yawlink_pitchbacklinkFP = Q_W_world_yawlink           * Q_B_yawlink_pitchbacklinkFP;
     const Eigen::Quaterniond Q_W_yawlink_pitchbacklinkFC = Q_W_yawlink_pitchbacklinkFP * Q_B_yawlink_pitchbacklinkFC;
-    
+
+    const Vector3d v_W_yawlink_pitchbacklink = 
+      Q_W_yawlink_pitchbacklinkFP.inverse() * v_yawlink_pitchbacklinkPP - 
+      Q_W_yawlink_pitchbacklinkFC.inverse() * v_yawlink_pitchbacklinkCP;
+
     const Eigen::Quaterniond Q_W_world_pitchbacklink = 
       Q_W_world_yawlink * Q_B_yawlink_pitchbacklinkFP * Q_B_yawlink_pitchbacklinkFC;
+
     CHECK_THAT (
       Matrix3d( 0.0,  0.0, -1.0,
                 1.0,  0.0,  0.0,
@@ -405,6 +411,11 @@ struct ECM2
     const Eigen::Quaterniond Q_W_pitchbacklink_pitchbottomlinkFC = 
       Q_W_yawlink_pitchbacklinkFP * Q_B_pitchbacklink_pitchbottomlinkFC;
     
+    const Vector3d v_W_pitchbacklink_pitchbottomlink = 
+      // mandate [2,..] = [0, -1, 0]
+      Q_W_pitchbacklink_pitchbottomlinkFP * v_pitchbacklink_pitchbottomlinkPP + 
+      Q_W_pitchbacklink_pitchbottomlinkFC * v_pitchbacklink_pitchbottomlinkCP;
+
     const Eigen::Quaterniond Q_W_world_pitchbottomlink = 
       Q_W_world_pitchbacklink * Q_B_pitchbacklink_pitchbottomlinkFP * Q_B_pitchbacklink_pitchbottomlinkFC;
     CHECK_THAT (
@@ -418,6 +429,10 @@ struct ECM2
     const Eigen::Quaterniond Q_W_pitchbottomlink_pitchendlinkFC = 
       Q_W_pitchbottomlink_pitchendlinkFP * Q_B_pitchbottomlink_pitchendlinkFC;
     
+    const Vector3d v_W_pitchbottomlink_pitchendlink = 
+      Q_W_pitchbottomlink_pitchendlinkFP * v_pitchbottomlink_pitchendlinkPP + 
+      Q_W_pitchbottomlink_pitchendlinkFC * v_pitchbottomlink_pitchendlinkCP;
+
     const Eigen::Quaterniond Q_W_world_pitchendlink = 
       Q_W_world_pitchbottomlink * Q_B_pitchbottomlink_pitchendlinkFP * Q_B_pitchbottomlink_pitchendlinkFC;
     CHECK_THAT (
@@ -431,6 +446,11 @@ struct ECM2
     const Eigen::Quaterniond Q_W_yawlink_pitchfrontlinkFC = 
       Q_W_yawlink_pitchfrontlinkFP * Q_B_yawlink_pitchfrontlinkFC;
     
+    const Vector3d v_W_yawlink_pitchfrontlink = 
+      // mandate
+      Q_W_yawlink_pitchfrontlinkFP.inverse() * v_yawlink_pitchfrontlinkPP + 
+      Q_W_yawlink_pitchfrontlinkFC * v_yawlink_pitchfrontlinkCP;
+
     const Eigen::Quaterniond Q_W_world_pitchfrontlink = 
       Q_W_world_yawlink * Q_B_yawlink_pitchfrontlinkFP * Q_B_yawlink_pitchfrontlinkFC;
     CHECK_THAT (
@@ -443,6 +463,10 @@ struct ECM2
       Q_W_world_pitchfrontlink     * Q_B_pitchfrontlink_pitchbottomlinkFP;
     const Eigen::Quaterniond Q_W_pitchfrontlink_pitchbottomlinkFC = 
       Q_W_pitchfrontlink_pitchbottomlinkFP * Q_B_pitchfrontlink_pitchbottomlinkFC;
+    
+    const Vector3d v_W_pitchfrontlink_pitchbottomlink = 
+      Q_W_pitchfrontlink_pitchbottomlinkFP * v_pitchfrontlink_pitchbottomlinkPP + 
+      Q_W_pitchfrontlink_pitchbottomlinkFC * v_pitchfrontlink_pitchbottomlinkCP;
     
     const Eigen::Quaterniond Q_W_world_pitchbottomlink2 = 
       Q_W_world_pitchfrontlink * Q_B_pitchfrontlink_pitchbottomlinkFP * Q_B_pitchfrontlink_pitchbottomlinkFC;
@@ -457,6 +481,10 @@ struct ECM2
     const Eigen::Quaterniond Q_W_pitchfrontlink_pitchtoplinkFC = 
       Q_W_pitchfrontlink_pitchtoplinkFP * Q_B_pitchfrontlink_pitchtoplinkFC;
     
+    const Vector3d v_W_pitchfrontlink_pitchtoplink = 
+      Q_W_pitchfrontlink_pitchtoplinkFP * v_pitchfrontlink_pitchtoplinkPP + 
+      Q_W_pitchfrontlink_pitchtoplinkFC * v_pitchfrontlink_pitchtoplinkCP;
+
     const Eigen::Quaterniond Q_W_world_pitchtoplink = 
       Q_W_world_pitchfrontlink * Q_B_pitchfrontlink_pitchtoplinkFP * Q_B_pitchfrontlink_pitchtoplinkFC;
     CHECK_THAT (
@@ -469,7 +497,11 @@ struct ECM2
       Q_W_world_pitchtoplink * Q_B_pitchtoplink_pitchendlinkFP;
     const Eigen::Quaterniond Q_W_pitchtoplink_pitchendlinkFC = 
       Q_W_pitchtoplink_pitchendlinkFP * Q_B_pitchtoplink_pitchendlinkFC;
-    
+
+    const Vector3d v_W_pitchtoplink_pitchendlink = 
+      Q_W_pitchtoplink_pitchendlinkFP * v_pitchtoplink_pitchendlinkPP - 
+      Q_W_pitchtoplink_pitchendlinkFC * v_pitchtoplink_pitchendlinkCP;
+
     const Eigen::Quaterniond Q_W_world_pitchendlink2 = 
       Q_W_world_pitchtoplink * Q_B_pitchtoplink_pitchendlinkFP * Q_B_pitchtoplink_pitchendlinkFC;
     CHECK_THAT (
@@ -483,6 +515,11 @@ struct ECM2
     const Eigen::Quaterniond Q_W_pitchendlink_maininsertionlinkFC = 
       Q_W_pitchendlink_maininsertionlinkFP * Q_B_pitchendlink_maininsertionlinkFC;
     
+    const Vector3d v_W_pitchendlink_maininsertionlink = Vector3d(0, 0.040988, 0.084072);
+      // Doest match
+      // Q_W_pitchendlink_maininsertionlinkFP * v_pitchendlink_maininsertionlinkPP - 
+      // Q_W_pitchendlink_maininsertionlinkFC.inverse() * v_pitchendlink_maininsertionlinkCP;
+
     const Eigen::Quaterniond Q_W_world_maininsertionlink = 
       Q_W_world_pitchendlink * Q_B_pitchendlink_maininsertionlinkFP * Q_B_pitchendlink_maininsertionlinkFC;
     CHECK_THAT (
@@ -495,7 +532,12 @@ struct ECM2
       Q_W_world_maininsertionlink * Q_B_maininsertionlink_toollinkFP;
     const Eigen::Quaterniond Q_W_maininsertionlink_toollinkFC = 
       Q_W_maininsertionlink_toollinkFP * Q_B_maininsertionlink_toollinkFC;
-    
+
+    const Vector3d v_W_maininsertionlink_toollink = Vector3d(0, 0.061999, -0.000951);
+      // Doesnt match
+      // Q_W_maininsertionlink_toollinkFP * v_maininsertionlink_toollinkPP - 
+      // Q_W_maininsertionlink_toollinkFC * v_maininsertionlink_toollinkCP;
+
     const Eigen::Quaterniond Q_W_world_toollink = 
       Q_W_world_maininsertionlink * Q_B_maininsertionlink_toollinkFP * Q_B_maininsertionlink_toollinkFC;
     CHECK_THAT (
@@ -504,34 +546,21 @@ struct ECM2
                 0.0,  0.0,  1.0), 
       AllCloseMatrix(Q_W_world_toollink.toRotationMatrix(), TEST_PREC, TEST_PREC));
     
-    //--------------------------//
-    //--------------------------//
-    //--------------------------//
-
-    // //-----------------------------------------------------//
-
-    // // world_pitchendlinkST.E      = Matrix3d( 0,  0, -1,  1,  0, 0,  0, -1, 0);
-    // // world_pitchfrontlinkST.E    = Matrix3d( 0,  0, -1,  1,  0, 0,  0, -1, 0);
-    // // // world_pitchbottomlink2ST.E  = Matrix3d( 1,  0,  0,  0,  0, 1,  0, -1, 0);
-    // // world_pitchtoplinkST.E      = Matrix3d( 0,  0, -1,  1,  0, 0,  0, -1, 0);
-    // // world_maininsertionlinkST.E = Matrix3d( 0,  0, -1,  0, -1, 0, -1,  0, 0);
-    // // world_toollinkST.E          = Matrix3d( 0,  1,  0, -1,  0, 0,  0,  0, 1);
-    // // //-----------------------------------------------------//
-    // // //--------------------------------------------------------------------//
-    // // const Vector3d baselink_yawlinkJAxis = world_baselinkST.E * baselink_yawlinkPA;
-    
-    // // const Vector3d yawlink_pitchbacklinkJAxis = world_yawlinkST.E * yawlink_pitchbacklinkPA;
-    // // const Vector3d pitchbacklink_pitchbottomlinkJAxis = world_pitchbacklinkST.E * pitchbacklink_pitchbottomlinkPA;
-    // // const Vector3d pitchbottomlink_pitchendlinkJAxis = world_pitchbottomlinkST.E * pitchbottomlink_pitchendlinkPA;
-    
-    // // const Vector3d yawlink_pitchfrontlinkJAxis = world_yawlinkST.E * yawlink_pitchfrontlinkPA;
-    // // const Vector3d pitchfrontlink_pitchtoplinkJAxis = world_pitchfrontlinkST.E * pitchfrontlink_pitchtoplinkPA;
-    // // const Vector3d pitchtoplink_pitchendlinkJAxis = world_pitchtoplinkST.E * pitchtoplink_pitchendlinkPA;
-    
-    // // const Vector3d pitchfrontlink_pitchbottomlinkJAxis = world_pitchfrontlinkST.E * pitchfrontlink_pitchbottomlinkPA;
-    // // const Vector3d pitchendlink_maininsertionlinkJAxis = world_pitchendlinkST.E * pitchendlink_maininsertionlinkPA;
-    // // const Vector3d maininsertionlink_toollinkJAxis = world_maininsertionlinkST.E * maininsertionlink_toollinkPA;
     // //--------------------------------------------------------------------//
+    // const Vector3d baselink_yawlinkJAxis = world_baselinkST.E * baselink_yawlinkPA;
+    
+    // const Vector3d yawlink_pitchbacklinkJAxis = world_yawlinkST.E * yawlink_pitchbacklinkPA;
+    // const Vector3d pitchbacklink_pitchbottomlinkJAxis = world_pitchbacklinkST.E * pitchbacklink_pitchbottomlinkPA;
+    // const Vector3d pitchbottomlink_pitchendlinkJAxis = world_pitchbottomlinkST.E * pitchbottomlink_pitchendlinkPA;
+    
+    // const Vector3d yawlink_pitchfrontlinkJAxis = world_yawlinkST.E * yawlink_pitchfrontlinkPA;
+    // const Vector3d pitchfrontlink_pitchtoplinkJAxis = world_pitchfrontlinkST.E * pitchfrontlink_pitchtoplinkPA;
+    // const Vector3d pitchtoplink_pitchendlinkJAxis = world_pitchtoplinkST.E * pitchtoplink_pitchendlinkPA;
+    
+    // const Vector3d pitchfrontlink_pitchbottomlinkJAxis = world_pitchfrontlinkST.E * pitchfrontlink_pitchbottomlinkPA;
+    // const Vector3d pitchendlink_maininsertionlinkJAxis = world_pitchendlinkST.E * pitchendlink_maininsertionlinkPA;
+    // const Vector3d maininsertionlink_toollinkJAxis = world_maininsertionlinkST.E * maininsertionlink_toollinkPA;
+    //--------------------------------------------------------------------//
 
 
     Joint joint_base = Joint(JointTypeFixed);
@@ -549,91 +578,93 @@ struct ECM2
       // baselink_yawlinkJ, yawlinkBody, "baselink-yawlink");
       Joint(SpatialVector (0., -1., 0., 0., 0., 0.)), yawlinkBody, "baselink-yawlink");
     
-    // // // Joint yawlink_pitchbacklinkJ = Joint(SpatialVector ( 
-    // // //   yawlink_pitchbacklinkJAxis(0), 
-    // // //   yawlink_pitchbacklinkJAxis(1), 
-    // // //   yawlink_pitchbacklinkJAxis(2),
-    // // //   0., 0., 0.));
-    // // yawlink_pitchbacklinkId = model->
-    // //   AddBody(baselink_yawlinkId, Xtrans(p_W_yawlink_pitchbacklink), 
-    // //   Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbacklinkBody, "yawlink-pitchbacklink");
-    //   // yawlink_pitchbacklinkJ, pitchbacklinkBody, "yawlink-pitchbacklink");
-
-    // // // Joint pitchbacklink_pitchbottomlinkJ = Joint(SpatialVector (
-    // // //   pitchbacklink_pitchbottomlinkJAxis(0), 
-    // // //   pitchbacklink_pitchbottomlinkJAxis(1), 
-    // // //   pitchbacklink_pitchbottomlinkJAxis(2),
-    // // //   0., 0., 0.));
-    // // pitchbacklink_pitchbottomlinkId = model->
-    // //   AddBody(yawlink_pitchbacklinkId, Xtrans(p_pitchbacklink_pitchbottomlink_world), 
-    // //   // pitchbacklink_pitchbottomlinkJ, pitchbottomlinkBody, "pitchbacklink-pitchbottomlink");
-    // //   Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbottomlinkBody, "pitchbacklink-pitchbottomlink");
-
-    // // // Joint pitchbottomlink_pitchendlinkJ = Joint(SpatialVector (
-    // // //   pitchbottomlink_pitchendlinkJAxis(0), 
-    // // //   pitchbottomlink_pitchendlinkJAxis(1), 
-    // // //   pitchbottomlink_pitchendlinkJAxis(2), 
-    // // //   0., 0., 0.));
-    // // pitchbottomlink_pitchendlinkId = model->
-    // //   AddBody(pitchbacklink_pitchbottomlinkId, Xtrans(p_pitchbottomlink_pitchendlink_world), 
-    // //   Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchendlinkBody, "pitchbottomlink-pitchendlink");
-    // //   // pitchbottomlink_pitchendlinkJ, pitchendlinkBody, "pitchbottomlink-pitchendlink");
     
-    // // // Joint yawlink_pitchfrontlinkJ = Joint(SpatialVector (
-    // // //   yawlink_pitchfrontlinkJAxis(0), 
-    // // //   yawlink_pitchfrontlinkJAxis(1), 
-    // // //   yawlink_pitchfrontlinkJAxis(2),
-    // // //   0., 0., 0.));
-    // // yawlink_pitchfrontlinkId = model->
-    // //   AddBody(baselink_yawlinkId, Xtrans(p_yawlink_pitchfrontlink_world), 
-    // //   Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchfrontlinkBody, "yawlink-pitchfrontlink");
-    // //   // yawlink_pitchfrontlinkJ, pitchfrontlinkBody, "yawlink-pitchfrontlink");
+    // Joint yawlink_pitchbacklinkJ = Joint(SpatialVector ( 
+    //   yawlink_pitchbacklinkJAxis(0), 
+    //   yawlink_pitchbacklinkJAxis(1), 
+    //   yawlink_pitchbacklinkJAxis(2),
+    //   0., 0., 0.));
+    yawlink_pitchbacklinkId = model->
+      AddBody(baselink_yawlinkId, Xtrans(v_W_yawlink_pitchbacklink), 
+      Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbacklinkBody, "yawlink-pitchbacklink");
+      // yawlink_pitchbacklinkJ, pitchbacklinkBody, "yawlink-pitchbacklink");
 
-    // // // This has to be added
-    // // pitchfrontlink_pitchbottomlinkId = model->
-    // // 	AddBody(yawlink_pitchfrontlinkId, Xtrans(p_pitchfrontlink_pitchbottomlink_world), 
-    // // 	Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), virtualBody, "pitchfrontlink-pitchbottomlink");
+    // Joint pitchbacklink_pitchbottomlinkJ = Joint(SpatialVector (
+    //   pitchbacklink_pitchbottomlinkJAxis(0), 
+    //   pitchbacklink_pitchbottomlinkJAxis(1), 
+    //   pitchbacklink_pitchbottomlinkJAxis(2),
+    //   0., 0., 0.));
+    pitchbacklink_pitchbottomlinkId = model->
+      AddBody(yawlink_pitchbacklinkId, Xtrans(v_W_pitchbacklink_pitchbottomlink), 
+      // pitchbacklink_pitchbottomlinkJ, pitchbottomlinkBody, "pitchbacklink-pitchbottomlink");
+      Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchbottomlinkBody, "pitchbacklink-pitchbottomlink");
+
+    // Joint pitchbottomlink_pitchendlinkJ = Joint(SpatialVector (
+    //   pitchbottomlink_pitchendlinkJAxis(0), 
+    //   pitchbottomlink_pitchendlinkJAxis(1), 
+    //   pitchbottomlink_pitchendlinkJAxis(2), 
+    //   0., 0., 0.));
+    pitchbottomlink_pitchendlinkId = model->
+      AddBody(pitchbacklink_pitchbottomlinkId, Xtrans(v_W_pitchbottomlink_pitchendlink), 
+      Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchendlinkBody, "pitchbottomlink-pitchendlink");
+      // pitchbottomlink_pitchendlinkJ, pitchendlinkBody, "pitchbottomlink-pitchendlink");
+      
+    
+    // Joint yawlink_pitchfrontlinkJ = Joint(SpatialVector (
+    //   yawlink_pitchfrontlinkJAxis(0), 
+    //   yawlink_pitchfrontlinkJAxis(1), 
+    //   yawlink_pitchfrontlinkJAxis(2),
+    //   0., 0., 0.));
+    yawlink_pitchfrontlinkId = model->
+      AddBody(baselink_yawlinkId, Xtrans(v_W_yawlink_pitchfrontlink), 
+      Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchfrontlinkBody, "yawlink-pitchfrontlink");
+      // yawlink_pitchfrontlinkJ, pitchfrontlinkBody, "yawlink-pitchfrontlink");
+
+    // This has to be added
+    pitchfrontlink_pitchbottomlinkId = model->
+    	AddBody(yawlink_pitchfrontlinkId, Xtrans(v_W_pitchfrontlink_pitchbottomlink), 
+    	Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), virtualBody, "pitchfrontlink-pitchbottomlink");
 
     // // // Joint pitchfrontlink_pitchtoplinkJ = Joint(SpatialVector (
     // // //   pitchfrontlink_pitchtoplinkJAxis(0), 
     // // //   pitchfrontlink_pitchtoplinkJAxis(1), 
     // // //   pitchfrontlink_pitchtoplinkJAxis(2),
     // // //   0., 0., 0.));
-    // // pitchfrontlink_pitchtoplinkId = model->
-    // //   AddBody(yawlink_pitchfrontlinkId, Xtrans(p_pitchfrontlink_pitchtoplink_world), 
-    // //   Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchtoplinkBody, 
-    // //   // pitchfrontlink_pitchtoplinkJ, pitchtoplinkBody, 
-    // //   "pitchfrontlink-pitchtoplink");
+    pitchfrontlink_pitchtoplinkId = model->
+      AddBody(yawlink_pitchfrontlinkId, Xtrans(v_W_pitchfrontlink_pitchtoplink), 
+      Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), pitchtoplinkBody, 
+      // pitchfrontlink_pitchtoplinkJ, pitchtoplinkBody, 
+      "pitchfrontlink-pitchtoplink");
 
     // // // Joint pitchtoplink_pitchendlinkJ = Joint(SpatialVector (
     // // //   pitchtoplink_pitchendlinkJAxis(0), 
     // // //   pitchtoplink_pitchendlinkJAxis(1), 
     // // //   pitchtoplink_pitchendlinkJAxis(2),
     // // //   0., 0., 0.));
-    // // pitchtoplink_pitchendlinkId = model->
-    // //   AddBody(pitchfrontlink_pitchtoplinkId, Xtrans(p_pitchtoplink_pitchendlink_world), 
-    // //   Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), virtualBody, "pitchtoplink-pitchendlink");
-    // //   // pitchtoplink_pitchendlinkJ, virtualBody, "pitchtoplink-pitchendlink");
+    pitchtoplink_pitchendlinkId = model->
+      AddBody(pitchfrontlink_pitchtoplinkId, Xtrans(v_W_pitchtoplink_pitchendlink), 
+      Joint(SpatialVector (-1., 0., 0., 0., 0., 0.)), virtualBody, "pitchtoplink-pitchendlink");
+      // pitchtoplink_pitchendlinkJ, virtualBody, "pitchtoplink-pitchendlink");
 
     // // // Joint pitchendlink_maininsertionlinkJ = Joint(SpatialVector ( 
     // // //   0., 0., 0., 
     // // //   pitchendlink_maininsertionlinkJAxis(0), 
     // // //   pitchendlink_maininsertionlinkJAxis(1), 
     // // //   pitchendlink_maininsertionlinkJAxis(2)));
-    // // pitchendlink_maininsertionlinkId = model->
-    // //   AddBody(pitchbottomlink_pitchendlinkId, Xtrans(p_pitchendlink_maininsertionlink_world), 
-    // //   Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody, "pitchendlink-maininsertionlink");
-    // //   // pitchendlink_maininsertionlinkJ, pitchendlinkBody, "pitchendlink-maininsertionlink");
+    pitchendlink_maininsertionlinkId = model->
+      AddBody(pitchbottomlink_pitchendlinkId, Xtrans(v_W_pitchendlink_maininsertionlink), 
+      Joint(SpatialVector (0., 0., 0., 0., 0., -1.)), pitchendlinkBody, "pitchendlink-maininsertionlink");
+      // pitchendlink_maininsertionlinkJ, pitchendlinkBody, "pitchendlink-maininsertionlink");
 
-    // // // Joint maininsertionlink_toollinkJ = Joint(SpatialVector (
-    // // //   maininsertionlink_toollinkJAxis(0), 
-    // // //   maininsertionlink_toollinkJAxis(1), 
-    // // //   maininsertionlink_toollinkJAxis(2),
-    // // //   0., 0., 0.));
-    // // maininsertionlink_toollinkId = model->
-    // //   AddBody(pitchendlink_maininsertionlinkId, Xtrans(p_maininsertionlink_toollink_world), 
-    // //   Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody, "maininsertionlink-toollink");
-    // //   // maininsertionlink_toollinkJ, pitchendlinkBody, "maininsertionlink-toollink");
+    // Joint maininsertionlink_toollinkJ = Joint(SpatialVector (
+    //   maininsertionlink_toollinkJAxis(0), 
+    //   maininsertionlink_toollinkJAxis(1), 
+    //   maininsertionlink_toollinkJAxis(2),
+    //   0., 0., 0.));
+    maininsertionlink_toollinkId = model->
+      AddBody(pitchendlink_maininsertionlinkId, Xtrans(v_W_maininsertionlink_toollink),  
+      Joint(SpatialVector (0., 0., 1., 0., 0., 0.)), pitchendlinkBody, "maininsertionlink-toollink");
+      // maininsertionlink_toollinkJ, pitchendlinkBody, "maininsertionlink-toollink");
 
 
 
