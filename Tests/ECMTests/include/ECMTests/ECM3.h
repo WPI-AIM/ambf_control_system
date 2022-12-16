@@ -240,53 +240,53 @@ public:
   //-----------------------------------------------------//
   Vector3d v_baselink_yawlink_ap               = { -0.0000, -1.0000, 00.0000 };
   Vector3d v_baselink_yawlink_ac               = { 00.0000, 00.0000, -1.0000 };
-  Vector3d v_baselink_yawlinkPP               = { 00.0000, 00.0000, 00.0000 };
-  Vector3d v_baselink_yawlinkCP               = { 00.0000, 00.0000, 00.5369 };
+  Vector3d v_baselink_yawlink_pp               = { 00.0000, 00.0000, 00.0000 };
+  Vector3d v_baselink_yawlink_pc               = { 00.0000, 00.0000, 00.5369 };
   //-----------------------------------------------------//
   Vector3d v_yawlink_pitchbacklink_ap          = { 1.0,     0.0,    0.0 };
   Vector3d v_yawlink_pitchbacklink_ac          = { 0.0,     0.0,    1.0 };
-  Vector3d v_yawlink_pitchbacklinkPP          = { 0.0, -0.0000, 0.1624 };
-  Vector3d v_yawlink_pitchbacklinkCP          = { 0.0,     0.0,    0.0 };
+  Vector3d v_yawlink_pitchbacklink_pp          = { 0.0, -0.0000, 0.1624 };
+  Vector3d v_yawlink_pitchbacklink_pc          = { 0.0,     0.0,    0.0 };
 
   Vector3d v_pitchbacklink_pitchbottomlink_ap  = {     0.0,     0.0,     1.0 };
   Vector3d v_pitchbacklink_pitchbottomlink_ac  = {     0.0,     0.0,     1.0 };
-  Vector3d v_pitchbacklink_pitchbottomlinkPP  = { -0.1028, -0.2867,     0.0 };
-  Vector3d v_pitchbacklink_pitchbottomlinkCP  = { -0.0364,  0.0000, -0.0000 };
+  Vector3d v_pitchbacklink_pitchbottomlink_pp  = { -0.1028, -0.2867,     0.0 };
+  Vector3d v_pitchbacklink_pitchbottomlink_pc  = { -0.0364,  0.0000, -0.0000 };
 
   Vector3d v_pitchbottomlink_pitchendlink_ap   = {    0.0,     0.0,     1.0 };
   Vector3d v_pitchbottomlink_pitchendlink_ac   = {    0.0,     0.0,     1.0 };
-  Vector3d v_pitchbottomlink_pitchendlinkPP   = { 0.3401, -0.0000, -0.0000 };
-  Vector3d v_pitchbottomlink_pitchendlinkCP   = {    0.0,     0.0,  0.0000 };
+  Vector3d v_pitchbottomlink_pitchendlink_pp   = { 0.3401, -0.0000, -0.0000 };
+  Vector3d v_pitchbottomlink_pitchendlink_pc   = {    0.0,     0.0,  0.0000 };
   //-----------------------------------------------------//
   Vector3d v_yawlink_pitchfrontlink_ap           = { 1.0,     0.0,    0.0 };
   Vector3d v_yawlink_pitchfrontlink_ac           = { 0.0,     0.0,    1.0 };
-  Vector3d v_yawlink_pitchfrontlinkPP           = { 0.0,     0.0,    0.2 };
-  Vector3d v_yawlink_pitchfrontlinkCP           = { 0.0,     0.0,    0.0 };
+  Vector3d v_yawlink_pitchfrontlink_pp           = { 0.0,     0.0,    0.2 };
+  Vector3d v_yawlink_pitchfrontlink_pc           = { 0.0,     0.0,    0.0 };
 
   Vector3d v_pitchfrontlink_pitchbottomlink_ap   = {     0.0,     0.0,     1.0 };
   Vector3d v_pitchfrontlink_pitchbottomlink_ac   = {     0.0,     0.0,     1.0 };
-  Vector3d v_pitchfrontlink_pitchbottomlinkPP   = { -0.1031, -0.2868,     0.0 };
-  Vector3d v_pitchfrontlink_pitchbottomlinkCP   = { -0.0000, -0.0000, -0.0000 };
+  Vector3d v_pitchfrontlink_pitchbottomlink_pp   = { -0.1031, -0.2868,     0.0 };
+  Vector3d v_pitchfrontlink_pitchbottomlink_pc   = { -0.0000, -0.0000, -0.0000 };
 
   Vector3d v_pitchfrontlink_pitchtoplink_ap  = {     0.0,     0.0,     1.0 };
   Vector3d v_pitchfrontlink_pitchtoplink_ac  = {     0.0,     0.0,     1.0 };
-  Vector3d v_pitchfrontlink_pitchtoplinkPP  = { -0.1084, -0.3242,     0.0 };
-  Vector3d v_pitchfrontlink_pitchtoplinkCP  = { -0.0000, -0.0000, -0.0000 };
+  Vector3d v_pitchfrontlink_pitchtoplink_pp  = { -0.1084, -0.3242,     0.0 };
+  Vector3d v_pitchfrontlink_pitchtoplink_pc  = { -0.0000, -0.0000, -0.0000 };
 
   Vector3d v_pitchtoplink_pitchendlink_ap  = {     0.0,     0.0,     1.0 };
   Vector3d v_pitchtoplink_pitchendlink_ac  = {     0.0,     0.0,     1.0 };
-  Vector3d v_pitchtoplink_pitchendlinkPP  = {  0.3404, -0.0000, -0.000 };
-  Vector3d v_pitchtoplink_pitchendlinkCP  = { -0.0051, -0.0376,  0.000 };
+  Vector3d v_pitchtoplink_pitchendlink_pp  = {  0.3404, -0.0000, -0.000 };
+  Vector3d v_pitchtoplink_pitchendlink_pc  = { -0.0051, -0.0376,  0.000 };
   //-----------------------------------------------------//
   Vector3d v_pitchendlink_maininsertionlink_ap = {     0.0,     1.0,    0.0 };
   Vector3d v_pitchendlink_maininsertionlink_ac = {     1.0,     0.0,    0.0 };
-  Vector3d v_pitchendlink_maininsertionlinkPP = {  0.1031, -0.0961, 0.0000 };
-  Vector3d v_pitchendlink_maininsertionlinkCP = { -0.0108,  -0.062, 0.0000 };
+  Vector3d v_pitchendlink_maininsertionlink_pp = {  0.1031, -0.0961, 0.0000 };
+  Vector3d v_pitchendlink_maininsertionlink_pc = { -0.0108,  -0.062, 0.0000 };
 
   Vector3d v_maininsertionlink_toollink_ap     = {     1.0,     0.0,    0.0 };
   Vector3d v_maininsertionlink_toollink_ac     = {     0.0,     0.0,   -1.0 };
-  Vector3d v_maininsertionlink_toollinkPP     = { -0.0108,  -0.062,    0.0 };
-  Vector3d v_maininsertionlink_toollinkCP     = { -0.0000, -0.0000, 0.0118 };
+  Vector3d v_maininsertionlink_toollink_pp     = { -0.0108,  -0.062,    0.0 };
+  Vector3d v_maininsertionlink_toollink_pc     = { -0.0000, -0.0000, 0.0118 };
   //-----------------------------------------------------//
   const double q_ROOT_baselink_childOffset                  = 0.0;
   const double q_baselink_yawlink_childOffset               = -3.1414;
