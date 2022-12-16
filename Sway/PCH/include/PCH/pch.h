@@ -1,3 +1,6 @@
+#ifndef _PCH_
+#define _PCH_
+
 #include <iostream>
 #include <stdio.h>
 #include <utility>
@@ -21,7 +24,7 @@
 
 #include <rbdl/Body.h>
 #include <rbdl/rbdl_config.h>
-#include <rbdl/rbdl.h>
+#include "rbdl/rbdl.h"
 #include "rbdl/rbdl_mathutils.h"
 #include "rbdl/Body.h"
 #include "rbdl/Logging.h"
@@ -32,5 +35,10 @@
 #include "rbdl/rbdl_errors.h"
 #include "rbdl/rbdl_math.h"
 #include "rbdl/rbdl_utils.h"
+#include "rbdl/rbdl_errors.h"
+#include "rbdl/Quaternion.h"
 
 #include "ambf_client/ambf_client.h"
+
+using namespace RigidBodyDynamics::Math;
+#endif

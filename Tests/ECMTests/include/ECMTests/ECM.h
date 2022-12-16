@@ -1,4 +1,8 @@
+#ifndef _ECM_
+#define _ECM_
+
 #include "rbdl/rbdl.h"
+#include "PCH/pch.h"
 #include "Tests/rbdl_tests.h"
 
 const double TEST_PREC = 1.0e-3;
@@ -483,3 +487,4 @@ struct ECM
 
   RigidBodyDynamics::Math::Vector3d point_position, point_acceleration;
 };
+#endif

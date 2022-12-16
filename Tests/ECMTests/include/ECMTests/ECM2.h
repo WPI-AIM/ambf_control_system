@@ -1,4 +1,8 @@
+#ifndef _ECM2_
+#define _ECM2_
+
 #include "rbdl/rbdl.h"
+#include "PCH/pch.h"
 #include "Tests/rbdl_tests.h"
 
 const double TEST_PREC = 1.0e-3;
@@ -886,3 +890,5 @@ public:
   RigidBodyDynamics::Math::VectorNd QDDot;
   RigidBodyDynamics::Math::VectorNd Tau;
 };
+
+#endif

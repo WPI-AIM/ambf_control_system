@@ -2,6 +2,7 @@
 #define RBDL_RBDL_TESTS_H
 
 #include "PCH/pch.h"
+#include "rbdl/rbdl.h"
 
 using namespace RigidBodyDynamics;
 using namespace RigidBodyDynamics::Math;

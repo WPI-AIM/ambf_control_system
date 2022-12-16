@@ -18,6 +18,7 @@ set(TESTS_HRD_DIR
 
 SET ( TESTS_SOURCE_FILES
   src/main.cc
+  src/Utilities.cpp
   )
 
 
@@ -162,7 +163,7 @@ CXX_STANDARD_REQUIRED YES
 )
 #####End of ECM Test App#############
 
-#####Beginning of ECM Test App#############
+#####Beginning of ECM2 Test App#############
 SET ( ECM2Tests_SOURCE_FILES
   ECMTests/src/ECM2KinematicsTests.cc
 )
@@ -186,4 +187,30 @@ set_target_properties(${ECM2} PROPERTIES
 CXX_STANDARD 20
 CXX_STANDARD_REQUIRED YES
 )
-#####End of ECM Test App#############
+#####End of ECM2 Test App#############
+
+#####Beginning of ECM3 Test App#############
+SET ( ECM3Tests_SOURCE_FILES
+  ECMTests/src/ECM3KinematicsTests.cc
+)
+
+set(ECM3 ECM3_app)
+ADD_EXECUTABLE ( ${ECM3} 
+  ${TESTS_SOURCE_FILES} 
+  ${ECM3Tests_SOURCE_FILES}
+  )
+
+target_include_directories(${ECM3}
+PRIVATE ${TESTS_HRD_DIR} 
+PRIVATE ECMTests/include
+)
+
+target_link_libraries(${ECM3} 
+  ${TESTS_LINK_LIBRARIES}
+)
+
+set_target_properties(${ECM3} PROPERTIES
+CXX_STANDARD 20
+CXX_STANDARD_REQUIRED YES
+)
+#####End of ECM3 Test App#############
