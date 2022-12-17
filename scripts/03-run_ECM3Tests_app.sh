@@ -1,3 +1,3 @@
 #! /bin/bash
 
-../out/bin/ECM3_app
+../out/bin/ECM3Tests_app

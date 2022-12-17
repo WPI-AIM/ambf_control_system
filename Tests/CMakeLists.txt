@@ -168,7 +168,7 @@ SET ( ECM2Tests_SOURCE_FILES
   ECMTests/src/ECM2KinematicsTests.cc
 )
 
-set(ECM2 ECM2_app)
+set(ECM2 ECM2Tests_app)
 ADD_EXECUTABLE ( ${ECM2} 
   ${TESTS_SOURCE_FILES} 
   ${ECM2Tests_SOURCE_FILES}
@@ -194,7 +194,7 @@ SET ( ECM3Tests_SOURCE_FILES
   ECMTests/src/ECM3KinematicsTests.cc
 )
 
-set(ECM3 ECM3_app)
+set(ECM3 ECM3Tests_app)
 ADD_EXECUTABLE ( ${ECM3} 
   ${TESTS_SOURCE_FILES} 
   ${ECM3Tests_SOURCE_FILES}
@@ -214,3 +214,29 @@ CXX_STANDARD 20
 CXX_STANDARD_REQUIRED YES
 )
 #####End of ECM3 Test App#############
+
+#####Beginning of PSM Test App#############
+SET ( PSMTests_SOURCE_FILES
+  PSMTests/src/PSMKinematicsTests.cc
+)
+
+set(PSM PSMTests_app)
+ADD_EXECUTABLE ( ${PSM} 
+  ${TESTS_SOURCE_FILES} 
+  ${PSMTests_SOURCE_FILES}
+  )
+
+target_include_directories(${PSM}
+PRIVATE ${TESTS_HRD_DIR} 
+PRIVATE PSMTests/include
+)
+
+target_link_libraries(${PSM} 
+  ${TESTS_LINK_LIBRARIES}
+)
+
+set_target_properties(${PSM} PROPERTIES
+CXX_STANDARD 20
+CXX_STANDARD_REQUIRED YES
+)
+#####End of PSM Test App#############
