@@ -18,6 +18,7 @@
                 "${workspaceFolder}/../ambf/build/devel/include/*",
                 "/opt/ros/noetic/include/*",
                 "${workspaceFolder}/Tests/ECMTests/include/*",
+                "${workspaceFolder}/Tests/PSMTests/include/*",
                 "/usr/include/*",
                 "/usr/include/linux/*"
             ],

@@ -15,5 +15,11 @@
     "macros.h": "c",
     "ostream": "cpp"
   },
-  "C_Cpp.errorSquiggles": "enabled"
+  "C_Cpp.errorSquiggles": "enabled",
+  "cmake.configureArgs": [
+    "-DCMAKE_CXX_COMPILER=clang++",
+    "-DCMAKE_C_COMPILER=clang", 
+    "-DCMAKE_BUILD_TYPE=Debug",
+    "-DCMAKE_C_STANDARD=90" 
+  ]
 }

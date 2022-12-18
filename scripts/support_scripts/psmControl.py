@@ -151,8 +151,8 @@ for i in range(15):
     # toolpitchlink_joint_angles     = get_all_joint_pos_wrapper(toolpitchlink_handler)
     # toolgripper1link_joint_angles  = get_all_joint_pos_wrapper(toolgripper1link_handler)
     # toolgripper2link_joint_angles  = get_all_joint_pos_wrapper(toolgripper2link_handler)
-    # pitchtoplink_joint_angles      = get_all_joint_pos_wrapper(pitchtoplink_handler)
-    # pitchfrontlink_joint_angles    = get_all_joint_pos_wrapper(pitchfrontlink_handler)
+    pitchfrontlink_joint_angles    = get_all_joint_pos_wrapper(pitchfrontlink_handler)
+    pitchtoplink_joint_angles      = get_all_joint_pos_wrapper(pitchtoplink_handler)
 
     set_joint_pos_wrapper(baselink_handler,               'baselink-yawlink', 0)
     set_joint_pos_wrapper(baselink_handler,          'yawlink-pitchbacklink', 0)
@@ -181,11 +181,11 @@ joint_name_angles = vectors_to_dict(joint_name_angles,
 # joint_name_angles = vectors_to_dict(joint_name_angles, 
 #   get_joint_names_wrapper(pitchendlink_handler), pitchendlink_joint_angles)
 
-# joint_name_angles = vectors_to_dict(joint_name_angles, 
-#   get_joint_names_wrapper(pitchfrontlink_handler), pitchfrontlink_joint_angles)
+joint_name_angles = vectors_to_dict(joint_name_angles, 
+  get_joint_names_wrapper(pitchfrontlink_handler), pitchfrontlink_joint_angles)
 
-# joint_name_angles = vectors_to_dict(joint_name_angles, 
-#   get_joint_names_wrapper(pitchtoplink_handler), pitchtoplink_joint_angles)
+joint_name_angles = vectors_to_dict(joint_name_angles, 
+  get_joint_names_wrapper(pitchtoplink_handler), pitchtoplink_joint_angles)
 
 # joint_name_angles = vectors_to_dict(joint_name_angles, 
 #   get_joint_names_wrapper(maininsertionlink_handler), maininsertionlink_joint_angles)
@@ -196,11 +196,14 @@ joint_name_angles = vectors_to_dict(joint_name_angles,
 print(len(joint_name_angles))
 
 
-joint_order_rbdl = ["baselink-yawlink", "yawlink-pitchbacklink", "pitchbacklink-pitchbottomlink", 
-  "pitchbottomlink-pitchendlink", "pitchendlink-maininsertionlink", "maininsertionlink-toolrolllink", 
+joint_order_rbdl = [
+  "baselink-yawlink", "yawlink-pitchbacklink", "pitchbacklink-pitchbottomlink", "pitchbacklink-pitchtoplink",
+  "pitchtoplink-pitchendlink", 
+  "yawlink-pitchfrontlink", "pitchfrontlink-pitchbottomlink", "pitchbottomlink-pitchendlink", 
+  "pitchendlink-maininsertionlink", "maininsertionlink-toolrolllink", 
   "toolrolllink-toolpitchlink", "toolpitchlink-toolgripper1link", "toolpitchlink-toolgripper2link", 
-  "pitchbacklink-pitchtoplink", "pitchtoplink-pitchendlink", "yawlink-pitchendlink", "yawlink-pitchfrontlink", 
-  "pitchfrontlink-pitchbottomlink" ]
+  ]
+# "yawlink-pitchendlink", 
 
 for body_id in range(len(joint_order_rbdl)):
   rbdl_joint_name = joint_order_rbdl[body_id]
